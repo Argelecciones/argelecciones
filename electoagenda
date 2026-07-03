@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendómetro — @argelecciones</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: #0f172a;
+            color: #f8fafc;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+        }
+
+        /* HEADER */
+        .header {
+            background: #0f172a;
+            border-bottom: 2px solid #1e293b;
+            padding: 18px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .header-title {
+            font-size: 22px;
+            font-weight: 900;
+            color: #f8fafc;
+            letter-spacing: -0.5px;
+        }
+        .header-sub {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+        .header-badge {
+            background: #f59e0b;
+            color: #0f172a;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.05em;
+        }
+
+        /* FILTROS */
+        .filtros {
+            display: flex;
+            gap: 8px;
+            padding: 16px 30px;
+            background: #0f172a;
+            border-bottom: 1px solid #1e293b;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filtro-label {
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-right: 4px;
+        }
+        .filtro-btn {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1.5px solid;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+            background: transparent;
+        }
+        .filtro-btn.todos    { border-color: #475569; color: #94a3b8; }
+        .filtro-btn.nacional { border-color: #3b82f6; color: #3b82f6; }
+        .filtro-btn.provincial { border-color: #a855f7; color: #a855f7; }
+        .filtro-btn.municipal  { border-color: #f59e0b; color: #f59e0b; }
+        .filtro-btn.partidos   { border-color: #10b981; color: #10b981; }
+
+        .filtro-btn.active.todos     { background: #475569; color: #f8fafc; }
+        .filtro-btn.active.nacional  { background: #3b82f6; color: #fff; }
+        .filtro-btn.active.provincial{ background: #a855f7; color: #fff; }
+        .filtro-btn.active.municipal { background: #f59e0b; color: #0f172a; }
+        .filtro-btn.active.partidos  { background: #10b981; color: #0f172a; }
+
+        .filtro-btn:hover { opacity: 0.85; }
+
+        /* ESTADO */
+        .estado-bar {
+            padding: 10px 30px;
+            font-size: 12px;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .estado-dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: #10b981;
+            display: inline-block;
+        }
+        .estado-dot.cargando { background: #f59e0b; animation: pulse 1s infinite; }
+        .estado-dot.error { background: #ef4444; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+        /* CONTENIDO PRINCIPAL */
+        .main {
+            max-width: 820px;
+            margin: 0 auto;
+            padding: 24px 20px 60px;
+        }
+
+        /* GRUPO MES */
+        .mes-grupo { margin-bottom: 40px; }
+        .mes-titulo {
+            font-size: 13px;
+            font-weight: 800;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #1e293b;
+            margin-bottom: 16px;
+        }
+
+        /* EVENTO */
+        .evento {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 14px 0;
+            border-bottom: 1px solid #1e293b;
+            animation: fadeIn 0.3s ease;
+        }
+        .evento:last-child { border-bottom: none; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
+
+        .evento-fecha {
+            min-width: 52px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .evento-dia {
+            font-size: 28px;
+            font-weight: 900;
+            line-height: 1;
+            color: #f8fafc;
+        }
+        .evento-diaNom {
+            font-size: 10px;
+            color: #64748b;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 2px;
+        }
+
+        .evento-linea {
+            width: 3px;
+            align-self: stretch;
+            border-radius: 3px;
+            flex-shrink: 0;
+            min-height: 40px;
+        }
+        .linea-nacional   { background: #3b82f6; }
+        .linea-provincial { background: #a855f7; }
+        .linea-municipal  { background: #f59e0b; }
+        .linea-partidos   { background: #10b981; }
+
+        .evento-cuerpo { flex: 1; }
+        .evento-categoria {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 4px;
+        }
+        .cat-nacional   { color: #3b82f6; }
+        .cat-provincial { color: #a855f7; }
+        .cat-municipal  { color: #f59e0b; }
+        .cat-partidos   { color: #10b981; }
+
+        .evento-descripcion {
+            font-size: 15px;
+            font-weight: 600;
+            color: #f1f5f9;
+            line-height: 1.4;
+        }
+
+        /* VACÍO */
+        .vacio {
+            text-align: center;
+            padding: 60px 20px;
+            color: #475569;
+        }
+        .vacio-icon { font-size: 40px; margin-bottom: 12px; }
+        .vacio-txt { font-size: 15px; }
+
+        /* FOOTER */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 11px;
+            color: #334155;
+            border-top: 1px solid #1e293b;
+        }
+
+        /* ACTUALIZAR */
+        .btn-actualizar {
+            background: #1e293b;
+            color: #94a3b8;
+            border: 1px solid #334155;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+            margin-left: auto;
+        }
+        .btn-actualizar:hover { background: #334155; color: #f8fafc; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-brand">
+        <div>
+            <div class="header-title">📅 Calendómetro</div>
+            <div class="header-sub">Agenda electoral · @argelecciones</div>
+        </div>
+    </div>
+    <span class="header-badge">2026</span>
+</div>
+
+<div class="filtros">
+    <span class="filtro-label">Filtrar:</span>
+    <button class="filtro-btn todos active" onclick="filtrar('todos')">Todos</button>
+    <button class="filtro-btn nacional" onclick="filtrar('Nacional')">🔵 Nacional</button>
+    <button class="filtro-btn provincial" onclick="filtrar('Provincial')">🟣 Provincial</button>
+    <button class="filtro-btn municipal" onclick="filtrar('Municipal')">🟠 Municipal</button>
+    <button class="filtro-btn partidos" onclick="filtrar('Partidos')">🟢 Partidos</button>
+    <button class="btn-actualizar" onclick="cargarDatos()">↻ Actualizar</button>
+</div>
+
+<div class="estado-bar">
+    <span class="estado-dot cargando" id="estadoDot"></span>
+    <span id="estadoTxt">Cargando datos...</span>
+</div>
+
+<div class="main" id="contenido"></div>
+
+<div class="footer">#Calendómetro · Solo para difusión · @argelecciones</div>
+
+<script>
+const CSV_URL = 'https://corsproxy.io/?https://docs.google.com/spreadsheets/d/e/2PACX-1vROFGH_AxsGb_4f2bbNfnyjjWDkh776VxkFk2JMUlq0NaXRVpNa6gu9u_vKi_QGNwurkOaGTIW3Zrj-/pub?gid=1639731372&single=true&output=csv';
+
+
+    const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    const DIAS  = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+
+    let todosLosEventos = [];
+    let filtroActivo = 'todos';
+
+    function parsearFecha(str) {
+        // Acepta dd/mm/aaaa o d/m/aaaa
+        const partes = str.trim().split('/');
+        if (partes.length !== 3) return null;
+        const d = parseInt(partes[0]), m = parseInt(partes[1]) - 1, a = parseInt(partes[2]);
+        if (isNaN(d) || isNaN(m) || isNaN(a)) return null;
+        return new Date(a, m, d);
+    }
+
+    function parsearCSV(texto) {
+        const lineas = texto.trim().split('\n');
+        const eventos = [];
+        // Saltar encabezado (primera línea)
+        for (let i = 1; i < lineas.length; i++) {
+            const cols = lineas[i].split(',');
+            if (cols.length < 3) continue;
+            const fechaStr = cols[0].trim();
+            const descripcion = cols[1].trim();
+            const categoria = cols[2].trim();
+            if (!fechaStr || !descripcion || !categoria) continue;
+            const fecha = parsearFecha(fechaStr);
+            if (!fecha) continue;
+            eventos.push({ fecha, descripcion, categoria, fechaStr });
+        }
+        // Ordenar cronológicamente
+        eventos.sort((a, b) => a.fecha - b.fecha);
+        return eventos;
+    }
+
+    function colorClase(cat) {
+        const c = cat.toLowerCase();
+        if (c === 'nacional')   return 'nacional';
+        if (c === 'provincial') return 'provincial';
+        if (c === 'municipal')  return 'municipal';
+        if (c === 'partidos')   return 'partidos';
+        return 'nacional';
+    }
+
+    function renderizar(eventos) {
+        const contenido = document.getElementById('contenido');
+        if (eventos.length === 0) {
+            contenido.innerHTML = `
+                <div class="vacio">
+                    <div class="vacio-icon">📭</div>
+                    <div class="vacio-txt">No hay eventos para este filtro.</div>
+                </div>`;
+            return;
+        }
+
+        // Agrupar por mes
+        const grupos = {};
+        eventos.forEach(ev => {
+            const key = `${ev.fecha.getFullYear()}-${ev.fecha.getMonth()}`;
+            if (!grupos[key]) grupos[key] = { label: `${MESES[ev.fecha.getMonth()]} ${ev.fecha.getFullYear()}`, eventos: [] };
+            grupos[key].eventos.push(ev);
+        });
+
+        let html = '';
+        Object.values(grupos).forEach(grupo => {
+            html += `<div class="mes-grupo"><div class="mes-titulo">${grupo.label}</div>`;
+            grupo.eventos.forEach(ev => {
+                const cls = colorClase(ev.categoria);
+                const diaNom = DIAS[ev.fecha.getDay()];
+                html += `
+                <div class="evento">
+                    <div class="evento-fecha">
+                        <div class="evento-dia">${ev.fecha.getDate()}</div>
+                        <div class="evento-diaNom">${diaNom}</div>
+                    </div>
+                    <div class="evento-linea linea-${cls}"></div>
+                    <div class="evento-cuerpo">
+                        <div class="evento-categoria cat-${cls}">${ev.categoria}</div>
+                        <div class="evento-descripcion">${ev.descripcion}</div>
+                    </div>
+                </div>`;
+            });
+            html += `</div>`;
+        });
+
+        contenido.innerHTML = html;
+    }
+
+    function filtrar(categoria) {
+        filtroActivo = categoria;
+        // Actualizar botones
+        document.querySelectorAll('.filtro-btn').forEach(btn => btn.classList.remove('active'));
+        if (categoria === 'todos') {
+            document.querySelector('.filtro-btn.todos').classList.add('active');
+            renderizar(todosLosEventos);
+        } else {
+            const cls = categoria.toLowerCase();
+            document.querySelector(`.filtro-btn.${cls}`)?.classList.add('active');
+            renderizar(todosLosEventos.filter(ev => ev.categoria.toLowerCase() === cls));
+        }
+    }
+
+    async function cargarDatos() {
+        const dot = document.getElementById('estadoDot');
+        const txt = document.getElementById('estadoTxt');
+        dot.className = 'estado-dot cargando';
+        txt.textContent = 'Actualizando desde Google Sheets...';
+
+        try {
+            const resp = await fetch(CSV_URL);
+            if (!resp.ok) throw new Error('Error al conectar con Google Sheets');
+            const csv = await resp.text();
+            todosLosEventos = parsearCSV(csv);
+
+            dot.className = 'estado-dot';
+            const ahora = new Date().toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'});
+            txt.textContent = `${todosLosEventos.length} eventos cargados · Actualizado ${ahora}`;
+
+            filtrar(filtroActivo);
+        } catch (err) {
+            dot.className = 'estado-dot error';
+            txt.textContent = `Error: ${err.message}. Verificá que el Sheets esté publicado.`;
+            document.getElementById('contenido').innerHTML = `
+                <div class="vacio">
+                    <div class="vacio-icon">⚠️</div>
+                    <div class="vacio-txt">No se pudieron cargar los datos.<br>Revisá que la hoja APP esté publicada como CSV.</div>
+                </div>`;
+        }
+    }
+
+    // Cargar al inicio
+    cargarDatos();
+</script>
+</body>
+</html>
