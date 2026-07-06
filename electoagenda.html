@@ -273,13 +273,12 @@ function parseCSV(txt){
   const lines = txt.trim().split('\n');
   const res = [];
   for(let i=1;i<lines.length;i++){
-    // Manejo básico de CSV (sin comas dentro de campos por ahora)
-    const cols = lines[i].split(',');
+    const cols = lines[i].split(/,|\t/);
     if(cols.length < 3) continue;
     const fecha = parseFecha(cols[0]);
-    const descripcion = (cols[1]||'').trim();
-    const categoria = (cols[2]||'').trim();
-    const provincia = (cols[3]||'').trim();
+    const descripcion = (cols[1]||'').trim().replace(/^"|"$/g,'');
+    const categoria = (cols[2]||'').trim().replace(/^"|"$/g,'');
+    const provincia = (cols[3]||'').trim().replace(/^"|"$/g,'');
     const destacado = (cols[4]||'').trim().toLowerCase() === 'si';
     if(!fecha||!descripcion||!categoria) continue;
     res.push({fecha, descripcion, categoria, provincia, destacado});
@@ -287,7 +286,6 @@ function parseCSV(txt){
   res.sort((a,b)=>a.fecha-b.fecha);
   return res;
 }
-
 function diasHasta(f){
   return Math.round((f - hoy)/(1000*60*60*24));
 }
