@@ -251,7 +251,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 <div class="footer">#ElectoAgenda · Solo para difusión · @argelecciones</div>
 
 <script>
-const CSV_URL = 'https://api.allorigins.win/raw?url=https://docs.google.com/spreadsheets/d/e/2PACX-1vROFGH_AxsGb_4f2bbNfnyjjWDkh776VxkFk2JMUlq0NaXRVpNa6gu9u_vKi_QGNwurkOaGTIW3Zrj-/pub?gid=1639731372&single=true&output=csv';
+const CSV_URL = 'https://script.google.com/macros/s/AKfycbzNeoVgpRk3Luck2mPhe86zJqkRssY7zQGAeQ-AmawGn3HJGlKeprxC3dNcp52dSCbZ/exec';
 
 const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const DIAS  = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
@@ -408,9 +408,9 @@ async function cargar(){
 
   try {
     const r = await fetch(CSV_URL);
+if(!r.ok) throw new Error('No se pudo conectar con Google Sheets');
+const csv = await r.text();
     if(!r.ok) throw new Error('No se pudo conectar con Google Sheets');
-    const csv = await r.text();
-    console.log(csv.substring(0, 500));
     eventos = parseCSV(csv);
     dot.className = 'dot ok';
     const hora = new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
