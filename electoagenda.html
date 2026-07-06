@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ElectoAgenda — @argelecciones</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b1220;
+  --surface:#111827;
+  --border:#1e2d45;
+  --text:#f0f4ff;
+  --muted:#4a5878;
+  --subtle:#1a2540;
+  --nacional:#3b82f6;
+  --provincial:#a855f7;
+  --municipal:#f59e0b;
+  --partidos:#10b981;
+  --destacado:#f43f5e;
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+
+/* HEADER */
+.header{
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:16px 24px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+}
+.header-left{display:flex;align-items:center;gap:14px}
+.header-title{font-size:20px;font-weight:900;letter-spacing:-0.3px}
+.header-title span{color:var(--destacado)}
+.header-tag{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-top:2px}
+.header-right{display:flex;align-items:center;gap:10px}
+.btn-refresh{
+  background:var(--subtle);border:1px solid var(--border);
+  color:var(--muted);padding:6px 12px;border-radius:6px;
+  font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;
+  display:flex;align-items:center;gap:5px;
+}
+.btn-refresh:hover{color:var(--text);border-color:var(--muted)}
+.spin{display:inline-block;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* PRÓXIMO DESTACADO */
+.proximo-banner{
+  background:linear-gradient(135deg,#1a0a14 0%,#2d0f20 100%);
+  border-bottom:1px solid #3d1525;
+  padding:14px 24px;
+  display:none;
+  align-items:center;gap:16px;
+}
+.proximo-banner.visible{display:flex}
+.proximo-etiqueta{
+  background:var(--destacado);color:#fff;
+  font-size:9px;font-weight:900;text-transform:uppercase;
+  letter-spacing:0.1em;padding:3px 8px;border-radius:3px;
+  white-space:nowrap;flex-shrink:0;
+}
+.proximo-dias{
+  font-size:28px;font-weight:900;color:var(--destacado);
+  line-height:1;flex-shrink:0;min-width:50px;text-align:right;
+}
+.proximo-label{font-size:10px;color:#f43f5e88;font-weight:700;text-align:right;margin-top:1px}
+.proximo-sep{width:1px;height:36px;background:#3d1525;flex-shrink:0}
+.proximo-desc{font-size:14px;font-weight:700;color:#fecdd3;line-height:1.3}
+.proximo-fecha{font-size:11px;color:#f43f5e88;margin-top:3px;font-weight:600}
+
+/* BUSCADOR Y FILTROS */
+.toolbar{
+  padding:12px 24px;
+  background:var(--bg);
+  border-bottom:1px solid var(--border);
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+}
+.buscador{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:6px;padding:7px 12px;color:var(--text);
+  font-size:13px;width:220px;outline:none;
+  transition:border-color .15s;
+}
+.buscador:focus{border-color:var(--muted)}
+.buscador::placeholder{color:var(--muted)}
+.filtros{display:flex;gap:6px;flex-wrap:wrap}
+.filtro{
+  padding:5px 12px;border-radius:20px;border:1.5px solid;
+  font-size:11px;font-weight:800;cursor:pointer;
+  transition:all .15s;background:transparent;letter-spacing:0.03em;
+}
+.filtro.f-todos   {border-color:var(--muted);color:var(--muted)}
+.filtro.f-nacional{border-color:var(--nacional);color:var(--nacional)}
+.filtro.f-provincial{border-color:var(--provincial);color:var(--provincial)}
+.filtro.f-municipal{border-color:var(--municipal);color:var(--municipal)}
+.filtro.f-partidos{border-color:var(--partidos);color:var(--partidos)}
+.filtro.f-destacado{border-color:var(--destacado);color:var(--destacado)}
+.filtro.active.f-todos   {background:var(--muted);color:#fff}
+.filtro.active.f-nacional{background:var(--nacional);color:#fff}
+.filtro.active.f-provincial{background:var(--provincial);color:#fff}
+.filtro.active.f-municipal{background:var(--municipal);color:#0f172a}
+.filtro.active.f-partidos{background:var(--partidos);color:#0f172a}
+.filtro.active.f-destacado{background:var(--destacado);color:#fff}
+.filtro:hover{opacity:.8}
+
+/* STATUS */
+.status{
+  padding:8px 24px;font-size:11px;color:var(--muted);
+  display:flex;align-items:center;gap:7px;border-bottom:1px solid var(--border);
+}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.dot.ok{background:var(--partidos)}
+.dot.loading{background:var(--municipal);animation:blink 1s infinite}
+.dot.error{background:var(--destacado)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* MAIN */
+.main{max-width:780px;margin:0 auto;padding:20px 20px 60px}
+
+/* MES */
+.mes-bloque{margin-bottom:36px}
+.mes-header{
+  display:flex;align-items:center;gap:12px;
+  padding-bottom:10px;border-bottom:1px solid var(--border);
+  margin-bottom:14px;
+}
+.mes-nombre{font-size:12px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:0.12em}
+.mes-count{
+  font-size:10px;font-weight:700;color:var(--muted);
+  background:var(--subtle);padding:2px 7px;border-radius:10px;
+}
+
+/* EVENTO */
+.evento{
+  display:grid;
+  grid-template-columns:52px 3px 1fr;
+  gap:0 14px;
+  padding:12px 0;
+  border-bottom:1px solid var(--border);
+  align-items:start;
+  transition:opacity .2s;
+}
+.evento:last-child{border-bottom:none}
+.evento.pasado{opacity:.38}
+.evento.destacado-ev .evento-desc{color:#fecdd3}
+
+.evento-num{text-align:center}
+.evento-dia{font-size:26px;font-weight:900;line-height:1;color:var(--text)}
+.evento-diaNom{font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:1px}
+.evento.pasado .evento-dia{color:var(--muted)}
+
+.evento-barra{border-radius:3px;align-self:stretch;min-height:36px}
+.barra-nacional  {background:var(--nacional)}
+.barra-provincial{background:var(--provincial)}
+.barra-municipal {background:var(--municipal)}
+.barra-partidos  {background:var(--partidos)}
+.barra-destacado {background:var(--destacado)}
+
+.evento-body{}
+.evento-top{display:flex;align-items:center;gap:7px;margin-bottom:4px;flex-wrap:wrap}
+.evento-cat{
+  font-size:9px;font-weight:900;text-transform:uppercase;
+  letter-spacing:.08em;
+}
+.cat-nacional  {color:var(--nacional)}
+.cat-provincial{color:var(--provincial)}
+.cat-municipal {color:var(--municipal)}
+.cat-partidos  {color:var(--partidos)}
+.cat-destacado {color:var(--destacado)}
+
+.evento-badge-dest{
+  background:var(--destacado);color:#fff;
+  font-size:8px;font-weight:900;padding:1px 6px;border-radius:2px;
+  text-transform:uppercase;letter-spacing:.05em;
+}
+.evento-badge-pasado{
+  background:var(--subtle);color:var(--muted);
+  font-size:8px;font-weight:700;padding:1px 6px;border-radius:2px;
+}
+.evento-dias-restantes{
+  font-size:9px;font-weight:800;color:var(--destacado);
+  margin-left:auto;white-space:nowrap;
+}
+.evento-dias-restantes.cerca{color:#fb923c}
+
+.evento-desc{font-size:14px;font-weight:600;color:var(--text);line-height:1.4}
+.evento-prov{font-size:11px;color:var(--muted);margin-top:3px;font-weight:600}
+
+/* VACÍO */
+.vacio{text-align:center;padding:60px 20px;color:var(--muted)}
+.vacio-icon{font-size:36px;margin-bottom:10px}
+.vacio-txt{font-size:14px}
+
+/* FOOTER */
+.footer{
+  text-align:center;padding:16px;
+  font-size:10px;color:var(--muted);
+  border-top:1px solid var(--border);
+  letter-spacing:.05em;text-transform:uppercase;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div>
+      <div class="header-title">Electo<span>Agenda</span></div>
+      <div class="header-tag">Agenda electoral · @argelecciones</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <button class="btn-refresh" onclick="cargar()" id="btnRefresh">
+      <span id="refreshIcon">↻</span> Actualizar
+    </button>
+  </div>
+</div>
+
+<div class="proximo-banner" id="proximoBanner">
+  <div class="proximo-etiqueta">Próximo evento</div>
+  <div>
+    <div class="proximo-dias" id="proximoDias">—</div>
+    <div class="proximo-label">días</div>
+  </div>
+  <div class="proximo-sep"></div>
+  <div>
+    <div class="proximo-desc" id="proximoDesc">—</div>
+    <div class="proximo-fecha" id="proximoFecha">—</div>
+  </div>
+</div>
+
+<div class="toolbar">
+  <input class="buscador" type="text" placeholder="🔍 Buscar evento..." id="buscador" oninput="renderizar()">
+  <div class="filtros">
+    <button class="filtro f-todos active" onclick="setFiltro('todos')">Todos</button>
+    <button class="filtro f-nacional" onclick="setFiltro('nacional')">🔵 Nacional</button>
+    <button class="filtro f-provincial" onclick="setFiltro('provincial')">🟣 Provincial</button>
+    <button class="filtro f-municipal" onclick="setFiltro('municipal')">🟠 Municipal</button>
+    <button class="filtro f-partidos" onclick="setFiltro('partidos')">🟢 Partidos</button>
+    <button class="filtro f-destacado" onclick="setFiltro('destacado')">⭐ Destacados</button>
+  </div>
+</div>
+
+<div class="status">
+  <span class="dot loading" id="statusDot"></span>
+  <span id="statusTxt">Cargando desde Google Sheets...</span>
+</div>
+
+<div class="main" id="main"></div>
+
+<div class="footer">#ElectoAgenda · Solo para difusión · @argelecciones</div>
+
+<script>
+const CSV_URL = 'https://corsproxy.io/?https://docs.google.com/spreadsheets/d/e/2PACX-1vROFGH_AxsGb_4f2bbNfnyjjWDkh776VxkFk2JMUlq0NaXRVpNa6gu9u_vKi_QGNwurkOaGTIW3Zrj-/pub?gid=1639731372&single=true&output=csv';
+
+const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const DIAS  = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+
+let eventos = [];
+let filtro = 'todos';
+const hoy = new Date(); hoy.setHours(0,0,0,0);
+
+function parseFecha(s){
+  const p = s.trim().split('/');
+  if(p.length!==3) return null;
+  const d=parseInt(p[0]),m=parseInt(p[1])-1,a=parseInt(p[2]);
+  if(isNaN(d)||isNaN(m)||isNaN(a)) return null;
+  const f = new Date(a,m,d); f.setHours(0,0,0,0);
+  return f;
+}
+
+function parseCSV(txt){
+  const lines = txt.trim().split('\n');
+  const res = [];
+  for(let i=1;i<lines.length;i++){
+    // Manejo básico de CSV (sin comas dentro de campos por ahora)
+    const cols = lines[i].split(',');
+    if(cols.length < 3) continue;
+    const fecha = parseFecha(cols[0]);
+    const descripcion = (cols[1]||'').trim();
+    const categoria = (cols[2]||'').trim();
+    const provincia = (cols[3]||'').trim();
+    const destacado = (cols[4]||'').trim().toLowerCase() === 'si';
+    if(!fecha||!descripcion||!categoria) continue;
+    res.push({fecha, descripcion, categoria, provincia, destacado});
+  }
+  res.sort((a,b)=>a.fecha-b.fecha);
+  return res;
+}
+
+function diasHasta(f){
+  return Math.round((f - hoy)/(1000*60*60*24));
+}
+
+function catKey(cat){
+  const c = cat.toLowerCase();
+  if(c.includes('nacion')) return 'nacional';
+  if(c.includes('provin')) return 'provincial';
+  if(c.includes('munici')) return 'municipal';
+  if(c.includes('partido')) return 'partidos';
+  return 'nacional';
+}
+
+function actualizarBannerProximo(){
+  const futuros = eventos.filter(e => e.fecha >= hoy);
+  const banner = document.getElementById('proximoBanner');
+  if(!futuros.length){ banner.classList.remove('visible'); return; }
+  const prox = futuros[0];
+  const dias = diasHasta(prox.fecha);
+  document.getElementById('proximoDias').textContent = dias === 0 ? '¡HOY!' : dias;
+  document.getElementById('proximoDesc').textContent = prox.descripcion;
+  const fechaStr = `${DIAS[prox.fecha.getDay()]} ${prox.fecha.getDate()} de ${MESES[prox.fecha.getMonth()]} de ${prox.fecha.getFullYear()}`;
+  document.getElementById('proximoFecha').textContent = fechaStr + (prox.provincia ? ` · ${prox.provincia}` : '');
+  banner.classList.add('visible');
+}
+
+function setFiltro(f){
+  filtro = f;
+  document.querySelectorAll('.filtro').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.filtro.f-${f}`)?.classList.add('active');
+  renderizar();
+}
+
+function renderizar(){
+  const busq = document.getElementById('buscador').value.toLowerCase().trim();
+  let lista = eventos;
+
+  if(filtro === 'destacado') lista = lista.filter(e => e.destacado);
+  else if(filtro !== 'todos') lista = lista.filter(e => catKey(e.categoria) === filtro);
+
+  if(busq) lista = lista.filter(e =>
+    e.descripcion.toLowerCase().includes(busq) ||
+    e.categoria.toLowerCase().includes(busq) ||
+    (e.provincia||'').toLowerCase().includes(busq)
+  );
+
+  const main = document.getElementById('main');
+  if(!lista.length){
+    main.innerHTML = `<div class="vacio"><div class="vacio-icon">📭</div><div class="vacio-txt">No hay eventos para este filtro.</div></div>`;
+    return;
+  }
+
+  // Agrupar por mes
+  const grupos = {};
+  lista.forEach(ev => {
+    const key = `${ev.fecha.getFullYear()}-${String(ev.fecha.getMonth()).padStart(2,'0')}`;
+    if(!grupos[key]) grupos[key] = {label:`${MESES[ev.fecha.getMonth()]} ${ev.fecha.getFullYear()}`, evs:[]};
+    grupos[key].evs.push(ev);
+  });
+
+  let html = '';
+  Object.values(grupos).forEach(g => {
+    html += `<div class="mes-bloque">
+      <div class="mes-header">
+        <div class="mes-nombre">${g.label}</div>
+        <div class="mes-count">${g.evs.length} evento${g.evs.length>1?'s':''}</div>
+      </div>`;
+
+    g.evs.forEach(ev => {
+      const pasado = ev.fecha < hoy;
+      const dias = diasHasta(ev.fecha);
+      const ck = catKey(ev.categoria);
+      const barraClass = ev.destacado ? 'barra-destacado' : `barra-${ck}`;
+      const catClass = ev.destacado ? 'cat-destacado' : `cat-${ck}`;
+      const diaNom = DIAS[ev.fecha.getDay()];
+
+      let badges = '';
+      if(ev.destacado && !pasado) badges += `<span class="evento-badge-dest">⭐ Clave</span>`;
+      if(pasado) badges += `<span class="evento-badge-pasado">Realizado</span>`;
+
+      let diasRestTxt = '';
+      if(!pasado && dias <= 30) {
+        const cls = dias <= 7 ? 'cerca' : '';
+        diasRestTxt = `<span class="evento-dias-restantes ${cls}">${dias === 0 ? '¡Hoy!' : `Faltan ${dias}d`}</span>`;
+      }
+
+      html += `
+      <div class="evento${pasado?' pasado':''}${ev.destacado?' destacado-ev':''}">
+        <div class="evento-num">
+          <div class="evento-dia">${ev.fecha.getDate()}</div>
+          <div class="evento-diaNom">${diaNom}</div>
+        </div>
+        <div class="evento-barra ${barraClass}"></div>
+        <div class="evento-body">
+          <div class="evento-top">
+            <span class="evento-cat ${catClass}">${ev.categoria}</span>
+            ${badges}
+            ${diasRestTxt}
+          </div>
+          <div class="evento-desc">${ev.descripcion}</div>
+          ${ev.provincia ? `<div class="evento-prov">📍 ${ev.provincia}</div>` : ''}
+        </div>
+      </div>`;
+    });
+
+    html += `</div>`;
+  });
+
+  main.innerHTML = html;
+}
+
+async function cargar(){
+  const dot = document.getElementById('statusDot');
+  const txt = document.getElementById('statusTxt');
+  const icon = document.getElementById('refreshIcon');
+  dot.className = 'dot loading';
+  txt.textContent = 'Actualizando desde Google Sheets...';
+  icon.className = 'spin';
+  icon.textContent = '↻';
+
+  try {
+    const r = await fetch(CSV_URL);
+    if(!r.ok) throw new Error('No se pudo conectar con Google Sheets');
+    const csv = await r.text();
+    eventos = parseCSV(csv);
+    dot.className = 'dot ok';
+    const hora = new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+    txt.textContent = `${eventos.length} eventos cargados · ${hora}`;
+    actualizarBannerProximo();
+    renderizar();
+  } catch(e) {
+    dot.className = 'dot error';
+    txt.textContent = `Error: ${e.message}`;
+    document.getElementById('main').innerHTML = `
+      <div class="vacio">
+        <div class="vacio-icon">⚠️</div>
+        <div class="vacio-txt">No se pudieron cargar los datos.<br>Verificá que la hoja APP esté publicada como CSV.</div>
+      </div>`;
+  } finally {
+    icon.className = '';
+    icon.textContent = '↻';
+  }
+}
+
+cargar();
+</script>
+</body>
+</html>
