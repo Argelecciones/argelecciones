@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ElectoAgenda — @argelecciones</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b1220;--surface:#111827;--border:#1e2d45;--text:#f0f4ff;
+  --muted:#4a5878;--subtle:#1a2540;
+  --nacional:#3b82f6;--provincial:#a855f7;--municipal:#f59e0b;
+  --partidos:#10b981;--destacado:#f43f5e;
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+
+/* HEADER */
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.header-left{display:flex;align-items:center;gap:14px}
+.header-title{font-size:20px;font-weight:900;letter-spacing:-0.3px}
+.header-title span{color:var(--destacado)}
+.header-tag{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-top:2px}
+.header-right{display:flex;align-items:center;gap:8px}
+.btn-header{background:#1e293b;border:1px solid #334155;color:#94a3b8;padding:6px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px;}
+.btn-header:hover{color:var(--text);border-color:var(--muted)}
+.btn-header.active{background:var(--destacado);border-color:var(--destacado);color:#fff}
+.spin{display:inline-block;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* BANNER PRÓXIMO */
+.proximo-banner{background:linear-gradient(135deg,#1a0a14 0%,#2d0f20 100%);border-bottom:1px solid #3d1525;padding:14px 24px;display:none;align-items:center;gap:16px;}
+.proximo-banner.visible{display:flex}
+.proximo-etiqueta{background:var(--destacado);color:#fff;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;padding:3px 8px;border-radius:3px;white-space:nowrap;flex-shrink:0;}
+.proximo-dias{font-size:28px;font-weight:900;color:var(--destacado);line-height:1;flex-shrink:0;min-width:50px;text-align:right;}
+.proximo-label{font-size:10px;color:#f43f5e88;font-weight:700;text-align:right;margin-top:1px}
+.proximo-sep{width:1px;height:36px;background:#3d1525;flex-shrink:0}
+.proximo-desc{font-size:14px;font-weight:700;color:#fecdd3;line-height:1.3}
+.proximo-fecha{font-size:11px;color:#f43f5e88;margin-top:3px;font-weight:600}
+
+/* TOOLBAR */
+.toolbar{padding:12px 24px;background:var(--bg);border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.buscador{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:7px 12px;color:var(--text);font-size:13px;width:200px;outline:none;transition:border-color .15s;}
+.buscador:focus{border-color:var(--muted)}
+.buscador::placeholder{color:var(--muted)}
+.filtros{display:flex;gap:6px;flex-wrap:wrap}
+.filtro{padding:5px 12px;border-radius:20px;border:1.5px solid;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s;background:transparent;letter-spacing:0.03em;}
+.filtro.f-todos{border-color:var(--muted);color:var(--muted)}
+.filtro.f-nacional{border-color:var(--nacional);color:var(--nacional)}
+.filtro.f-provincial{border-color:var(--provincial);color:var(--provincial)}
+.filtro.f-municipal{border-color:var(--municipal);color:var(--municipal)}
+.filtro.f-partidos{border-color:var(--partidos);color:var(--partidos)}
+.filtro.f-destacado{border-color:var(--destacado);color:var(--destacado)}
+.filtro.active.f-todos{background:var(--muted);color:#fff}
+.filtro.active.f-nacional{background:var(--nacional);color:#fff}
+.filtro.active.f-provincial{background:var(--provincial);color:#fff}
+.filtro.active.f-municipal{background:var(--municipal);color:#0f172a}
+.filtro.active.f-partidos{background:var(--partidos);color:#0f172a}
+.filtro.active.f-destacado{background:var(--destacado);color:#fff}
+.filtro:hover{opacity:.8}
+
+/* STATUS */
+.status{padding:8px 24px;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:7px;border-bottom:1px solid var(--border);}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.dot.ok{background:var(--partidos)}
+.dot.loading{background:var(--municipal);animation:blink 1s infinite}
+.dot.error{background:var(--destacado)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* MAIN */
+.main{max-width:780px;margin:0 auto;padding:20px 20px 60px}
+
+/* ====== VISTA LISTA ====== */
+.mes-bloque{margin-bottom:36px}
+.mes-header{display:flex;align-items:center;gap:12px;padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:14px;}
+.mes-nombre{font-size:12px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:0.12em}
+.mes-count{font-size:10px;font-weight:700;color:var(--muted);background:var(--subtle);padding:2px 7px;border-radius:10px;}
+.evento{display:grid;grid-template-columns:52px 3px 1fr;gap:0 14px;padding:12px 0;border-bottom:1px solid var(--border);align-items:start;transition:opacity .2s;}
+.evento:last-child{border-bottom:none}
+.evento.pasado{opacity:.38}
+.evento.destacado-ev .evento-desc{color:#fecdd3}
+.evento-num{text-align:center}
+.evento-dia{font-size:26px;font-weight:900;line-height:1;color:var(--text)}
+.evento-diaNom{font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:1px}
+.evento.pasado .evento-dia{color:var(--muted)}
+.evento-barra{border-radius:3px;align-self:stretch;min-height:36px}
+.barra-nacional{background:var(--nacional)}
+.barra-provincial{background:var(--provincial)}
+.barra-municipal{background:var(--municipal)}
+.barra-partidos{background:var(--partidos)}
+.barra-destacado{background:var(--destacado)}
+.evento-top{display:flex;align-items:center;gap:7px;margin-bottom:4px;flex-wrap:wrap}
+.evento-cat{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;}
+.cat-nacional{color:var(--nacional)}.cat-provincial{color:var(--provincial)}.cat-municipal{color:var(--municipal)}.cat-partidos{color:var(--partidos)}.cat-destacado{color:var(--destacado)}
+.evento-badge-dest{background:var(--destacado);color:#fff;font-size:8px;font-weight:900;padding:1px 6px;border-radius:2px;text-transform:uppercase;letter-spacing:.05em;}
+.evento-badge-pasado{background:var(--subtle);color:var(--muted);font-size:8px;font-weight:700;padding:1px 6px;border-radius:2px;}
+.evento-dias-restantes{font-size:9px;font-weight:800;color:var(--destacado);margin-left:auto;white-space:nowrap;}
+.evento-dias-restantes.cerca{color:#fb923c}
+.evento-desc{font-size:14px;font-weight:600;color:var(--text);line-height:1.4}
+.evento-prov{font-size:11px;color:var(--muted);margin-top:3px;font-weight:600}
+
+/* ====== VISTA CALENDARIO ====== */
+#vistaCalendario{display:none}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;padding:16px 0 12px;max-width:780px;margin:0 auto;}
+.cal-mes-titulo{font-size:16px;font-weight:900;color:var(--text);text-transform:uppercase;letter-spacing:.08em}
+.btn-cal-nav{background:var(--subtle);border:1px solid var(--border);color:var(--muted);width:34px;height:34px;border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.btn-cal-nav:hover{color:var(--text);border-color:var(--muted)}
+.cal-grid{max-width:780px;margin:0 auto 16px;}
+.cal-dias-semana{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px;}
+.cal-dia-sem{text-align:center;font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:4px 0;}
+.cal-celdas{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.cal-celda{background:var(--surface);border:1px solid var(--border);border-radius:8px;min-height:100px;padding:8px;cursor:default;transition:border-color .15s;position:relative;}
+.cal-celda.otro-mes{opacity:.25}
+.cal-celda.hoy-cel{border-color:var(--muted)}
+.cal-celda.tiene-eventos{cursor:pointer}
+.cal-celda.tiene-eventos:hover{border-color:var(--muted)}
+.cal-num{font-size:15px;font-weight:900;color:var(--muted);margin-bottom:5px}
+.cal-celda.hoy-cel .cal-num{color:var(--text)}
+.cal-punto{border-radius:4px;margin-bottom:3px;font-size:11px;font-weight:700;color:#fff;padding:2px 6px;line-height:1.3;overflow:hidden;white-space:normal;word-break:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.cal-punto.nacional{background:var(--nacional)}
+.cal-punto.provincial{background:var(--provincial)}
+.cal-punto.municipal{background:var(--municipal)}
+.cal-punto.partidos{background:var(--partidos)}
+.cal-punto.destacado{background:var(--destacado)}
+.cal-mas{font-size:8px;color:var(--muted);font-weight:700;margin-top:2px}
+
+/* PANEL DETALLE CALENDARIO */
+.cal-detalle{max-width:780px;margin:0 auto 20px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;display:none;}
+.cal-detalle.visible{display:block}
+.cal-detalle-titulo{font-size:12px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;}
+.cal-detalle-evento{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+.cal-detalle-evento:last-child{border-bottom:none}
+.cal-det-barra{width:3px;height:36px;border-radius:2px;flex-shrink:0}
+.cal-det-cat{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px}
+.cal-det-desc{font-size:13px;font-weight:600;color:var(--text)}
+.cal-det-prov{font-size:10px;color:var(--muted);margin-top:2px}
+
+/* BOTÓN DESCARGA PLACA */
+.cal-descarga-row{max-width:780px;margin:0 auto 20px;display:flex;justify-content:flex-end;gap:8px;}
+.btn-descarga{background:var(--destacado);color:#fff;border:none;padding:8px 18px;border-radius:6px;font-size:12px;font-weight:800;cursor:pointer;transition:opacity .15s;}
+.btn-descarga:hover{opacity:.85}
+.btn-descarga.secundario{background:var(--subtle);border:1px solid var(--border);color:var(--muted);}
+.btn-descarga.secundario:hover{color:var(--text);opacity:1}
+
+/* PLACA EXPORTABLE (oculta, 1920x1080) */
+#placaCalendario{
+  position:fixed;left:-9999px;top:0;
+  width:1920px;height:1080px;
+  background:#0b1220;
+  font-family:'Segoe UI',system-ui,sans-serif;
+  padding:60px 70px;box-sizing:border-box;
+  display:flex;flex-direction:column;gap:30px;
+  color:#f0f4ff;
+}
+.placa-header-cal{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #1e2d45;padding-bottom:28px;}
+.placa-titulo-cal{font-size:80px;font-weight:900;letter-spacing:-1px;line-height:1}
+.placa-titulo-cal span{color:#f43f5e}
+.placa-subtitulo-cal{font-size:26px;color:#4a5878;font-weight:700;margin-top:8px}
+.placa-mes-cal{font-size:40px;font-weight:900;color:#f0f4ff;text-align:right}
+.placa-año-cal{font-size:22px;color:#4a5878;font-weight:700;text-align:right;margin-top:4px}
+.placa-grid-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;flex:1}
+.placa-diaSem{text-align:center;font-size:16px;font-weight:900;color:#4a5878;text-transform:uppercase;letter-spacing:.08em;padding:8px 0;}
+.placa-celda-cal{background:#111827;border:1px solid #1e2d45;border-radius:8px;padding:10px;min-height:110px;display:flex;flex-direction:column;gap:4px;}
+.placa-celda-cal.otro-mes-p{opacity:.2}
+.placa-celda-cal.hoy-p{border-color:#4a5878}
+.placa-num-cal{font-size:18px;font-weight:900;color:#4a5878;margin-bottom:4px}
+.placa-celda-cal.hoy-p .placa-num-cal{color:#f0f4ff}
+.placa-ev-cal{font-size:21px;font-weight:700;color:#fff;padding:2px 5px;border-radius:3px;white-space:normal;word-break:break-word;line-height:1.3;}
+.placa-footer-cal{display:flex;justify-content:space-between;align-items:center;border-top:1px solid #1e2d45;padding-top:16px;}
+.placa-footer-txt{font-size:18px;color:#4a5878;font-weight:700}
+
+/* MODAL PREVISUALIZACIÓN */
+.gallery-modal{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(11,18,32,0.96);display:none;justify-content:center;align-items:center;z-index:10000;padding:30px;cursor:zoom-out;}
+.gallery-content-wrapper{position:relative;max-width:92%;max-height:90%;display:flex;flex-direction:column;align-items:center;}
+.gallery-image{width:100%;height:auto;max-height:82vh;object-fit:contain;border-radius:12px;box-shadow:0 20px 50px rgba(0,0,0,0.6);border:1px solid #334155;cursor:default;}
+.gallery-close-btn{position:absolute;top:-50px;right:0;background:transparent;border:none;color:#f0f4ff;font-size:38px;font-weight:700;cursor:pointer;transition:color .2s;}
+.gallery-close-btn:hover{color:#f43f5e}
+.gallery-caption{color:#94a3b8;font-size:13px;font-weight:600;margin-top:15px;text-transform:uppercase;letter-spacing:.05em;}
+/* VACÍO */
+.vacio{text-align:center;padding:60px 20px;color:var(--muted)}
+.vacio-icon{font-size:36px;margin-bottom:10px}
+.vacio-txt{font-size:14px}
+
+/* FOOTER */
+.footer{text-align:center;padding:16px;font-size:10px;color:var(--muted);border-top:1px solid var(--border);letter-spacing:.05em;text-transform:uppercase;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <img src="logo.png" alt="Logo ArgElecciones" style="height:44px;width:auto;">
+    <div>
+      <div class="header-title">Electo<span>Agenda</span></div>
+      <div class="header-tag">Agenda electoral · @argelecciones</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <button class="btn-header" id="btnLista" onclick="setVista('lista')">☰ Lista</button>
+    <button class="btn-header" id="btnCal" onclick="setVista('calendario')">📅 Calendario</button>
+    <button class="btn-header" onclick="cargar()" id="btnRefresh">
+      <span id="refreshIcon">↻</span> Actualizar
+    </button>
+  </div>
+</div>
+
+<div class="proximo-banner" id="proximoBanner">
+  <div class="proximo-etiqueta">Próximo evento</div>
+  <div>
+    <div class="proximo-dias" id="proximoDias">—</div>
+    <div class="proximo-label">días</div>
+  </div>
+  <div class="proximo-sep"></div>
+  <div>
+    <div class="proximo-desc" id="proximoDesc">—</div>
+    <div class="proximo-fecha" id="proximoFecha">—</div>
+  </div>
+</div>
+
+<div class="toolbar">
+  <input class="buscador" type="text" placeholder="🔍 Buscar evento..." id="buscador" oninput="renderizarLista()">
+  <div class="filtros">
+    <button class="filtro f-todos active" onclick="setFiltro('todos')">Todos</button>
+    <button class="filtro f-nacional" onclick="setFiltro('nacional')">🔵 Nacional</button>
+    <button class="filtro f-provincial" onclick="setFiltro('provincial')">🟣 Provincial</button>
+    <button class="filtro f-municipal" onclick="setFiltro('municipal')">🟠 Municipal</button>
+    <button class="filtro f-partidos" onclick="setFiltro('partidos')">🟢 Partidos</button>
+    <button class="filtro f-destacado" onclick="setFiltro('destacado')">⭐ Destacados</button>
+  </div>
+  <button class="btn-header" id="btnPasados" onclick="togglePasados()" style="margin-left:auto">👁 Mostrar pasados</button>
+</div>
+
+<div class="status">
+  <span class="dot loading" id="statusDot"></span>
+  <span id="statusTxt">Cargando desde Google Sheets...</span>
+</div>
+
+<!-- VISTA LISTA -->
+<div id="vistaLista">
+  <div class="main" id="main"></div>
+</div>
+
+<!-- VISTA CALENDARIO -->
+<div id="vistaCalendario" style="padding:0 20px">
+<div class="cal-detalle" id="calDetalle"></div>
+  <div class="cal-nav">
+    <button class="btn-cal-nav" onclick="cambiarMesCal(-1)">‹</button>
+    <div class="cal-mes-titulo" id="calTitulo">—</div>
+    <button class="btn-cal-nav" onclick="cambiarMesCal(1)">›</button>
+  </div>
+  <div class="cal-grid">
+    <div class="cal-dias-semana">
+      <div class="cal-dia-sem">Dom</div><div class="cal-dia-sem">Lun</div>
+      <div class="cal-dia-sem">Mar</div><div class="cal-dia-sem">Mié</div>
+      <div class="cal-dia-sem">Jue</div><div class="cal-dia-sem">Vie</div>
+      <div class="cal-dia-sem">Sáb</div>
+    </div>
+    <div class="cal-celdas" id="calCeldas"></div>
+  </div>
+  <div class="cal-descarga-row">
+    <button class="btn-descarga secundario" onclick="previsualizarPlacaCal()">📸 Vista previa placa</button>
+    <button class="btn-descarga" onclick="descargarPlacaCal()">📥 Descargar placa del mes</button>
+  </div>
+</div>
+
+<!-- PLACA EXPORTABLE OCULTA -->
+<div id="placaCalendario">
+  <div class="placa-header-cal">
+    <div>
+      <div class="placa-titulo-cal">Electo<span>Agenda</span></div>
+      <div class="placa-subtitulo-cal">Agenda electoral · @argelecciones</div>
+    </div>
+    <div>
+      <div class="placa-mes-cal" id="placaMesTitulo">—</div>
+      <div class="placa-año-cal" id="placaAñoTitulo">—</div>
+    </div>
+  </div>
+  <div class="placa-grid-cal" id="placaGridCal"></div>
+  <div class="placa-footer-cal">
+    <img src="logo.png" alt="Logo" style="height:60px;width:auto;">
+    <div class="placa-footer-txt">#ElectoAgenda · Solo para difusión</div>
+  </div>
+</div>
+
+<div id="galleryModalEntity" class="gallery-modal" onclick="cerrarModalGaleria()">
+  <div class="gallery-content-wrapper" onclick="event.stopPropagation()">
+    <button class="gallery-close-btn" onclick="cerrarModalGaleria()">&times;</button>
+    <img id="galleryStaticImage" class="gallery-image" src="" alt="Vista previa placa">
+    <div class="gallery-caption">Previsualización — ESC o clic afuera para cerrar</div>
+  </div>
+</div>
+<div class="footer">#ElectoAgenda · Solo para difusión · @argelecciones</div>
+
+<script>
+const CSV_URL = 'https://script.google.com/macros/s/AKfycbzNeoVgpRk3Luck2mPhe86zJqkRssY7zQGAeQ-AmawGn3HJGlKeprxC3dNcp52dSCbZ/exec';
+const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const DIAS  = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+
+let eventos = [];
+let filtro = 'todos';
+let vista = 'lista';
+let mostrarPasados = false;
+let calAño, calMes;
+const hoy = new Date(); hoy.setHours(0,0,0,0);
+calAño = hoy.getFullYear(); calMes = hoy.getMonth();
+
+function parseFecha(s){
+  const p = s.trim().split('/');
+  if(p.length!==3) return null;
+  const d=parseInt(p[0]),m=parseInt(p[1])-1,a=parseInt(p[2]);
+  if(isNaN(d)||isNaN(m)||isNaN(a)) return null;
+  const f=new Date(a,m,d); f.setHours(0,0,0,0); return f;
+}
+
+function parseCSV(txt){
+  const lines=txt.trim().split('\n'); const res=[];
+  for(let i=1;i<lines.length;i++){
+    const cols=lines[i].split(',');
+    if(cols.length<3) continue;
+    const fecha=parseFecha(cols[0]);
+    const descripcion=(cols[1]||'').trim().replace(/^"|"$/g,'');
+    const categoria=(cols[2]||'').trim().replace(/^"|"$/g,'');
+    const provincia=(cols[3]||'').trim().replace(/^"|"$/g,'');
+    const destacado=(cols[4]||'').trim().toLowerCase()==='si';
+    if(!fecha||!descripcion||!categoria) continue;
+    res.push({fecha,descripcion,categoria,provincia,destacado});
+  }
+  res.sort((a,b)=>a.fecha-b.fecha); return res;
+}
+
+function diasHasta(f){ return Math.round((f-hoy)/(1000*60*60*24)); }
+
+function catKey(cat){
+  const c=cat.toLowerCase();
+  if(c.includes('nacion')) return 'nacional';
+  if(c.includes('provin')) return 'provincial';
+  if(c.includes('munici')) return 'municipal';
+  if(c.includes('partido')) return 'partidos';
+  return 'nacional';
+}
+
+function actualizarBannerProximo(){
+  const futuros=eventos.filter(e=>e.fecha>=hoy);
+  const banner=document.getElementById('proximoBanner');
+  if(!futuros.length){banner.classList.remove('visible');return;}
+  const prox=futuros[0]; const dias=diasHasta(prox.fecha);
+  document.getElementById('proximoDias').textContent=dias===0?'¡HOY!':dias;
+  document.getElementById('proximoDesc').textContent=prox.descripcion;
+  const fechaStr=`${DIAS[prox.fecha.getDay()]} ${prox.fecha.getDate()} de ${MESES[prox.fecha.getMonth()]} de ${prox.fecha.getFullYear()}`;
+  document.getElementById('proximoFecha').textContent=fechaStr+(prox.provincia?` · ${prox.provincia}`:'');
+  banner.classList.add('visible');
+}
+
+function cerrarModalGaleria(){
+  document.getElementById('galleryModalEntity').style.display='none';
+}
+window.addEventListener('keydown',(e)=>{if(e.key==='Escape') cerrarModalGaleria();});
+
+function togglePasados(){
+  mostrarPasados=!mostrarPasados;
+  const btn=document.getElementById('btnPasados');
+  btn.textContent=mostrarPasados?'👁 Ocultar pasados':'👁 Mostrar pasados';
+  btn.classList.toggle('active', mostrarPasados);
+  renderizarLista();
+}
+
+function setFiltro(f){
+  filtro=f;
+  document.querySelectorAll('.filtro').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`.filtro.f-${f}`)?.classList.add('active');
+  if(vista==='lista') renderizarLista();
+  else renderizarCalendario();
+}
+
+function setVista(v){
+  vista=v;
+  document.getElementById('vistaLista').style.display=v==='lista'?'block':'none';
+  document.getElementById('vistaCalendario').style.display=v==='calendario'?'block':'none';
+  document.getElementById('btnLista').classList.toggle('active',v==='lista');
+  document.getElementById('btnCal').classList.toggle('active',v==='calendario');
+  if(v==='calendario') renderizarCalendario();
+}
+
+// ====== VISTA LISTA ======
+function renderizarLista(){
+  const busq=document.getElementById('buscador').value.toLowerCase().trim();
+  let lista=eventos;
+  if(!mostrarPasados) lista=lista.filter(e=>e.fecha>=hoy);
+  if(filtro==='destacado') lista=lista.filter(e=>e.destacado);
+  else if(filtro!=='todos') lista=lista.filter(e=>catKey(e.categoria)===filtro);
+  if(busq) lista=lista.filter(e=>e.descripcion.toLowerCase().includes(busq)||(e.provincia||'').toLowerCase().includes(busq));
+  const main=document.getElementById('main');
+  if(!lista.length){main.innerHTML=`<div class="vacio"><div class="vacio-icon">📭</div><div class="vacio-txt">No hay eventos para este filtro.</div></div>`;return;}
+  const grupos={};
+  lista.forEach(ev=>{
+    const key=`${ev.fecha.getFullYear()}-${String(ev.fecha.getMonth()).padStart(2,'0')}`;
+    if(!grupos[key]) grupos[key]={label:`${MESES[ev.fecha.getMonth()]} ${ev.fecha.getFullYear()}`,evs:[]};
+    grupos[key].evs.push(ev);
+  });
+  let html='';
+  Object.values(grupos).forEach(g=>{
+    html+=`<div class="mes-bloque"><div class="mes-header"><div class="mes-nombre">${g.label}</div><div class="mes-count">${g.evs.length} evento${g.evs.length>1?'s':''}</div></div>`;
+    g.evs.forEach(ev=>{
+      const pasado=ev.fecha<hoy; const dias=diasHasta(ev.fecha);
+      const ck=catKey(ev.categoria);
+      const barraClass=ev.destacado?'barra-destacado':`barra-${ck}`;
+      const catClass=ev.destacado?'cat-destacado':`cat-${ck}`;
+      const diaNom=DIAS[ev.fecha.getDay()];
+      let badges='';
+      if(ev.destacado&&!pasado) badges+=`<span class="evento-badge-dest">⭐ Clave</span>`;
+      if(pasado) badges+=`<span class="evento-badge-pasado">Realizado</span>`;
+      let diasRestTxt='';
+      if(!pasado&&dias<=30){const cls=dias<=7?'cerca':'';diasRestTxt=`<span class="evento-dias-restantes ${cls}">${dias===0?'¡Hoy!':`Faltan ${dias}d`}</span>`;}
+      html+=`<div class="evento${pasado?' pasado':''}${ev.destacado?' destacado-ev':''}">
+        <div class="evento-num"><div class="evento-dia">${ev.fecha.getDate()}</div><div class="evento-diaNom">${diaNom}</div></div>
+        <div class="evento-barra ${barraClass}"></div>
+        <div class="evento-body">
+          <div class="evento-top"><span class="evento-cat ${catClass}">${ev.categoria}</span>${badges}${diasRestTxt}</div>
+          <div class="evento-desc">${ev.descripcion}</div>
+          ${ev.provincia?`<div class="evento-prov">📍 ${ev.provincia}</div>`:''}
+        </div></div>`;
+    });
+    html+=`</div>`;
+  });
+  main.innerHTML=html;
+}
+
+// ====== VISTA CALENDARIO ======
+function cambiarMesCal(d){ calMes+=d; if(calMes>11){calMes=0;calAño++;}else if(calMes<0){calMes=11;calAño--;} renderizarCalendario(); }
+
+function renderizarCalendario(){
+  document.getElementById('calTitulo').textContent=`${MESES[calMes]} ${calAño}`;
+  document.getElementById('calDetalle').classList.remove('visible');
+  const primer=new Date(calAño,calMes,1);
+  const ultimo=new Date(calAño,calMes+1,0);
+  const inicioSem=primer.getDay();
+  let celdas='';
+  // Celdas vacías antes del primer día
+  for(let i=0;i<inicioSem;i++){
+    const d=new Date(calAño,calMes,-(inicioSem-1-i));
+    celdas+=`<div class="cal-celda otro-mes"><div class="cal-num">${d.getDate()}</div></div>`;
+  }
+  for(let d=1;d<=ultimo.getDate();d++){
+    const fecha=new Date(calAño,calMes,d); fecha.setHours(0,0,0,0);
+    const esHoy=fecha.getTime()===hoy.getTime();
+    let evsDia=eventos.filter(e=>e.fecha.getTime()===fecha.getTime());
+    if(filtro==='destacado') evsDia=evsDia.filter(e=>e.destacado);
+    else if(filtro!=='todos') evsDia=evsDia.filter(e=>catKey(e.categoria)===filtro);
+    let puntosHTML='';
+    evsDia.slice(0,3).forEach(ev=>{
+      const cls=ev.destacado?'destacado':catKey(ev.categoria);
+      puntosHTML+=`<div class="cal-punto ${cls}">${ev.descripcion}</div>`;
+    });
+    if(evsDia.length>3) puntosHTML+=`<div class="cal-mas">+${evsDia.length-3} más</div>`;
+    const tieneEv=evsDia.length>0;
+    celdas+=`<div class="cal-celda${esHoy?' hoy-cel':''}${tieneEv?' tiene-eventos':''}" ${tieneEv?`onclick="mostrarDetalleDia(${d})"`:''}><div class="cal-num">${d}</div>${puntosHTML}</div>`;
+  }
+  // Completar última semana
+  const celdastotal=inicioSem+ultimo.getDate();
+  const resto=celdastotal%7===0?0:7-(celdastotal%7);
+  for(let i=1;i<=resto;i++){
+    celdas+=`<div class="cal-celda otro-mes"><div class="cal-num">${i}</div></div>`;
+  }
+  document.getElementById('calCeldas').innerHTML=celdas;
+}
+
+function mostrarDetalleDia(d){
+  const fecha=new Date(calAño,calMes,d); fecha.setHours(0,0,0,0);
+  let evsDia=eventos.filter(e=>e.fecha.getTime()===fecha.getTime());
+  if(filtro==='destacado') evsDia=evsDia.filter(e=>e.destacado);
+  else if(filtro!=='todos') evsDia=evsDia.filter(e=>catKey(e.categoria)===filtro);
+  if(!evsDia.length) return;
+  const detalle=document.getElementById('calDetalle');
+  const diaNom=DIAS[fecha.getDay()];
+  let html=`<div class="cal-detalle-titulo">${diaNom} ${d} de ${MESES[calMes]} de ${calAño}</div>`;
+  evsDia.forEach(ev=>{
+    const ck=ev.destacado?'destacado':catKey(ev.categoria);
+    const color=ck==='nacional'?'var(--nacional)':ck==='provincial'?'var(--provincial)':ck==='municipal'?'var(--municipal)':ck==='partidos'?'var(--partidos)':'var(--destacado)';
+    html+=`<div class="cal-detalle-evento">
+      <div class="cal-det-barra" style="background:${color}"></div>
+      <div><div class="cal-det-cat" style="color:${color}">${ev.categoria}</div>
+      <div class="cal-det-desc">${ev.descripcion}</div>
+      ${ev.provincia?`<div class="cal-det-prov">📍 ${ev.provincia}</div>`:''}</div>
+    </div>`;
+  });
+  detalle.innerHTML=html; detalle.classList.add('visible');
+}
+
+// ====== PLACA DEL MES ======
+function construirPlacaCal(){
+  document.getElementById('placaMesTitulo').textContent=MESES[calMes].toUpperCase();
+  document.getElementById('placaAñoTitulo').textContent=calAño;
+  const primer=new Date(calAño,calMes,1);
+  const ultimo=new Date(calAño,calMes+1,0);
+  const inicioSem=primer.getDay();
+  let html='';
+  // Encabezados días
+  ['DOM','LUN','MAR','MIÉ','JUE','VIE','SÁB'].forEach(d=>{
+    html+=`<div class="placa-diaSem">${d}</div>`;
+  });
+  // Vacíos inicio
+  for(let i=0;i<inicioSem;i++){
+    const d=new Date(calAño,calMes,-(inicioSem-1-i));
+    html+=`<div class="placa-celda-cal otro-mes-p"><div class="placa-num-cal">${d.getDate()}</div></div>`;
+  }
+  for(let d=1;d<=ultimo.getDate();d++){
+    const fecha=new Date(calAño,calMes,d); fecha.setHours(0,0,0,0);
+    const esHoy=fecha.getTime()===hoy.getTime();
+    const evsDia=eventos.filter(e=>e.fecha.getTime()===fecha.getTime());
+    let evsHTML='';
+    evsDia.slice(0,3).forEach(ev=>{
+      const ck=ev.destacado?'destacado':catKey(ev.categoria);
+      const color=ck==='nacional'?'#3b82f6':ck==='provincial'?'#a855f7':ck==='municipal'?'#f59e0b':ck==='partidos'?'#10b981':'#f43f5e';
+      evsHTML+=`<div class="placa-ev-cal" style="background:${color}">${ev.descripcion}</div>`;
+    });
+    if(evsDia.length>3) evsHTML+=`<div style="font-size:10px;color:#4a5878;font-weight:700">+${evsDia.length-3}</div>`;
+    html+=`<div class="placa-celda-cal${esHoy?' hoy-p':''}"><div class="placa-num-cal">${d}</div>${evsHTML}</div>`;
+  }
+  // Resto
+  const total=inicioSem+ultimo.getDate();
+  const resto=total%7===0?0:7-(total%7);
+  for(let i=1;i<=resto;i++) html+=`<div class="placa-celda-cal otro-mes-p"><div class="placa-num-cal">${i}</div></div>`;
+  document.getElementById('placaGridCal').innerHTML=html;
+}
+
+function previsualizarPlacaCal(){
+  construirPlacaCal();
+  const placa=document.getElementById('placaCalendario');
+  const orig=placa.style.cssText;
+  placa.querySelector('img').style.display='none';
+  placa.style.position='absolute';
+  placa.style.left='0';
+  placa.style.top='0';
+  placa.style.display='flex';
+  html2canvas(placa,{scale:1,backgroundColor:'#0b1220',width:1920,height:1080,useCORS:true}).then(canvas=>{
+    placa.style.cssText=orig;
+    placa.style.display='none';
+    document.getElementById('galleryStaticImage').src=canvas.toDataURL('image/png');
+    document.getElementById('galleryModalEntity').style.display='flex';
+  }).catch(err=>{placa.style.cssText=orig;placa.style.display='none';});
+}
+
+function descargarPlacaCal(){
+  construirPlacaCal();
+  const placa=document.getElementById('placaCalendario');
+  placa.style.left='0';
+  placa.style.top='0';
+  placa.style.position='fixed';
+  placa.style.zIndex='-1';
+  placa.style.display='flex'; placa.querySelector('img').style.display='none';
+  setTimeout(()=>{
+    html2canvas(placa,{scale:1,backgroundColor:'#0b1220',width:1920,height:1080,useCORS:true,allowTaint:true}).then(canvas=>{
+      placa.style.position='fixed';
+      placa.style.left='-9999px';
+      placa.style.zIndex='';
+      const link=document.createElement('a');
+      link.download=`electoagenda-${MESES[calMes].toLowerCase()}-${calAño}-argelecciones.png`;
+      link.href=canvas.toDataURL('image/png');
+      link.click();
+	  placa.querySelector('img').style.display='';
+    }).catch(err=>{
+      placa.style.left='-9999px';
+      alert('Error al generar la placa: '+err.message);
+    });
+  }, 200);
+}
+
+// ====== CARGA DE DATOS ======
+async function cargar(){
+  const dot=document.getElementById('statusDot');
+  const txt=document.getElementById('statusTxt');
+  const icon=document.getElementById('refreshIcon');
+  dot.className='dot loading'; txt.textContent='Actualizando desde Google Sheets...';
+  icon.className='spin'; icon.textContent='↻';
+  try{
+    const r=await fetch(CSV_URL);
+    if(!r.ok) throw new Error('No se pudo conectar con Google Sheets');
+    const csv=await r.text();
+    eventos=parseCSV(csv);
+    dot.className='dot ok';
+    const hora=new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+    txt.textContent=`${eventos.length} eventos cargados · ${hora}`;
+    actualizarBannerProximo();
+    renderizarLista();
+    if(vista==='calendario') renderizarCalendario();
+  }catch(e){
+    dot.className='dot error'; txt.textContent=`Error: ${e.message}`;
+    document.getElementById('main').innerHTML=`<div class="vacio"><div class="vacio-icon">⚠️</div><div class="vacio-txt">No se pudieron cargar los datos.</div></div>`;
+  }finally{icon.className=''; icon.textContent='↻';}
+}
+
+// Activar vista lista por defecto
+setVista('lista');
+cargar();
+</script>
+</body>
+</html>
