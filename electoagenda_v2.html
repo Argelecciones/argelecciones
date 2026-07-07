@@ -369,7 +369,27 @@ function setFiltro(f){
   document.querySelectorAll('.filtro').forEach(b=>b.classList.remove('active'));
   document.querySelector(`.filtro.f-${f}`)?.classList.add('active');
   if(vista==='lista') renderizarLista();
-  else renderizarCalendario();
+  else {
+    // Si no hay eventos en el mes actual con este filtro, ir al próximo mes con eventos
+    if(f!=='todos'){
+      const tieneEvMes=eventos.some(e=>{
+        const mismoMes=e.fecha.getFullYear()===calAño&&e.fecha.getMonth()===calMes;
+        if(!mismoMes) return false;
+        if(f==='destacado') return e.destacado;
+        return catKey(e.categoria)===f;
+      });
+      if(!tieneEvMes){
+        const proximo=eventos.find(e=>{
+          const despues=e.fecha>new Date(calAño,calMes,1);
+          if(!despues) return false;
+          if(f==='destacado') return e.destacado;
+          return catKey(e.categoria)===f;
+        });
+        if(proximo){calAño=proximo.fecha.getFullYear();calMes=proximo.fecha.getMonth();}
+      }
+    }
+    renderizarCalendario();
+  }
 }
 
 function setVista(v){
