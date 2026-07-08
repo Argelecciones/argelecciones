@@ -211,11 +211,12 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
     <div class="proximo-dias" id="proximoDias">—</div>
     <div class="proximo-label">días</div>
   </div>
-  <div class="proximo-sep"></div>
+ <div class="proximo-sep"></div>
   <div>
     <div class="proximo-desc" id="proximoDesc">—</div>
     <div class="proximo-fecha" id="proximoFecha">—</div>
   </div>
+  <button id="btnCopiarProximo" onclick="copiarProximo()" style="background:#f43f5e;border:none;color:#fff;padding:6px 12px;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;margin-left:8px;flex-shrink:0;">📋 Copiar</button>
 </div>
 
 <div class="toolbar">
@@ -350,6 +351,16 @@ function actualizarBannerProximo(){
   const fechaStr=`${DIAS[prox.fecha.getDay()]} ${prox.fecha.getDate()} de ${MESES[prox.fecha.getMonth()]} de ${prox.fecha.getFullYear()}`;
   document.getElementById('proximoFecha').textContent=fechaStr+(prox.provincia?` · ${prox.provincia}`:'');
   banner.classList.add('visible');
+}
+	function copiarProximo(){
+  const desc=document.getElementById('proximoDesc').textContent;
+  const fecha=document.getElementById('proximoFecha').textContent;
+  const texto=`ElectoAgenda @Argelecciones | Próximo evento: 📅 ${desc} — ${fecha}`;
+  navigator.clipboard.writeText(texto).then(()=>{
+    const btn=document.getElementById('btnCopiarProximo');
+    btn.textContent='✅ Copiado';
+    setTimeout(()=>{btn.textContent='📋 Copiar';},2000);
+  });
 }
 
 function cerrarModalGaleria(){
