@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora Hare — Provincia de Buenos Aires · @argelecciones</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f8f9fc;
+  --surface:#ffffff;
+  --border:#e2e8f0;
+  --border2:#cbd5e1;
+  --text:#0f172a;
+  --muted:#64748b;
+  --subtle:#f1f5f9;
+  --pba:#1d4ed8;
+  --pba2:#1e40af;
+  --acento:#f59e0b;
+  --verde:#16a34a;
+  --rojo:#dc2626;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.05);
+  --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.05);
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+
+/* HEADER */
+.header{background:var(--pba);padding:18px 28px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+.header-logo{height:44px;width:auto}
+.header-titles{}
+.header-title{font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3px}
+.header-title span{color:var(--acento)}
+.header-sub{font-size:11px;color:#93c5fd;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-top:2px}
+
+/* LAYOUT */
+.layout{max-width:900px;margin:0 auto;padding:28px 20px 60px}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px;box-shadow:var(--shadow);margin-bottom:20px}
+.card-title{font-size:12px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.card-title span{background:var(--pba);color:#fff;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0}
+
+/* SELECTORS */
+.selector-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:560px){.selector-grid{grid-template-columns:1fr}}
+.field-label{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.field-select,.field-input{width:100%;background:var(--subtle);border:1.5px solid var(--border2);border-radius:8px;padding:9px 12px;font-size:14px;color:var(--text);outline:none;transition:border-color .15s;font-family:inherit}
+.field-select:focus,.field-input:focus{border-color:var(--pba)}
+.params-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:14px}
+@media(max-width:560px){.params-row{grid-template-columns:1fr 1fr}}
+.param-box{background:var(--subtle);border:1.5px solid var(--border);border-radius:8px;padding:12px}
+.param-box-label{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.param-box-val{font-size:22px;font-weight:900;color:var(--pba)}
+.param-box-val.editable{border:none;background:transparent;width:100%;font-size:22px;font-weight:900;color:var(--pba);outline:none;font-family:inherit;padding:0}
+.param-box-val.editable:focus{color:var(--pba2)}
+
+/* TABLA PARTIDOS */
+.tabla-partidos{width:100%;border-collapse:collapse}
+.tabla-partidos th{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:8px 10px;border-bottom:2px solid var(--border);text-align:left}
+.tabla-partidos td{padding:6px 8px;border-bottom:1px solid var(--border)}
+.tabla-partidos tr:last-child td{border-bottom:none}
+.input-partido{width:100%;border:1.5px solid var(--border);border-radius:6px;padding:7px 10px;font-size:13px;color:var(--text);outline:none;font-family:inherit;transition:border-color .15s}
+.input-partido:focus{border-color:var(--pba)}
+.input-votos{width:100%;border:1.5px solid var(--border);border-radius:6px;padding:7px 10px;font-size:13px;color:var(--text);outline:none;font-family:inherit;text-align:right;transition:border-color .15s}
+.input-votos:focus{border-color:var(--pba)}
+.btn-del{background:none;border:none;color:#94a3b8;cursor:pointer;font-size:16px;padding:4px 8px;border-radius:4px;transition:color .15s}
+.btn-del:hover{color:var(--rojo)}
+.btn-agregar{background:var(--subtle);border:1.5px dashed var(--border2);border-radius:8px;padding:10px;width:100%;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;margin-top:10px;transition:all .15s}
+.btn-agregar:hover{border-color:var(--pba);color:var(--pba)}
+
+/* BOTÓN CALCULAR */
+.btn-calcular{background:var(--pba);color:#fff;border:none;border-radius:10px;padding:14px 32px;font-size:15px;font-weight:900;cursor:pointer;width:100%;transition:background .15s;letter-spacing:.02em;margin-top:4px}
+.btn-calcular:hover{background:var(--pba2)}
+
+/* RESULTADOS */
+.resultado-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.resultado-titulo{font-size:16px;font-weight:900;color:var(--text)}
+.btn-acciones{display:flex;gap:8px;flex-wrap:wrap}
+.btn-accion{border:none;border-radius:7px;padding:8px 14px;font-size:12px;font-weight:800;cursor:pointer;transition:all .15s}
+.btn-xlsx{background:#16a34a;color:#fff}
+.btn-xlsx:hover{background:#15803d}
+.btn-detalle{background:var(--subtle);border:1.5px solid var(--border2);color:var(--muted)}
+.btn-detalle:hover{color:var(--text);border-color:var(--muted)}
+.btn-detalle.active{background:var(--pba);color:#fff;border-color:var(--pba)}
+
+/* TABLA RESULTADOS */
+.tabla-resultados{width:100%;border-collapse:collapse;margin-bottom:16px}
+.tabla-resultados th{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:8px 10px;border-bottom:2px solid var(--border);text-align:right}
+.tabla-resultados th:first-child{text-align:left}
+.tabla-resultados td{padding:10px 10px;border-bottom:1px solid var(--border);font-size:13px;text-align:right}
+.tabla-resultados td:first-child{text-align:left;font-weight:700}
+.tabla-resultados tr:last-child td{border-bottom:none}
+.tabla-resultados tr.ganador td{background:#f0fdf4}
+.banca-badge{display:inline-block;background:var(--pba);color:#fff;font-size:13px;font-weight:900;padding:3px 10px;border-radius:20px;min-width:32px;text-align:center}
+.banca-badge.cero{background:var(--subtle);color:var(--muted)}
+.art109{font-size:10px;color:var(--acento);font-weight:800}
+
+/* VIÑETAS */
+.vinetas{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.vineta{display:flex;align-items:center;gap:12px;background:var(--subtle);border-radius:8px;padding:10px 14px;border-left:4px solid var(--pba)}
+.vineta-partido{font-size:13px;font-weight:800;color:var(--text);flex:1}
+.vineta-detalle{font-size:12px;color:var(--muted)}
+.vineta-total{font-size:18px;font-weight:900;color:var(--pba);min-width:30px;text-align:right}
+.vineta-cero .vineta-total{color:var(--muted)}
+.vineta-cero{opacity:.6}
+
+/* CÁLCULO COMPLETO */
+.calculo-completo{display:none;margin-top:16px;border-top:1px solid var(--border);padding-top:16px}
+.calculo-completo.visible{display:block}
+.calculo-seccion{margin-bottom:16px}
+.calculo-seccion-titulo{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border)}
+.calculo-tabla{width:100%;border-collapse:collapse}
+.calculo-tabla th{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:6px 8px;border-bottom:1px solid var(--border);text-align:right}
+.calculo-tabla th:first-child{text-align:left}
+.calculo-tabla td{padding:7px 8px;border-bottom:1px solid var(--border);font-size:12px;text-align:right;color:var(--text)}
+.calculo-tabla td:first-child{text-align:left;font-weight:600}
+.calculo-tabla tr:last-child td{border-bottom:none}
+.rank-badge{display:inline-block;background:var(--acento);color:#fff;font-size:10px;font-weight:900;padding:1px 6px;border-radius:3px}
+.nota-art{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;font-size:12px;color:#92400e;font-weight:600;margin-top:8px}
+
+/* FOOTER */
+.footer{text-align:center;padding:16px;font-size:10px;color:var(--muted);border-top:1px solid var(--border);text-transform:uppercase;letter-spacing:.05em}
+
+/* OCULTO */
+.oculto{display:none}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <img src="logo.png" alt="Logo" class="header-logo">
+  <div class="header-titles">
+    <div class="header-title">Calculadora <span>Hare</span></div>
+    <div class="header-sub">Provincia de Buenos Aires · @argelecciones</div>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- BLOQUE 1: CONFIGURACIÓN -->
+  <div class="card">
+    <div class="card-title"><span>1</span> Configuración de la elección</div>
+    <div class="selector-grid">
+      <div>
+        <div class="field-label">Tipo de elección</div>
+        <select class="field-select" id="selTipo" onchange="onTipoChange()">
+          <option value="sinGobernador">Sin gobernador (años impares: 2025, 2029…)</option>
+          <option value="conGobernador">Con gobernador (años pares: 2027, 2031…)</option>
+        </select>
+      </div>
+      <div>
+        <div class="field-label">Sección electoral</div>
+        <select class="field-select" id="selSeccion" onchange="onSeccionChange()">
+        </select>
+      </div>
+    </div>
+    <div class="params-row">
+      <div class="param-box">
+        <div class="param-box-label">Cargo</div>
+        <div class="param-box-val" id="paramCargo" style="font-size:16px;padding-top:4px">—</div>
+      </div>
+      <div class="param-box">
+        <div class="param-box-label">Bancas a elegir</div>
+        <input class="param-box-val editable" id="paramBancas" type="number" min="1" value="0">
+      </div>
+      <div class="param-box">
+        <div class="param-box-label">Cociente (calculado)</div>
+        <div class="param-box-val" id="paramCociente" style="font-size:15px;padding-top:5px">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOQUE 2: PARTIDOS -->
+  <div class="card">
+    <div class="card-title"><span>2</span> Partidos y votos</div>
+    <table class="tabla-partidos" id="tablaPartidos">
+      <thead>
+        <tr>
+          <th style="width:50%">Partido / Alianza</th>
+          <th style="width:40%;text-align:right">Votos afirmativos</th>
+          <th style="width:10%"></th>
+        </tr>
+      </thead>
+      <tbody id="tbodyPartidos"></tbody>
+    </table>
+    <button class="btn-agregar" onclick="agregarFila()">+ Agregar partido</button>
+  </div>
+
+  <!-- BOTÓN CALCULAR -->
+  <button class="btn-calcular" onclick="calcular()">⚖️ Calcular distribución de bancas</button>
+
+<div id="normativa" style="display:none;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:20px;margin-top:16px;font-size:13px;line-height:1.7;color:#334155">
+  <strong style="font-size:14px;color:#0f172a">Ley 5109 — Capítulo XVI: Del Cuociente Electoral</strong>
+  <p style="margin-top:12px"><strong>Art. 109.</strong> Hecha la suma general de los votos computados de cada Sección o Distrito Electoral, la Junta Electoral procederá:</p>
+  <p style="margin-top:8px"><strong>a)</strong> Dividirá el número total de sufragios por el número de candidatos que corresponde elegir. El cuociente de esta operación será el cuociente electoral.</p>
+  <p style="margin-top:8px"><strong>b)</strong> Dividirá por el cuociente electoral el número de votos obtenidos por cada lista. Las listas cuyos votos no alcancen el cuociente carecerán de representación.</p>
+  <p style="margin-top:8px"><strong>c)</strong> Si la suma de todos los cuocientes no alcanzase el número total de representantes, se adjudicará un candidato más a cada una de las listas cuya división por el cuociente electoral haya arrojado mayor residuo, hasta completar la representación con los candidatos de la lista que obtuvo mayor número de sufragios. En caso de residuos iguales, se adjudicará al partido con mayoría de sufragios.</p>
+  <p style="margin-top:8px"><strong>Art. 110.</strong> Cuando ningún partido llegare al cuociente electoral, se tomará como base el 50% del mismo. No lográndose el mismo, se disminuirá en otro 50%, y así sucesivamente. Si la cantidad de partidos que alcanzaren el cuociente fuera superior al de bancas a distribuir, éstas se adjudicarán a los que hubieren obtenido mayor número de sufragios.</p>
+</div>
+
+<button onclick="toggleNormativa()" style="background:#f1f5f9;border:1.5px solid #cbd5e1;border-radius:8px;padding:10px 20px;font-size:12px;font-weight:800;color:#64748b;cursor:pointer;width:100%;margin-top:10px" id="btnNormativa">📋 Ver normativa (Ley 5109)</button>
+
+  <!-- BLOQUE 3: RESULTADOS -->
+  <div class="card oculto" id="cardResultados" style="margin-top:20px">
+    <div class="resultado-header">
+      <div class="resultado-titulo" id="resultadoTitulo">Distribución de bancas</div>
+      <div class="btn-acciones">
+        <button class="btn-accion btn-detalle" id="btnDetalle" onclick="toggleDetalle()">📊 Ver cálculo completo</button>
+        <button class="btn-accion btn-xlsx" onclick="descargarXLSX()">📥 Descargar Excel</button>
+      </div>
+    </div>
+
+    <!-- Tabla resumen -->
+    <table class="tabla-resultados" id="tablaResultados">
+      <thead>
+        <tr>
+          <th>Partido</th>
+          <th>Votos</th>
+          <th>Coc.</th>
+          <th>Resto</th>
+          <th>Bancas</th>
+        </tr>
+      </thead>
+      <tbody id="tbodyResultados"></tbody>
+    </table>
+
+    <!-- Viñetas -->
+    <div class="vinetas" id="vinetas"></div>
+
+    <!-- Cálculo completo -->
+    <div class="calculo-completo" id="calculoCompleto">
+      <div class="calculo-seccion">
+        <div class="calculo-seccion-titulo">Parámetros del cociente</div>
+        <table class="calculo-tabla">
+          <tr><td>Total votos afirmativos</td><td id="detTotalVotos">—</td></tr>
+          <tr><td>Bancas a elegir</td><td id="detBancas">—</td></tr>
+          <tr><td>Cociente Hare</td><td id="detCociente">—</td></tr>
+        </table>
+      </div>
+      <div class="calculo-seccion">
+        <div class="calculo-seccion-titulo">Paso 1 — Bancas por cociente</div>
+        <table class="calculo-tabla" id="detTabla1">
+          <thead><tr><th>Partido</th><th>Votos</th><th>Votos / Cociente</th><th>Bancas cociente</th></tr></thead>
+          <tbody id="detBody1"></tbody>
+        </table>
+      </div>
+      <div class="calculo-seccion">
+        <div class="calculo-seccion-titulo">Paso 2 — Bancas por resto (mayores residuos)</div>
+        <table class="calculo-tabla" id="detTabla2">
+          <thead><tr><th>Partido</th><th>Resto (votos)</th><th>Ranking</th><th>Banca por resto</th></tr></thead>
+          <tbody id="detBody2"></tbody>
+        </table>
+      </div>
+      <div id="detArt109" class="oculto">
+        <div class="calculo-seccion-titulo">Paso 3 — Art. 109 inc. c (bancas sobrantes)</div>
+        <div class="nota-art" id="detArt109Txt"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">Calculadora Hare — Provincia de Buenos Aires · @argelecciones · Solo para difusión</div>
+
+<script>
+// ====== DATOS DE SECCIONES ======
+const SECCIONES = {
+  sinGobernador: [
+    { nombre: 'Capital',  cargo: 'Diputados provinciales', bancas: 6  },
+    { nombre: 'Primera',  cargo: 'Senadores provinciales', bancas: 8  },
+    { nombre: 'Segunda',  cargo: 'Diputados provinciales', bancas: 11 },
+    { nombre: 'Tercera',  cargo: 'Diputados provinciales', bancas: 18 },
+    { nombre: 'Cuarta',   cargo: 'Senadores provinciales', bancas: 7  },
+    { nombre: 'Quinta',   cargo: 'Senadores provinciales', bancas: 5  },
+    { nombre: 'Sexta',    cargo: 'Diputados provinciales', bancas: 11 },
+    { nombre: 'Séptima',  cargo: 'Senadores provinciales', bancas: 3  },
+  ],
+  conGobernador: [
+    { nombre: 'Capital',  cargo: 'Senadores provinciales', bancas: 3  },
+    { nombre: 'Primera',  cargo: 'Diputados provinciales', bancas: 15 },
+    { nombre: 'Segunda',  cargo: 'Senadores provinciales', bancas: 5  },
+    { nombre: 'Tercera',  cargo: 'Senadores provinciales', bancas: 9  },
+    { nombre: 'Cuarta',   cargo: 'Diputados provinciales', bancas: 14 },
+    { nombre: 'Quinta',   cargo: 'Diputados provinciales', bancas: 11 },
+    { nombre: 'Sexta',    cargo: 'Senadores provinciales', bancas: 6  },
+    { nombre: 'Séptima',  cargo: 'Diputados provinciales', bancas: 6  },
+  ]
+};
+
+let filaCount = 0;
+let ultimoResultado = null;
+
+// ====== INIT ======
+function init() {
+  poblarSecciones();
+  onSeccionChange();
+  // Filas iniciales
+  for (let i = 0; i < 4; i++) agregarFila();
+}
+
+function poblarSecciones() {
+  const tipo = document.getElementById('selTipo').value;
+  const sel = document.getElementById('selSeccion');
+  sel.innerHTML = '';
+  SECCIONES[tipo].forEach((s, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = `${s.nombre} — ${s.cargo}`;
+    sel.appendChild(opt);
+  });
+}
+
+function onTipoChange() {
+  poblarSecciones();
+  onSeccionChange();
+}
+
+function onSeccionChange() {
+  const tipo = document.getElementById('selTipo').value;
+  const idx = parseInt(document.getElementById('selSeccion').value);
+  const sec = SECCIONES[tipo][idx];
+  document.getElementById('paramCargo').textContent = sec.cargo;
+  document.getElementById('paramBancas').value = sec.bancas;
+  document.getElementById('paramCociente').textContent = '—';
+  document.getElementById('cardResultados').classList.add('oculto');
+}
+
+// ====== FILAS ======
+function agregarFila() {
+  filaCount++;
+  const tr = document.createElement('tr');
+  tr.id = `fila-${filaCount}`;
+  tr.innerHTML = `
+    <td><input class="input-partido" type="text" placeholder="Nombre del partido o alianza" id="p-${filaCount}"></td>
+    <td><input class="input-votos" type="number" min="0" placeholder="0" id="v-${filaCount}"></td>
+    <td><button class="btn-del" onclick="borrarFila(${filaCount})" title="Eliminar">✕</button></td>
+  `;
+  document.getElementById('tbodyPartidos').appendChild(tr);
+}
+
+function borrarFila(id) {
+  const tr = document.getElementById(`fila-${id}`);
+  if (tr) tr.remove();
+}
+
+// ====== CÁLCULO HARE ======
+function calcular() {
+  const tipo = document.getElementById('selTipo').value;
+  const idx = parseInt(document.getElementById('selSeccion').value);
+  const seccion = SECCIONES[tipo][idx];
+  const bancas = parseInt(document.getElementById('paramBancas').value) || seccion.bancas;
+
+  // Recolectar partidos
+  const partidos = [];
+  document.querySelectorAll('[id^="fila-"]').forEach(tr => {
+    const id = tr.id.replace('fila-', '');
+    const nombre = document.getElementById(`p-${id}`)?.value.trim();
+    const votos = parseInt(document.getElementById(`v-${id}`)?.value) || 0;
+    if (nombre && votos > 0) partidos.push({ nombre, votos });
+  });
+
+  if (partidos.length === 0) {
+    alert('Cargá al menos un partido con votos.');
+    return;
+  }
+
+  const totalVotos = partidos.reduce((s, p) => s + p.votos, 0);
+  const cociente = totalVotos / bancas;
+
+  // Paso 1: bancas por cociente
+  partidos.forEach(p => {
+    p.bancasCociente = Math.floor(p.votos / cociente);
+    p.resto = p.votos - p.bancasCociente * cociente;
+    p.bancasResto = 0;
+    p.art109 = 0;
+  });
+
+  // Paso 2: bancas por resto
+  let bancasAsignadas = partidos.reduce((s, p) => s + p.bancasCociente, 0);
+  let bancasFaltantes = bancas - bancasAsignadas;
+
+  // Ordenar por resto descendente para asignar
+  const porResto = [...partidos]
+  .filter(p => p.bancasCociente >= 1)
+  .sort((a, b) => b.resto - a.resto);
+  porResto.forEach((p, i) => { p.rankResto = i + 1; });
+
+  let i = 0;
+  while (bancasFaltantes > 0 && i < porResto.length) {
+    porResto[i].bancasResto++;
+    bancasFaltantes--;
+    i++;
+  }
+
+  // Paso 3: Art. 109 inc. c — si aún faltan bancas, van al partido con más votos
+  let art109aplicado = false;
+  let art109txt = '';
+  bancasAsignadas = partidos.reduce((s, p) => s + p.bancasCociente + p.bancasResto, 0);
+  bancasFaltantes = bancas - bancasAsignadas;
+  if (bancasFaltantes > 0) {
+    art109aplicado = true;
+    const masVotos = [...partidos].sort((a, b) => b.votos - a.votos)[0];
+    masVotos.art109 = bancasFaltantes;
+    art109txt = `Se aplicó el art. 109 inc. c de la Ley 5109: ${bancasFaltantes} banca${bancasFaltantes > 1 ? 's' : ''} asignada${bancasFaltantes > 1 ? 's' : ''} al partido con más votos (${masVotos.nombre}) ya que los restos no alcanzaron para completar las ${bancas} bancas a elegir.`;
+  }
+
+  // Total
+  partidos.forEach(p => { p.total = p.bancasCociente + p.bancasResto + p.art109; });
+
+  // Ordenar por total desc
+  partidos.sort((a, b) => b.total - a.total || b.votos - a.votos);
+
+  ultimoResultado = { partidos, totalVotos, cociente, bancas, seccion, art109aplicado, art109txt };
+
+  mostrarResultados();
+  document.getElementById('cardResultados').classList.remove('oculto');
+  document.getElementById('cardResultados').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function mostrarResultados() {
+  const { partidos, totalVotos, cociente, bancas, seccion, art109aplicado, art109txt } = ultimoResultado;
+
+  document.getElementById('resultadoTitulo').textContent =
+    `${seccion.nombre} · ${seccion.cargo} · ${bancas} bancas`;
+  document.getElementById('paramCociente').textContent = cociente.toFixed(2).toLocaleString('es-AR');
+
+  // Tabla resumen
+  const tbody = document.getElementById('tbodyResultados');
+  tbody.innerHTML = '';
+  partidos.forEach(p => {
+    const tr = document.createElement('tr');
+    if (p.total > 0) tr.classList.add('ganador');
+    tr.innerHTML = `
+      <td>${p.nombre}${p.art109 > 0 ? ' <span class="art109">Mayoría</span>' : ''}</td>
+      <td>${p.votos.toLocaleString('es-AR')}</td>
+      <td>${p.bancasCociente}</td>
+      <td>${Math.round(p.resto).toLocaleString('es-AR')}</td>
+      <td><span class="banca-badge${p.total === 0 ? ' cero' : ''}">${p.total}</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // Viñetas
+  const vinetas = document.getElementById('vinetas');
+  vinetas.innerHTML = '';
+  partidos.forEach(p => {
+    const partes = [];
+    if (p.bancasCociente > 0) partes.push(`${p.bancasCociente} por cociente`);
+    if (p.bancasResto > 0) partes.push(`${p.bancasResto} por resto`);
+    if (p.art109 > 0) partes.push(`${p.art109} por art.109c`);
+    if (partes.length === 0) partes.push('sin bancas');
+    const div = document.createElement('div');
+    div.className = `vineta${p.total === 0 ? ' vineta-cero' : ''}`;
+    div.innerHTML = `
+      <div class="vineta-partido">${p.nombre}</div>
+      <div class="vineta-detalle">${partes.join(' + ')}</div>
+      <div class="vineta-total">${p.total}</div>
+    `;
+    vinetas.appendChild(div);
+  });
+
+  // Detalle cálculo
+  document.getElementById('detTotalVotos').textContent = totalVotos.toLocaleString('es-AR');
+  document.getElementById('detBancas').textContent = bancas;
+  document.getElementById('detCociente').textContent =
+    `${totalVotos.toLocaleString('es-AR')} ÷ ${bancas} = ${cociente.toFixed(2)}`;
+
+  const detBody1 = document.getElementById('detBody1');
+  detBody1.innerHTML = '';
+  [...partidos].sort((a,b) => b.votos - a.votos).forEach(p => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${p.nombre}</td>
+      <td>${p.votos.toLocaleString('es-AR')}</td>
+      <td>${p.votos.toLocaleString('es-AR')} ÷ ${cociente.toFixed(2)} = ${(p.votos/cociente).toFixed(4)}</td>
+      <td><strong>${p.bancasCociente}</strong></td>
+    `;
+    detBody1.appendChild(tr);
+  });
+
+  const detBody2 = document.getElementById('detBody2');
+  detBody2.innerHTML = '';
+  [...partidos].sort((a,b) => b.resto - a.resto).forEach(p => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${p.nombre}</td>
+      <td>${Math.round(p.resto).toLocaleString('es-AR')}</td>
+      <td>${p.bancasResto > 0 ? `<span class="rank-badge">#${p.rankResto}</span>` : `#${p.rankResto}`}</td>
+      <td><strong>${p.bancasResto}</strong></td>
+    `;
+    detBody2.appendChild(tr);
+  });
+
+  const art109div = document.getElementById('detArt109');
+  const art109txt2 = document.getElementById('detArt109Txt');
+  if (art109aplicado) {
+    art109div.classList.remove('oculto');
+    art109txt2.textContent = art109txt;
+  } else {
+    art109div.classList.add('oculto');
+  }
+}
+function toggleNormativa(){
+  const div=document.getElementById('normativa');
+  const btn=document.getElementById('btnNormativa');
+  const visible=div.style.display==='block';
+  div.style.display=visible?'none':'block';
+  btn.textContent=visible?'📋 Ver normativa (Ley 5109)':'📋 Ocultar normativa';
+}
+
+function toggleDetalle() {
+  const div = document.getElementById('calculoCompleto');
+  const btn = document.getElementById('btnDetalle');
+  div.classList.toggle('visible');
+  btn.classList.toggle('active');
+  btn.textContent = div.classList.contains('visible') ? '📊 Ocultar cálculo' : '📊 Ver cálculo completo';
+}
+
+// ====== EXCEL ======
+function descargarXLSX() {
+  if (!ultimoResultado) return;
+  const { partidos, totalVotos, cociente, bancas, seccion } = ultimoResultado;
+
+  const wb = XLSX.utils.book_new();
+
+  // Hoja 1: Resumen
+  const resumen = [
+    [`Calculadora Hare — Provincia de Buenos Aires — @argelecciones`],
+    [`Sección: ${seccion.nombre}`, `Cargo: ${seccion.cargo}`, `Bancas: ${bancas}`],
+    [],
+    ['Partido', 'Votos', 'Bancas cociente', 'Bancas resto', 'Mayoría', 'Total bancas'],
+    ...partidos.map(p => [p.nombre, p.votos, p.bancasCociente, p.bancasResto, p.art109, p.total])
+  ];
+  const ws1 = XLSX.utils.aoa_to_sheet(resumen);
+  XLSX.utils.book_append_sheet(wb, ws1, 'Resultados');
+
+  // Hoja 2: Cálculo completo
+  const detalle = [
+    ['PARÁMETROS'],
+    ['Total votos afirmativos', totalVotos],
+    ['Bancas a elegir', bancas],
+    ['Cociente Hare', cociente.toFixed(4)],
+    [],
+    ['PASO 1 — BANCAS POR COCIENTE'],
+    ['Partido', 'Votos', 'Votos / Cociente', 'Bancas cociente', 'Resto (votos)'],
+    ...[...partidos].sort((a,b)=>b.votos-a.votos).map(p => [
+      p.nombre, p.votos, (p.votos/cociente).toFixed(4), p.bancasCociente, Math.round(p.resto)
+    ]),
+    [],
+    ['PASO 2 — BANCAS POR RESTO'],
+    ['Partido', 'Resto (votos)', 'Ranking', 'Banca por resto'],
+    ...[...partidos].sort((a,b)=>b.resto-a.resto).map(p => [
+      p.nombre, Math.round(p.resto), p.rankResto, p.bancasResto
+    ])
+  ];
+  const ws2 = XLSX.utils.aoa_to_sheet(detalle);
+  XLSX.utils.book_append_sheet(wb, ws2, 'Cálculo completo');
+
+  XLSX.writeFile(wb, `hare-${seccion.nombre.toLowerCase()}-argelecciones.xlsx`);
+}
+
+init();
+</script>
+</body>
+</html>
