@@ -27,74 +27,67 @@
             color: var(--text-main);
         }
 
-        /* Contenedor Principal: Bloquea la pantalla para que nada se desborde externamente */
-.dhondt-container {
-    display: flex;
-    height: 100vh;
-    max-width: 1400px;
-    margin: 0 auto;
-    overflow: hidden; /* Evita el desborde global de la p��gina */
-    box-sizing: border-box;
-}
+        /* Contenedor Principal adaptable */
+        .dhondt-container {
+            display: flex;
+            height: 100vh;
+            max-width: 1400px;
+            margin: 0 auto;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
 
-/* Calculadora (Izquierda): Ahora es fija o scroll si tiene muchos partidos, sin molestar a la derecha */
-.dhondt-main {
-    flex: 1;
-    padding: 30px;
-    height: 100vh;
-    overflow-y: auto; 
-    box-sizing: border-box;
-}
+        /* Calculadora (Izquierda) */
+        .dhondt-main {
+            flex: 1;
+            padding: 30px;
+            height: 100vh;
+            overflow-y: auto; 
+            box-sizing: border-box;
+        }
 
-/* Barra Lateral (Derecha): Contenedor base r��gido del alto de la pantalla */
-.dhondt-sidebar {
-    width: 320px;
-    background: var(--bg-dark);
-    border-left: 1px solid #334155;
-    padding: 25px 20px;
-    box-sizing: border-box;
-    height: 100vh;
-    display: flex;
-    flex-direction: column; /* Organiza el t��tulo arriba y las tarjetas abajo */
-}
+        /* Barra Lateral (Derecha) */
+        .dhondt-sidebar {
+            width: 320px;
+            background: var(--bg-dark);
+            border-left: 1px solid #334155;
+            padding: 25px 20px;
+            box-sizing: border-box;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
 
-/* El t��tulo se queda arriba fijo */
-.dhondt-sidebar h3 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    font-size: 14px;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    flex-shrink: 0; /* Evita que el t��tulo se achique o mueva */
-}
+        .dhondt-sidebar h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
 
-/* Contenedor del Scroll (Las Provincias): ESTO ACTIVA LA BARRA QUE FALTA EN LA DERECHA */
-.sidebar-scroll {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    overflow-y: auto; /* Fuerza la aparici��n de la barra de scroll a la derecha */
-    flex-grow: 1; /* Ocupa todo el espacio que sobra hacia abajo */
-    padding-right: 5px; /* Peque?o aire para que la barra no pise las tarjetas */
-}
+        /* Contenedor del Scroll */
+        .sidebar-scroll {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+            flex-grow: 1;
+            padding-right: 5px;
+        }
 
-/* Estilo est��tico para la barra de scroll del ayudamemoria (Derecha) */
-.sidebar-scroll::-webkit-scrollbar {
-    width: 6px;
-}
-
-.sidebar-scroll::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.sidebar-scroll::-webkit-scrollbar-thumb {
-    background: #334155;
-    border-radius: 4px;
-}
-
-.sidebar-scroll::-webkit-scrollbar-thumb:hover {
-    background: #475569;
-}
+        /* Scrollbars */
+        .sidebar-scroll::-webkit-scrollbar, .dhondt-main::-webkit-scrollbar {
+            width: 6px;
+        }
+        .sidebar-scroll::-webkit-scrollbar-track, .dhondt-main::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sidebar-scroll::-webkit-scrollbar-thumb, .dhondt-main::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
 
         .tool-header {
             background: #0f172a;
@@ -139,14 +132,15 @@
             letter-spacing: 0.5px;
         }
 
+        /* Cambiado a CSS Grid responsivo para las cajas de configuración */
         .config-grid {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin-bottom: 15px;
         }
 
         .input-group {
-            flex: 1;
             display: flex;
             flex-direction: column;
         }
@@ -166,6 +160,8 @@
             border-radius: 6px;
             font-size: 14px;
             font-family: inherit;
+            box-sizing: border-box;
+            width: 100%;
         }
 
         .party-row {
@@ -257,21 +253,6 @@
         .analysis-box h4 { margin: 0 0 5px 0; color: #60a5fa; }
         .analysis-box p { margin: 0; font-size: 14px; line-height: 1.5; }
 
-        .dhondt-sidebar {
-            width: 320px;
-            background: var(--bg-dark);
-            border-left: 1px solid #334155;
-            padding: 25px 20px;
-        }
-
-        .dhondt-sidebar h3 { margin-top: 0; font-size: 14px; color: var(--text-muted); text-transform: uppercase; }
-
-        .sidebar-scroll {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
         .law-card {
             background: var(--bg-card);
             padding: 12px;
@@ -281,11 +262,102 @@
 
         .law-card h4 { margin: 0 0 5px 0; font-size: 13px; color: #38bdf8; }
         .law-card p { margin: 0; font-size: 12px; color: #cbd5e1; line-height: 1.4; }
+
+        /* Botón disparador del modal (Oculto en Desktop) */
+        .btn-trigger-mobile {
+            display: none;
+            width: 100%;
+            background: #1e293b;
+            color: #38bdf8;
+            border: 1px solid #334155;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        /* Botón para cerrar dentro del modal mobile */
+        .sidebar-close-btn {
+            display: none;
+        }
+
+        /* ======================================================= */
+        /* === MEDIA QUERIES PARA DISPOSITIVOS MÓVILES (MOBILE) === */
+        /* ======================================================= */
+        @media (max-width: 768px) {
+            .dhondt-container {
+                flex-direction: column;
+                height: auto;
+                overflow: visible;
+            }
+
+            .dhondt-main {
+                height: auto;
+                overflow: visible;
+                padding: 15px;
+            }
+
+            .tool-header {
+                margin: -15px -15px 20px -15px;
+                padding: 15px;
+                flex-direction: row;
+                text-align: left;
+            }
+
+            /* Mostrar botón disparador en móviles */
+            .btn-trigger-mobile {
+                display: flex;
+            }
+
+            /* Transformamos la barra lateral en una ventana modal emergente */
+            .dhondt-sidebar {
+                display: none; /* Oculto por defecto */
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                z-index: 9999;
+                border-left: none;
+                padding: 20px;
+                background: #090d16;
+            }
+
+            /* Clase activa que inyectará JS para mostrarlo */
+            .dhondt-sidebar.active {
+                display: flex;
+            }
+
+            .sidebar-close-btn {
+                display: block;
+                background: var(--danger);
+                color: white;
+                border: none;
+                padding: 12px;
+                border-radius: 6px;
+                font-weight: 700;
+                font-family: inherit;
+                margin-top: 15px;
+                cursor: pointer;
+                text-align: center;
+                width: 100%;
+            }
+
+            .party-row {
+                gap: 5px;
+            }
+            
+            .party-name { flex: 1.5; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- === ESTRUCTURA HTML === -->
     <div class="dhondt-container">
         <main class="dhondt-main">
             <header class="tool-header">
@@ -295,6 +367,11 @@
                     <p>Distribución de bancas legislativas · @argelecciones</p>
                 </div>
             </header>
+
+            <!-- Botón disparador del ayudamemoria en Mobile -->
+            <button class="btn-trigger-mobile" onclick="toggleSidebar(true)">
+                📌 Ver pisos electorales por provincia
+            </button>
 
             <section class="config-section">
                 <h3>1. Configuración de la Elección</h3>
@@ -363,7 +440,8 @@
             </section>
         </main>
 
-        <aside class="dhondt-sidebar">
+        <!-- Barra lateral (Actúa como modal en móviles) -->
+        <aside class="dhondt-sidebar" id="mobileSidebar">
             <h3>📌 Ayudamemoria: Pisos Electorales</h3>
             <div class="sidebar-scroll">
                 <div class="law-card">
@@ -404,7 +482,7 @@
                 </div>
 				<div class="law-card">
                     <h4>Salta (Diputados provinciales)</h4>
-                    <p><strong>Piso:</strong> 5% de los votos válidos emitidos del padrón electoral de cada departamento. <strong>Piso interno de cada frente:</strong> No hay. </p>
+                    <p><strong>Piso:</strong> 5% de los votos válidos emitidos del padrón electoral de cada departamento.</p>
                 </div>
 					<div class="law-card">
                     <h4>Jujuy (Diputados provinciales)</h4>
@@ -424,9 +502,11 @@
                 </div>
 				<div class="law-card">
                     <h4>Catamarca (Diputados provinciales)</h4>
-                    <p>Departamentos con 1 banca para el más votado, en el resto D'Hondt, con tope de bancas para la mayoría seg&uacute;n depto. Las restantes bancas se adjudicarán a las minorías, a cuyo fin la totalidad de los sufragios obtenidos por ellas en cada departamento, se tendrán como total electoral sobre el cual se aplicará el cociente que corresponda en porcentual a cada minoría. Nunca podrán las minorías tener un porcentual menor al equivalente a 8 bancas, pudiendo acrecer estas &uacute;ltimas en caso de ser mayoría en los departamentos. Piso 3% de los votos válidamente emitidos en toda la Provincia.  (Consitución pcial.)</p>
+                    <p>Piso 3% de los votos válidamente emitidos en toda la Provincia. (Constitución pcial.)</p>
                 </div>
             </div>
+            <!-- Botón interno para cerrar en Mobile -->
+            <button class="sidebar-close-btn" onclick="toggleSidebar(false)">Cerrar Ventana</button>
         </aside>
     </div>
 
@@ -441,6 +521,18 @@
             
             document.getElementById('btnAddParty').addEventListener('click', () => addPartyRow());
         });
+
+        // Función para controlar el ayudamemoria en Mobile
+        function toggleSidebar(show) {
+            const sidebar = document.getElementById('mobileSidebar');
+            if (show) {
+                sidebar.classList.add('active');
+                document.body.style.overflow = 'hidden'; // Traba el scroll de atrás
+            } else {
+                sidebar.classList.remove('active');
+                document.body.style.overflow = 'auto'; // Libera el scroll
+            }
+        }
 
         function addPartyRow(name = '', votes = '') {
             partyCount++;
