@@ -352,12 +352,15 @@ function actualizarBannerProximo(){
   document.getElementById('proximoFecha').textContent=fechaStr+(prox.provincia?` · ${prox.provincia}`:'');
   banner.classList.add('visible');
 }
-	function copiarProximo(){
+function copiarProximo(){
   const desc=document.getElementById('proximoDesc').textContent;
-  const fecha=document.getElementById('proximoFecha').textContent;
-		const prov=document.getElementById('proximoFecha').textContent.split('·')[1]?.trim()||'';
-const fecha=document.getElementById('proximoFecha').textContent.split('·')[0]?.trim()||'';
-  const texto=`📅ElectoAgenda @Argelecciones | Próximo evento:\n\n🗳${desc} (${prov}): ${fecha}`;
+  const fechaCompleta=document.getElementById('proximoFecha').textContent;
+  const partes=fechaCompleta.split('·');
+  const fechaTxt=partes[0]?.trim()||'';
+  const provTxt=partes[1]?.trim()||'';
+  const texto=provTxt
+    ? `📅ElectoAgenda @Argelecciones | Próximo evento:\n\n🗳${desc} (${provTxt}): ${fechaTxt}`
+    : `📅ElectoAgenda @Argelecciones | Próximo evento:\n\n🗳${desc}: ${fechaTxt}`;
   navigator.clipboard.writeText(texto).then(()=>{
     const btn=document.getElementById('btnCopiarProximo');
     btn.textContent='✅ Copiado';
