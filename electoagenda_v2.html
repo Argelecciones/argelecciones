@@ -143,32 +143,65 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .btn-descarga.secundario{background:var(--subtle);border:1px solid var(--border);color:var(--muted);}
 .btn-descarga.secundario:hover{color:var(--text);opacity:1}
 
-/* PLACA EXPORTABLE (oculta, 1920x1080) */
+/* PLACA EXPORTABLE - SOLUCIONADO EL CORTE DE ALTURA */
 #placaCalendario{
   position:fixed;left:-9999px;top:0;
   width:1920px;height:1080px;
   background:#0b1220;
   font-family:'Segoe UI',system-ui,sans-serif;
-  padding:60px 70px;box-sizing:border-box;
-  display:flex;flex-direction:column;gap:30px;
+  padding:50px 60px;box-sizing:border-box;
+  display:flex;flex-direction:column;
+  justify-content:space-between;
   color:#f0f4ff;
 }
-.placa-header-cal{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #1e2d45;padding-bottom:28px;}
-.placa-titulo-cal{font-size:80px;font-weight:900;letter-spacing:-1px;line-height:1}
+.placa-header-cal{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #1e2d45;padding-bottom:20px;flex-shrink:0;}
+.placa-titulo-cal{font-size:72px;font-weight:900;letter-spacing:-1px;line-height:1}
 .placa-titulo-cal span{color:#f43f5e}
-.placa-subtitulo-cal{font-size:26px;color:#4a5878;font-weight:700;margin-top:8px}
-.placa-mes-cal{font-size:40px;font-weight:900;color:#f0f4ff;text-align:right}
-.placa-año-cal{font-size:22px;color:#4a5878;font-weight:700;text-align:right;margin-top:4px}
-.placa-grid-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;flex:1}
-.placa-diaSem{text-align:center;font-size:16px;font-weight:900;color:#4a5878;text-transform:uppercase;letter-spacing:.08em;padding:8px 0;}
-.placa-celda-cal{background:#111827;border:1px solid #1e2d45;border-radius:8px;padding:10px;min-height:110px;display:flex;flex-direction:column;gap:4px;}
+.placa-subtitulo-cal{font-size:24px;color:#4a5878;font-weight:700;margin-top:6px}
+.placa-mes-cal{font-size:36px;font-weight:900;color:#f0f4ff;text-align:right}
+.placa-año-cal{font-size:20px;color:#4a5878;font-weight:700;text-align:right;margin-top:4px}
+
+.placa-grid-cal{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:8px;
+  height:760px; /* Altura estricta para forzar la contención total */
+  margin:20px 0;
+  flex-shrink:0;
+}
+.placa-diaSem{text-align:center;font-size:14px;font-weight:900;color:#4a5878;text-transform:uppercase;letter-spacing:.08em;padding:4px 0;}
+.placa-celda-cal{background:#111827;border:1px solid #1e2d45;border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:4px;overflow:hidden;}
 .placa-celda-cal.otro-mes-p{opacity:.2}
 .placa-celda-cal.hoy-p{border-color:#4a5878}
-.placa-num-cal{font-size:18px;font-weight:900;color:#4a5878;margin-bottom:4px}
+.placa-num-cal{font-size:16px;font-weight:900;color:#4a5878;margin-bottom:2px}
 .placa-celda-cal.hoy-p .placa-num-cal{color:#f0f4ff}
-.placa-ev-cal{font-size:21px;font-weight:700;color:#fff;padding:2px 5px;border-radius:3px;white-space:normal;word-break:break-word;line-height:1.3;}
-.placa-footer-cal{display:flex;justify-content:space-between;align-items:center;border-top:1px solid #1e2d45;padding-top:16px;}
-.placa-footer-txt{font-size:18px;color:#4a5878;font-weight:700}
+.placa-ev-cal{font-size:11px;font-weight:700;color:#fff;padding:3px 5px;border-radius:4px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;white-space:normal;word-break:break-word;}
+
+.placa-footer-cal{display:flex;justify-content:space-between;align-items:center;border-top:1px solid #1e2d45;padding-top:15px;flex-shrink:0;}
+.placa-footer-txt{font-size:16px;color:#4a5878;font-weight:700}
+
+/* PLACA PRÓXIMO EVENTO INTERNA (1200x1200px) */
+#placaProximoExport{
+  position:fixed;left:-9999px;top:0;
+  width:1200px;height:1200px;
+  background:#0b1220;
+  font-family:'Segoe UI',system-ui,sans-serif;
+  padding:90px;box-sizing:border-box;
+  display:flex;flex-direction:column;
+  justify-content:space-between;
+  color:#f0f4ff;
+}
+.placa-prox-header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #1e2d45;padding-bottom:30px;}
+.placa-prox-brand{font-size:36px;font-weight:900;letter-spacing:-0.5px}
+.placa-prox-brand span{color:#f43f5e}
+.placa-prox-tag{background:#f43f5e;color:#fff;font-size:16px;font-weight:900;text-transform:uppercase;letter-spacing:0.12em;padding:6px 16px;border-radius:4px;}
+.placa-prox-body{flex:1;display:flex;flex-direction:column;justify-content:center;gap:40px;padding:40px 0;}
+.placa-prox-dias-container{display:flex;align-items:baseline;gap:15px;}
+.placa-prox-dias-num{font-size:150px;font-weight:900;color:#f43f5e;line-height:1}
+.placa-prox-dias-lbl{font-size:32px;font-weight:800;color:#4a5878;text-transform:uppercase;letter-spacing:0.05em;}
+.placa-prox-title{font-size:52px;font-weight:800;color:#fff;line-height:1.25;letter-spacing:-0.5px;}
+.placa-prox-date{font-size:28px;font-weight:600;color:#a855f7;background:rgba(168,85,247,0.08);padding:12px 24px;border-radius:8px;border:1px solid rgba(168,85,247,0.2);align-self:flex-start;}
+.placa-prox-footer{display:flex;justify-content:space-between;align-items:center;border-top:1px solid #1e2d45;padding-top:30px;}
 
 /* MODAL PREVISUALIZACIÓN */
 .gallery-modal{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(11,18,32,0.96);display:none;justify-content:center;align-items:center;z-index:10000;padding:30px;cursor:zoom-out;}
@@ -177,6 +210,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .gallery-close-btn{position:absolute;top:-50px;right:0;background:transparent;border:none;color:#f0f4ff;font-size:38px;font-weight:700;cursor:pointer;transition:color .2s;}
 .gallery-close-btn:hover{color:#f43f5e}
 .gallery-caption{color:#94a3b8;font-size:13px;font-weight:600;margin-top:15px;text-transform:uppercase;letter-spacing:.05em;}
+
 /* VACÍO */
 .vacio{text-align:center;padding:60px 20px;color:var(--muted)}
 .vacio-icon{font-size:36px;margin-bottom:10px}
@@ -211,12 +245,15 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
     <div class="proximo-dias" id="proximoDias">—</div>
     <div class="proximo-label">días</div>
   </div>
- <div class="proximo-sep"></div>
-  <div>
+  <div class="proximo-sep"></div>
+  <div style="flex-grow: 1;">
     <div class="proximo-desc" id="proximoDesc">—</div>
     <div class="proximo-fecha" id="proximoFecha">—</div>
   </div>
-  <button id="btnCopiarProximo" onclick="copiarProximo()" style="background:#f43f5e;border:none;color:#fff;padding:6px 12px;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;margin-left:8px;flex-shrink:0;">📋 Copiar</button>
+  <div style="display: flex; gap: 6px; flex-shrink: 0;">
+    <button id="btnCopiarProximo" onclick="copiarProximo()" style="background:#1e293b; border:1px solid #334155; color:#fff; padding:6px 12px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">📋 Copiar</button>
+    <button id="btnPlacaProximo" onclick="descargarPlacaProximo()" style="background:#f43f5e; border:none; color:#fff; padding:6px 12px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">📸 Imagen</button>
+  </div>
 </div>
 
 <div class="toolbar">
@@ -265,7 +302,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
   </div>
 </div>
 
-<!-- PLACA EXPORTABLE OCULTA -->
+<!-- PLACA EXPORTABLE CALENDARIO OCULTA (1920x1080) -->
 <div id="placaCalendario">
   <div class="placa-header-cal">
     <div>
@@ -279,8 +316,28 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
   </div>
   <div class="placa-grid-cal" id="placaGridCal"></div>
   <div class="placa-footer-cal">
-    <img src="logo.png" alt="Logo" style="height:60px;width:auto;">
-    <div class="placa-footer-txt">#ElectoAgenda · Solo para difusión</div>
+    <img src="logo.png" alt="Logo" style="height:45px;width:auto;">
+    <div class="placa-footer-txt">#ElectoAgenda · Solo para difusión · @argelecciones</div>
+  </div>
+</div>
+
+<!-- PLACA EXPORTABLE PRÓXIMO EVENTO OCULTA (1200x1200px) -->
+<div id="placaProximoExport">
+  <div class="placa-prox-header">
+    <div class="placa-prox-brand">Electo<span>Agenda</span></div>
+    <div class="placa-prox-tag">Próximo evento</div>
+  </div>
+  <div class="placa-prox-body">
+    <div class="placa-prox-dias-container">
+      <div class="placa-prox-dias-num" id="placaProxDiasNum">0</div>
+      <div class="placa-prox-dias-lbl" id="placaProxDiasLbl">días restantes</div>
+    </div>
+    <div class="placa-prox-title" id="placaProxTitle">—</div>
+    <div class="placa-prox-date" id="placaProxDate">—</div>
+  </div>
+  <div class="placa-prox-footer">
+    <img src="logo.png" alt="Logo" style="height:50px;width:auto;">
+    <div style="font-size:20px; color:#4a5878; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">@argelecciones</div>
   </div>
 </div>
 
@@ -352,7 +409,8 @@ function actualizarBannerProximo(){
   document.getElementById('proximoFecha').textContent=fechaStr+(prox.provincia?` · ${prox.provincia}`:'');
   banner.classList.add('visible');
 }
-function copiarProximo(){
+
+function copiarProximo()){
   const desc=document.getElementById('proximoDesc').textContent;
   const fechaCompleta=document.getElementById('proximoFecha').textContent;
   const partes=fechaCompleta.split('·');
@@ -366,6 +424,58 @@ function copiarProximo(){
     btn.textContent='✅ Copiado';
     setTimeout(()=>{btn.textContent='📋 Copiar';},2000);
   });
+}
+
+function descargarPlacaProximo(){
+  const futuros=eventos.filter(e=>e.fecha>=hoy);
+  if(!futuros.length) return;
+  const prox=futuros[0]; 
+  const dias=diasHasta(prox.fecha);
+
+  // Mapeamos los datos reales a la placa cuadrada de fondo
+  const numPlaca = dias === 0 ? "¡HOY!" : dias;
+  const lblPlaca = dias === 0 ? "" : (dias === 1 ? "día restante" : "días restantes");
+  
+  document.getElementById('placaProxDiasNum').textContent = numPlaca;
+  document.getElementById('placaProxDiasLbl').textContent = lblPlaca;
+  document.getElementById('placaProxTitle').textContent = prox.descripcion;
+  
+  const fechaStr = `${DIAS[prox.fecha.getDay()]} ${prox.fecha.getDate()} de ${MESES[prox.fecha.getMonth()]} de ${prox.fecha.getFullYear()}`;
+  document.getElementById('placaProxDate').textContent = fechaStr + (prox.provincia ? ` · 📍 ${prox.provincia}` : '');
+
+  const placa = document.getElementById('placaProximoExport');
+  const orig = placa.style.cssText;
+  
+  placa.style.position = 'fixed';
+  placa.style.left = '0';
+  placa.style.top = '0';
+  placa.style.zIndex = '-1';
+  placa.style.display = 'flex';
+  placa.querySelector('img').style.display = 'none';
+
+  setTimeout(() => {
+    html2canvas(placa, {
+      scale: 1,
+      backgroundColor: '#0b1220',
+      width: 1200,
+      height: 1200,
+      useCORS: true,
+      allowTaint: true
+    }).then(canvas => {
+      placa.style.cssText = orig;
+      placa.style.display = 'none';
+      
+      const link = document.createElement('a');
+      link.download = `proximo-evento-${prox.fecha.getFullYear()}-${prox.fecha.getMonth()+1}-${prox.fecha.getDate()}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      placa.querySelector('img').style.display = '';
+    }).catch(err => {
+      placa.style.cssText = orig;
+      placa.style.display = 'none';
+      alert('Error generando imagen: ' + err.message);
+    });
+  }, 150);
 }
 
 function cerrarModalGaleria(){
@@ -387,7 +497,6 @@ function setFiltro(f){
   document.querySelector(`.filtro.f-${f}`)?.classList.add('active');
   if(vista==='lista') renderizarLista();
   else {
-    // Si no hay eventos en el mes actual con este filtro, ir al próximo mes con eventos
     if(f!=='todos'){
       const tieneEvMes=eventos.some(e=>{
         const mismoMes=e.fecha.getFullYear()===calAño&&e.fecha.getMonth()===calMes;
@@ -472,7 +581,6 @@ function renderizarCalendario(){
   const ultimo=new Date(calAño,calMes+1,0);
   const inicioSem=primer.getDay();
   let celdas='';
-  // Celdas vacías antes del primer día
   for(let i=0;i<inicioSem;i++){
     const d=new Date(calAño,calMes,-(inicioSem-1-i));
     celdas+=`<div class="cal-celda otro-mes"><div class="cal-num">${d.getDate()}</div></div>`;
@@ -485,18 +593,17 @@ function renderizarCalendario(){
     else if(filtro!=='todos') evsDia=evsDia.filter(e=>catKey(e.categoria)===filtro);
     let puntosHTML='';
     if(evsDia.length>0){
-  const primero=evsDia[0];
-  const cls=primero.destacado?'destacado':catKey(primero.categoria);
-  puntosHTML+=`<div class="cal-punto ${cls}">${primero.descripcion}</div>`;
-  if(evsDia.length>1){
-    const cls2=evsDia[evsDia.length-1].destacado?'destacado':catKey(evsDia[evsDia.length-1].categoria);
-    puntosHTML+=`<div class="cal-mas ${cls2}">+${evsDia.length-1}</div>`;
-  }
-}
+      const primero=evsDia[0];
+      const cls=primero.destacado?'destacado':catKey(primero.categoria);
+      puntosHTML+=`<div class="cal-punto ${cls}">${primero.descripcion}</div>`;
+      if(evsDia.length>1){
+        const cls2=evsDia[evsDia.length-1].destacado?'destacado':catKey(evsDia[evsDia.length-1].categoria);
+        puntosHTML+=`<div class="cal-mas ${cls2}">+${evsDia.length-1}</div>`;
+      }
+    }
     const tieneEv=evsDia.length>0;
     celdas+=`<div class="cal-celda${esHoy?' hoy-cel':''}${tieneEv?' tiene-eventos':''}" ${tieneEv?`onclick="mostrarDetalleDia(${d})"`:''}><div class="cal-num">${d}</div>${puntosHTML}</div>`;
   }
-  // Completar última semana
   const celdastotal=inicioSem+ultimo.getDate();
   const resto=celdastotal%7===0?0:7-(celdastotal%7);
   for(let i=1;i<=resto;i++){
@@ -535,11 +642,9 @@ function construirPlacaCal(){
   const ultimo=new Date(calAño,calMes+1,0);
   const inicioSem=primer.getDay();
   let html='';
-  // Encabezados días
   ['DOM','LUN','MAR','MIÉ','JUE','VIE','SÁB'].forEach(d=>{
     html+=`<div class="placa-diaSem">${d}</div>`;
   });
-  // Vacíos inicio
   for(let i=0;i<inicioSem;i++){
     const d=new Date(calAño,calMes,-(inicioSem-1-i));
     html+=`<div class="placa-celda-cal otro-mes-p"><div class="placa-num-cal">${d.getDate()}</div></div>`;
@@ -554,10 +659,9 @@ function construirPlacaCal(){
       const color=ck==='nacional'?'#3b82f6':ck==='provincial'?'#a855f7':ck==='municipal'?'#f59e0b':ck==='partidos'?'#10b981':'#f43f5e';
       evsHTML+=`<div class="placa-ev-cal" style="background:${color}">${ev.descripcion}</div>`;
     });
-    if(evsDia.length>3) evsHTML+=`<div style="font-size:10px;color:#4a5878;font-weight:700">+${evsDia.length-3}</div>`;
+    if(evsDia.length>3) evsHTML+=`<div style="font-size:10px;color:#4a5878;font-weight:700;margin-top:2px;padding-left:4px;">+${evsDia.length-3}</div>`;
     html+=`<div class="placa-celda-cal${esHoy?' hoy-p':''}"><div class="placa-num-cal">${d}</div>${evsHTML}</div>`;
   }
-  // Resto
   const total=inicioSem+ultimo.getDate();
   const resto=total%7===0?0:7-(total%7);
   for(let i=1;i<=resto;i++) html+=`<div class="placa-celda-cal otro-mes-p"><div class="placa-num-cal">${i}</div></div>`;
@@ -630,7 +734,6 @@ async function cargar(){
   }finally{icon.className=''; icon.textContent='↻';}
 }
 
-// Activar vista lista por defecto
 setVista('lista');
 cargar();
 </script>
