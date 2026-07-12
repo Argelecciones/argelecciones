@@ -410,7 +410,7 @@ function actualizarBannerProximo(){
   banner.classList.add('visible');
 }
 
-function copiarProximo()){
+function copiarProximo(){
   const desc=document.getElementById('proximoDesc').textContent;
   const fechaCompleta=document.getElementById('proximoFecha').textContent;
   const partes=fechaCompleta.split('·');
@@ -432,7 +432,6 @@ function descargarPlacaProximo(){
   const prox=futuros[0]; 
   const dias=diasHasta(prox.fecha);
 
-  // Mapeamos los datos reales a la placa cuadrada de fondo
   const numPlaca = dias === 0 ? "¡HOY!" : dias;
   const lblPlaca = dias === 0 ? "" : (dias === 1 ? "día restante" : "días restantes");
   
@@ -527,7 +526,6 @@ function setVista(v){
   if(v==='calendario') renderizarCalendario();
 }
 
-// ====== VISTA LISTA ======
 function renderizarLista(){
   const busq=document.getElementById('buscador').value.toLowerCase().trim();
   let lista=eventos;
@@ -571,7 +569,6 @@ function renderizarLista(){
   main.innerHTML=html;
 }
 
-// ====== VISTA CALENDARIO ======
 function cambiarMesCal(d){ calMes+=d; if(calMes>11){calMes=0;calAño++;}else if(calMes<0){calMes=11;calAño--;} renderizarCalendario(); }
 
 function renderizarCalendario(){
@@ -634,7 +631,6 @@ function mostrarDetalleDia(d){
   detalle.innerHTML=html; detalle.classList.add('visible');
 }
 
-// ====== PLACA DEL MES ======
 function construirPlacaCal(){
   document.getElementById('placaMesTitulo').textContent=MESES[calMes].toUpperCase();
   document.getElementById('placaAñoTitulo').textContent=calAño;
@@ -702,7 +698,7 @@ function descargarPlacaCal(){
       link.download=`electoagenda-${MESES[calMes].toLowerCase()}-${calAño}-argelecciones.png`;
       link.href=canvas.toDataURL('image/png');
       link.click();
-	  placa.querySelector('img').style.display='';
+      placa.querySelector('img').style.display='';
     }).catch(err=>{
       placa.style.left='-9999px';
       alert('Error al generar la placa: '+err.message);
@@ -710,7 +706,6 @@ function descargarPlacaCal(){
   }, 200);
 }
 
-// ====== CARGA DE DATOS ======
 async function cargar(){
   const dot=document.getElementById('statusDot');
   const txt=document.getElementById('statusTxt');
