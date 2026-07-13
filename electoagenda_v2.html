@@ -255,6 +255,42 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
   
   .cal-descarga-row { padding: 0 16px; flex-direction: column; }
   .btn-descarga { width: 100%; text-align: center; }
+  /* Reducción de tamaños en el encabezado de la placa para ganar espacio vertical */
+#placaCalendario {
+  padding: 40px 70px 30px; /* Reducimos padding superior e inferior (antes 60px) */
+  gap: 20px; /* Menos espacio de separación entre bloques (antes 30px) */
+}
+
+.placa-header-cal {
+  padding-bottom: 16px; /* Menos espacio debajo de la línea divisoria (antes 28px) */
+}
+
+.placa-titulo-cal {
+  font-size: 60px; /* Achicamos ElectoAgenda (antes 80px) */
+}
+
+.placa-subtitulo-cal {
+  font-size: 20px; /* Achicamos el subtítulo (antes 26px) */
+  margin-top: 4px;
+}
+
+.placa-mes-cal {
+  font-size: 32px; /* Ajustamos el tamaño del mes (antes 40px) */
+}
+
+.placa-año-cal {
+  font-size: 18px; /* Ajustamos el tamaño del año (antes 22px) */
+  margin-top: 2px;
+}
+
+/* Ajuste sutil en las celdas para que aprovechen mejor el nuevo espacio */
+.placa-celda-cal {
+  padding: 8px;
+  gap: 3px;
+}
+
+.placa-ev-cal {
+  font-size: 19px; /* Un puntito menos al texto del evento ayuda a que no desborde (antes 21px) */
 }
 </style>
 </head>
