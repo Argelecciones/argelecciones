@@ -449,11 +449,18 @@ function actualizarBannerProximo(){
   // Encontrar el índice absoluto del próximo evento en el array principal
   const idxAbsoluto = eventos.indexOf(prox);
   
-  document.getElementById('proximoDias').textContent=dias===0?'¡HOY!':dias;
+ // Ocultar o mostrar la palabra "días" según si es hoy o no
+  if (dias === 0) {
+    document.getElementById('proximoDias').textContent = '¡HOY!';
+    document.getElementById('proximoDias').nextElementSibling.style.display = 'none'; // Oculta el div que dice "días"
+  } else {
+    document.getElementById('proximoDias').textContent = dias;
+    document.getElementById('proximoDias').nextElementSibling.style.display = 'block'; // Muestra "días" si faltan más
+  }
+  
   document.getElementById('proximoDesc').textContent=prox.descripcion;
   const fechaStr=`${DIAS[prox.fecha.getDay()]} ${prox.fecha.getDate()} de ${MESES[prox.fecha.getMonth()]} de ${prox.fecha.getFullYear()}`;
   document.getElementById('proximoFecha').textContent=fechaStr+(prox.provincia?` · ${prox.provincia}`:'');
-  
   // Vincular eventos de los botones del banner superior
   const btnCopiar = document.getElementById('btnCopiarProximo');
   btnCopiar.onclick = () => copiarEvento(idxAbsoluto, btnCopiar);
