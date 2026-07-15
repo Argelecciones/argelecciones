@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Radar Electoral - @ArgElecciones Tools</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --bg-dark: #0f172a;
+        --bg-card: #1e293b;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --accent: #2563eb;
+        --color-noticia: #38bdf8;
+        --color-encuesta: #f59e0b;
+    }
+    body {
+        margin: 0;
+        font-family: 'Inter', sans-serif;
+        background-color: #090d16;
+        color: var(--text-main);
+        padding: 20px;
+    }
+    .spa-container { max-width: 900px; margin: 0 auto; }
+
+    .tool-header {
+        background: var(--bg-dark);
+        padding: 20px;
+        border-radius: 8px;
+        border-bottom: 1px solid #1e293b;
+        margin-bottom: 20px;
+    }
+    .tool-header h2 { font-size: 22px; font-weight: 800; margin: 0; }
+    .tool-header h2 span { color: var(--color-encuesta); }
+    .tool-header p { color: #93c5fd; margin: 5px 0 0 0; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
+
+    .search-section {
+        background: var(--bg-card);
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #334155;
+        margin-bottom: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px;
+    }
+    .input-group { display: flex; flex-direction: column; gap: 6px; }
+    .input-group label { font-size: 12px; font-weight: 600; color: #cbd5e1; }
+    select, input {
+        background: var(--bg-dark);
+        border: 1px solid #475569;
+        color: #fff;
+        padding: 12px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-family: inherit;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    #statusBar { font-size: 13px; color: var(--text-muted); margin-bottom: 15px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+    #statusBar strong { color: var(--text-main); }
+
+    .lista-noticias { display: flex; flex-direction: column; gap: 10px; }
+
+    .noticia-card {
+        background: var(--bg-card);
+        border: 1px solid #334155;
+        border-left: 4px solid var(--color-noticia);
+        border-radius: 8px;
+        padding: 16px 18px;
+        text-decoration: none;
+        color: var(--text-main);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        transition: background 0.15s ease, transform 0.1s ease;
+    }
+    .noticia-card:hover { background: #253347; transform: translateX(2px); }
+    .noticia-card.tema-encuesta { border-left-color: var(--color-encuesta); }
+
+    .noticia-meta { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
+    .badge-tema {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: 800;
+        color: #0f172a;
+        background: var(--color-noticia);
+    }
+    .badge-tema.tema-encuesta { background: var(--color-encuesta); }
+    .noticia-titulo { font-size: 16px; font-weight: 700; line-height: 1.4; }
+
+    .sin-resultados { text-align: center; color: var(--text-muted); padding: 40px 0; font-size: 14px; }
+
+    .tool-footer { text-align: center; color: var(--text-muted); font-size: 12px; margin-top: 25px; }
+    .tool-footer .brand { color: var(--color-encuesta); font-weight: 800; }
+	/* Botón de ocultar dentro de la tarjeta */
+.noticia-card {
+    position: relative;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.btn-ocultar {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-muted);
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    z-index: 10;
+    transition: background 0.2s, color 0.2s;
+}
+
+.btn-ocultar:hover {
+    background: #ef4444; /* Rojo al pasar el mouse */
+    color: white;
+}
+
+/* Tarjeta en proceso de ocultarse */
+.noticia-card.ocultando {
+    opacity: 0;
+    transform: scale(0.95);
+}
+
+/* Botón para restablecer la vista */
+.btn-restablecer {
+    background: transparent;
+    border: 1px solid var(--text-muted);
+    color: var(--text-muted);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-left: 10px;
+}
+
+.btn-restablecer:hover {
+    border-color: var(--text-main);
+    color: var(--text-main);
+}
+
+/* Ajustar los metas de la tarjeta para que no se pisen con el botón */
+.noticia-meta {
+    padding-right: 35px;
+}
+</style>
+</head>
+<body>
+<div class="spa-container">
+
+    <div class="tool-header">
+        <h2>Radar <span>Electoral</span></h2>
+        <p>@ArgElecciones Tools</p>
+    </div>
+
+    <div class="search-section">
+        <div class="filter-grid">
+            <div class="input-group">
+                <label for="filterTema">Tipo:</label>
+                <select id="filterTema" onchange="renderizarLista()">
+                    <option value="">-- Noticias y Encuestas --</option>
+                    <option value="Noticia">Solo Noticias</option>
+                    <option value="Encuesta">Solo Encuestas</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="filterMedio">Medio:</label>
+                <select id="filterMedio" onchange="renderizarLista()">
+                    <option value="">-- Todos los medios --</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="searchTexto">Buscar por palabra clave:</label>
+                <input type="text" id="searchTexto" placeholder="Ej: balotaje, provincia..." oninput="renderizarLista()">
+            </div>
+        </div>
+    </div>
+
+    <div id="statusBar">
+        <span id="loadingStatus">⏳ Cargando noticias...</span>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <span id="conteoResultados"></span>
+            <button id="btnRestablecer" class="btn-restablecer" style="display: none;" onclick="restablecerOcultos()">Mostrar ocultas</button>
+        </div>
+    </div>
+
+    <div class="lista-noticias" id="listaNoticias"></div>
+
+    <div class="tool-footer">
+        Se actualiza automáticamente cada 24-48hs · <span class="brand">@argelecciones</span>
+    </div>
+
+</div>
+
+<script>
+    // Reemplazar por la URL de "Implementación web" del Apps Script.
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxGjDGKBgwpTDx8BF59UCv3vMWEk0l1tvnHzW6O6ylaunQ1DEdofCO8Dt7JNxn9oM2TLg/exec";
+
+    let BD_NOTICIAS = [];
+    const STORAGE_OCULTOS = 'noticias_ocultas_argelecciones';
+
+    // Funciones auxiliares para gestionar las noticias ocultas de forma local
+    function obtenerOcultas() {
+        const guardadas = localStorage.getItem(STORAGE_OCULTOS);
+        return guardadas ? JSON.parse(guardadas) : [];
+    }
+
+    function ocultarNoticia(event, url) {
+        // Evita que al hacer clic en la cruz se abra el enlace de la noticia
+        event.preventDefault();
+        event.stopPropagation();
+        
+        // Guardar URL en localStorage
+        const ocultas = obtenerOcultas();
+        if (!ocultas.includes(url)) {
+            ocultas.push(url);
+            localStorage.setItem(STORAGE_OCULTOS, JSON.stringify(ocultas));
+        }
+
+        // Animación visual de desvanecimiento antes de renderizar
+        const tarjeta = document.querySelector(`[data-url="${btoa(url)}"]`);
+        if (tarjeta) {
+            tarjeta.classList.add('ocultando');
+            setTimeout(() => {
+                renderizarLista();
+            }, 300);
+        }
+    }
+
+    function restablecerOcultos() {
+        localStorage.removeItem(STORAGE_OCULTOS);
+        renderizarLista();
+    }
+
+    async function cargarNoticias() {
+        try {
+            const response = await fetch(APPS_SCRIPT_URL);
+            const data = await response.json();
+            BD_NOTICIAS = data.noticias || [];
+            document.getElementById('loadingStatus').innerText =
+                BD_NOTICIAS.length > 0
+                    ? `Última actualización: ${new Date(BD_NOTICIAS[0].Fecha).toLocaleString('es-AR')}`
+                    : "Sin noticias cargadas todavía.";
+            poblarFiltroMedios();
+            renderizarLista();
+        } catch (error) {
+            console.error("Error en conexión:", error);
+            document.getElementById('loadingStatus').innerText = "❌ Error al cargar los datos.";
+        }
+    }
+
+    function poblarFiltroMedios() {
+        const selMedio = document.getElementById('filterMedio');
+        // Limpiamos opciones anteriores para no duplicarlas si se vuelve a cargar
+        selMedio.innerHTML = '<option value="">Todos los medios</option>';
+        const medios = [...new Set(BD_NOTICIAS.map(n => n.Medio).filter(Boolean))].sort();
+        medios.forEach(m => {
+            const opt = document.createElement('option');
+            opt.value = m;
+            opt.textContent = m;
+            selMedio.appendChild(opt);
+        });
+    }
+
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.innerText = str;
+        return div.innerHTML;
+    }
+
+    function renderizarLista() {
+        const fTema = document.getElementById('filterTema').value;
+        const fMedio = document.getElementById('filterMedio').value;
+        const fTexto = document.getElementById('searchTexto').value.toLowerCase().trim();
+
+        // Obtener las URLs que el usuario ocultó en su navegador
+        const ocultas = obtenerOcultas();
+        
+        // Mostrar u ocultar el botón de "Mostrar ocultas" según si hay elementos archivados
+        document.getElementById('btnRestablecer').style.display = ocultas.length > 0 ? 'inline-block' : 'none';
+
+        // Filtrar la lista
+        let filtradas = BD_NOTICIAS.slice();
+        
+        // Excluir de la lista visual las noticias que están guardadas como "ocultas"
+        filtradas = filtradas.filter(n => !ocultas.includes(n.URL));
+
+        if (fTema) filtradas = filtradas.filter(n => n.Tema === fTema);
+        if (fMedio) filtradas = filtradas.filter(n => n.Medio === fMedio);
+        if (fTexto) filtradas = filtradas.filter(n => (n.Titulo || "").toLowerCase().includes(fTexto));
+
+        filtradas.sort((a, b) => new Date(b.Fecha) - new Date(a.Fecha));
+
+        const contenedor = document.getElementById('listaNoticias');
+        document.getElementById('conteoResultados').innerText = `${filtradas.length} resultado(s)`;
+
+        if (filtradas.length === 0) {
+            contenedor.innerHTML = `<div class="sin-resultados">No hay noticias que coincidan con estos filtros.</div>`;
+            return;
+        }
+
+        contenedor.innerHTML = filtradas.map(n => {
+            const claseTema = n.Tema === "Encuesta" ? "tema-encuesta" : "";
+            const fechaFmt = n.Fecha ? new Date(n.Fecha).toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
+            // Codificamos la URL en base64 para asignarla como identificador seguro en la etiqueta HTML
+            const urlSegura = btoa(n.URL); 
+
+            return `
+                <a class="noticia-card ${claseTema}" href="${escapeHtml(n.URL)}" target="_blank" rel="noopener noreferrer" data-url="${urlSegura}">
+                    <button class="btn-ocultar" title="Ocultar esta noticia" onclick="ocultarNoticia(event, '${escapeHtml(n.URL)}')">✕</button>
+                    
+                    <div class="noticia-meta">
+                        <span class="badge-tema ${claseTema}">${escapeHtml(n.Tema || 'Noticia')}</span>
+                        <span>${escapeHtml(n.Medio || '')}</span>
+                        <span>·</span>
+                        <span>${fechaFmt}</span>
+                    </div>
+                    <div class="noticia-titulo">${escapeHtml(n.Titulo || '')}</div>
+                </a>
+            `;
+        }).join('');
+    }
+
+    cargarNoticias();
+</script>
+</body>
+</html>
