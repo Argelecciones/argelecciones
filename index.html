@@ -22,6 +22,7 @@
             --color-calendario: #d97706; /* Amarillo / Ámbar oscuro legible */
             --color-dhondt: #dc2626; /* Rojo */
             --color-hare: #16a34a; /* Verde */
+            --color-radar: #06b6d4; /* Celeste / Turquesa para el Radar Electoral */
         }
 
         body {
@@ -148,6 +149,14 @@
         }
         .card-hare h3 { color: #166534; }
 
+        /* 5. Radar Electoral (Celeste/Turquesa) */
+        .card-radar:hover {
+            transform: translateY(-5px);
+            border-color: var(--color-radar);
+            box-shadow: 0 10px 20px rgba(6, 182, 212, 0.55);
+        }
+        .card-radar h3 { color: #0891b2; }
+
 
         /* Footer */
         .toolbox-footer {
@@ -167,42 +176,42 @@
 <body>
 
     <div class="toolbox-container">
-        <!-- Encabezado de la central -->
         <header class="toolbox-header">
             <img src="logo.png" alt="@argelecciones" class="toolbox-logo">
             <h1>@Argelecciones Toolbox</h1>
             <p>Herramientas para el análisis electoral y legislativo de Argentina</p>
         </header>
 
-        <!-- Botonera Interactiva -->
         <div class="tools-grid">
             
-            <!-- 1. Congresómetro -->
             <a href="congresometro.html" class="tool-card card-congreso">
                 <div class="tool-icon">🏛️</div>
                 <h3>Congresómetro</h3>
                 <p>Monitoreo dinámico de votaciones para ambas cámaras del Congreso y "busca quórum".</p>
             </a>
 
-            <!-- 2. Calendómetro / Electoagenda -->
             <a href="electoagenda_v2.html" class="tool-card card-calendario">
                 <div class="tool-icon">📅</div>
                 <h3>Electoagenda</h3>
                 <p>Cronograma y seguimiento del calendario electoral nacional y provincial.</p>
             </a>
 
-            <!-- 3. Calculadora D'Hondt -->
             <a href="DHondt_v2.html" class="tool-card card-dhondt">
                 <div class="tool-icon">📊</div>
                 <h3>Sistema D'Hondt</h3>
                 <p>Distribución de bancas mediante cocientes proporcionales.</p>
             </a>
 
-            <!-- 4. Calculadora Cociente Hare -->
             <a href="hare.html" class="tool-card card-hare">
                 <div class="tool-icon">🧮</div>
                 <h3>Cociente Hare</h3>
                 <p>Cálculo de reparto por residuo mayor (Provincia de Bs. As.).</p>
+            </a>
+
+            <a href="Radar-electoral.html" class="tool-card card-radar">
+                <div class="tool-icon">📡</div>
+                <h3>Radar Electoral</h3>
+                <p>Últimas noticias y encuestas publicadas sobre reforma y proceso electoral en tiempo real.</p>
             </a>
 
         </div>
