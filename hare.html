@@ -147,13 +147,15 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
         <select class="field-select" id="selTipo" onchange="onTipoChange()">
           <option value="sinGobernador">Sin gobernador (años impares: 2025, 2029…)</option>
           <option value="conGobernador">Con gobernador (años pares: 2027, 2031…)</option>
+          <option value="concejales">Concejales (Municipios)</option>
         </select>
       </div>
       <div>
-        <div class="field-label">Sección electoral</div>
+        <div class="field-label" id="lblSeccion">Sección electoral</div>
         <select class="field-select" id="selSeccion" onchange="onSeccionChange()">
         </select>
       </div>
+    </div>
     </div>
     <div class="params-row">
       <div class="param-box">
@@ -285,6 +287,9 @@ const SECCIONES = {
     { nombre: 'Quinta',   cargo: 'Diputados provinciales', bancas: 11 },
     { nombre: 'Sexta',    cargo: 'Senadores provinciales', bancas: 6  },
     { nombre: 'Séptima',  cargo: 'Diputados provinciales', bancas: 6  },
+  ],
+  concejales: [
+    { nombre: 'Concejo Deliberante (editar bancas a la derecha)', cargo: 'Concejales', bancas: 12 }
   ]
 };
 
@@ -312,6 +317,11 @@ function poblarSecciones() {
 }
 
 function onTipoChange() {
+  const tipo = document.getElementById('selTipo').value;
+  const lbl = document.getElementById('lblSeccion');
+  if (lbl) {
+    lbl.textContent = tipo === 'concejales' ? 'Municipio / Concejo' : 'Sección electoral';
+  }
   poblarSecciones();
   onSeccionChange();
 }
