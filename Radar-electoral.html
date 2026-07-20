@@ -32,7 +32,20 @@
         border-radius: 8px;
         border-bottom: 1px solid #1e293b;
         margin-bottom: 20px;
+        
+        /* 🚀 Flexbox para alinear el logo y el texto */
+        display: flex;
+        align-items: center; /* Centrado vertical */
+        gap: 20px;           /* Espacio entre el logo y el texto */
     }
+
+    /* Tamaño de logo */
+    .tool-header-logo {
+        height: 55px;        /* Alto ideal para que no rompa la estructura */
+        width: auto;         /* Mantiene la proporción original */
+        object-fit: contain;
+    }
+
     .tool-header h2 { font-size: 22px; font-weight: 800; margin: 0; }
     .tool-header h2 span { color: var(--color-encuesta); }
     .tool-header p { color: #93c5fd; margin: 5px 0 0 0; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
@@ -168,10 +181,11 @@
 <div class="spa-container">
 
     <div class="tool-header">
-     <img src="logo.png" alt="Logo" class="tool-header-logo">
-    <div>
-        <h2>Radar <span>Electoral</span></h2>
-        <p>@ArgElecciones Toolbox</p>
+        <img src="logo.png" alt="Logo" class="tool-header-logo">
+        <div class="tool-header-text">
+            <h2>Radar <span>Electoral</span></h2>
+            <p>@ArgElecciones Toolbox</p>
+        </div>
     </div>
 
     <div class="search-section">
