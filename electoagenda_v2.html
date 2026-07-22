@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ElectoAgenda — @argelecciones</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -13,7 +14,7 @@
   --nacional:#3b82f6;--provincial:#a855f7;--municipal:#f59e0b;
   --partidos:#10b981;--destacado:#f43f5e;
 }
-body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;min-height:100vh}
 
 /* HEADER */
 .header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
@@ -183,7 +184,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 #placaProximoExport {
   position: fixed; left: -9999px; top: 0;
   width: 1200px; height: 1200px;
-  background: #0b1220;
+  background: linear-gradient(135deg, #0b1220 0%, #111827 60%, #131b2e 100%);
   font-family: 'Segoe UI', system-ui, sans-serif;
   padding: 80px; box-sizing: border-box;
   display: flex; flex-direction: column; justify-content: space-between;
@@ -398,10 +399,11 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 
 <!-- PLACA DE EXPORTACIÓN DINÁMICA DE UN EVENTO -->
 <div id="placaProximoExport">
+  <div id="placaProxAccent" style="position:absolute; top:0; left:0; right:0; height:8px; border-radius:0;"></div>
   <div class="placa-prox-header">
     <div>
       <div style="font-size: 44px; font-weight: 900; letter-spacing: -0.5px;">Electo<span style="color:#f43f5e">Agenda</span></div>
-      <div style="font-size: 18px; color: #4a5878; font-weight: 700; margin-top: 4px;">Agenda electoral · @argelecciones</div>
+      <div style="font-size: 18px; color: #4a5878; font-weight: 700; margin-top: 4px;">@ArgElecciones</div>
     </div>
     <div class="placa-prox-tag">Evento</div>
   </div>
@@ -414,9 +416,9 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
     <div class="placa-prox-badge-date" id="placaProxDate">—</div>
   </div>
   <div class="placa-prox-footer">
-    <img src="logo.png" alt="Logo" style="height:70px; width:auto;">
-    <div style="font-size: 20px; color: #4a5878; font-weight: 700;">#ElectoAgenda · Solo para difusión</div>
-  </div>
+    <div style="font-size: 20px; color: #4a5878; font-weight: 700;">ElectoAgenda</div>
+    <img src="logo.png" alt="Logo" style="height:90px; width:auto;">
+</div>
 </div>
 
 <div id="galleryModalEntity" class="gallery-modal" onclick="cerrarModalGaleria()">
@@ -432,6 +434,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 const CSV_URL = 'https://script.google.com/macros/s/AKfycbzNeoVgpRk3Luck2mPhe86zJqkRssY7zQGAeQ-AmawGn3HJGlKeprxC3dNcp52dSCbZ/exec';
 const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const DIAS  = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+const DIAS_LARGOS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 
 let eventos = [];
 let filtro = 'todos';
@@ -527,6 +530,9 @@ function copiarEvento(idx, btn) {
 function descargarPlacaEvento(idx) {
   const ev = eventos[idx];
   if(!ev) return;
+  const colores = { nacional:'#3b82f6', provincial:'#a855f7', municipal:'#f59e0b', partidos:'#10b981' };
+const colorAccent = ev.destacado ? '#f43f5e' : (colores[catKey(ev.categoria)] || '#3b82f6');
+document.getElementById('placaProxAccent').style.background = colorAccent;
   
   const dias = diasHasta(ev.fecha);
   const numPlaca = dias < 0 ? "PASADO" : (dias === 0 ? "¡HOY!" : dias);
@@ -536,7 +542,7 @@ function descargarPlacaEvento(idx) {
   document.getElementById('placaProxDiasLbl').textContent = lblPlaca;
   document.getElementById('placaProxTitle').textContent = ev.descripcion;
   
-  const fechaStr = `${DIAS[ev.fecha.getDay()]} ${ev.fecha.getDate()} de ${MESES[ev.fecha.getMonth()]} de ${ev.fecha.getFullYear()}`;
+  const fechaStr = `${DIAS_LARGOS[ev.fecha.getDay()]} ${ev.fecha.getDate()} de ${MESES[ev.fecha.getMonth()]} de ${ev.fecha.getFullYear()}`;
   document.getElementById('placaProxDate').textContent = fechaStr + (ev.provincia ? ` · 📍 ${ev.provincia}` : '');
 
   const placa = document.getElementById('placaProximoExport');
