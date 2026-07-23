@@ -576,9 +576,9 @@ document.fonts.ready.then(() => {
       placa.style.cssText = orig;
       placa.style.display = 'none';
       alert('Error generando imagen: ' + err.message);
-    });
-  }, 150);
-});
+    }, 150);
+  });
+}
 
 function cerrarModalGaleria(){
   document.getElementById('galleryModalEntity').style.display='none';
