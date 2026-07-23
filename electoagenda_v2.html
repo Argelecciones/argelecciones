@@ -452,10 +452,29 @@ function parseFecha(s){
   const f=new Date(a,m,d); f.setHours(0,0,0,0); return f;
 }
 
+function parseCSVLine(line){
+  const cols = [];
+  let cur = '';
+  let inQuotes = false;
+  for(let i=0;i<line.length;i++){
+    const c = line[i];
+    if(c === '"'){
+      if(inQuotes && line[i+1] === '"'){ cur += '"'; i++; }
+      else inQuotes = !inQuotes;
+    } else if(c === ',' && !inQuotes){
+      cols.push(cur); cur = '';
+    } else {
+      cur += c;
+    }
+  }
+  cols.push(cur);
+  return cols;
+}
+
 function parseCSV(txt){
   const lines=txt.trim().split('\n'); const res=[];
   for(let i=1;i<lines.length;i++){
-    const cols=lines[i].split(',');
+    const cols=parseCSVLine(lines[i]);
     if(cols.length<3) continue;
     const fecha=parseFecha(cols[0]);
     const descripcion=(cols[1]||'').trim().replace(/^"|"$/g,'');
