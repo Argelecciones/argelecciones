@@ -555,6 +555,7 @@ document.getElementById('placaProxAccent').style.background = colorAccent;
   placa.style.display = 'flex';
   placa.querySelector('img').style.display = 'block';
 
+document.fonts.ready.then(() => {
   setTimeout(() => {
     html2canvas(placa, {
       scale: 1,
@@ -577,7 +578,7 @@ document.getElementById('placaProxAccent').style.background = colorAccent;
       alert('Error generando imagen: ' + err.message);
     });
   }, 150);
-}
+});
 
 function cerrarModalGaleria(){
   document.getElementById('galleryModalEntity').style.display='none';
