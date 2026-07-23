@@ -430,7 +430,7 @@ function mostrarResultados() {
 
   document.getElementById('resultadoTitulo').textContent =
     `${seccion.nombre} · ${seccion.cargo} · ${bancas} bancas`;
-  document.getElementById('paramCociente').textContent = cociente.toFixed(2).toLocaleString('es-AR');
+  document.getElementById('paramCociente').textContent = cociente.toLocaleString('es-AR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
   // Tabla resumen
   const tbody = document.getElementById('tbodyResultados');
