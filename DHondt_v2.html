@@ -582,6 +582,11 @@
             let baseCalculoPiso = totalVotosPositivos;
             if (baseExclusion === 'padron') baseCalculoPiso = totalPadron;
 
+			if (baseCalculoPiso <= 0) {
+    alert('Ingresá un Padrón Total mayor a 0 para calcular el piso sobre el padrón.');
+    return;
+}
+
             let partidosFiltro = partidos.filter(p => {
                 const porcentaje = (p.votes / baseCalculoPiso) * 100;
                 return porcentaje >= pisoExclusion;
