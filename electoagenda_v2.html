@@ -106,8 +106,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
 
 /* BOTONES DE ACCIÓN EN CADA EVENTO */
 .evento-acciones{position:absolute;right:0;top:50%;transform:translateY(-50%);display:flex;gap:4px;}
-  .evento-efemeride .evento-body{padding-right:0;padding-bottom:44px}
-.evento-efemeride .evento-acciones{left:0;right:auto;top:auto;bottom:0;transform:none;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.evento-efemeride .evento-body{padding-right:0;padding-bottom:44px}
+.evento-efemeride .evento-acciones{left:auto;right:0;top:auto;bottom:0;transform:none;display:flex;gap:4px}
 .btn-accion-ev{background:#1e293b;border:1px solid #334155;color:#94a3b8;width:34px;height:34px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all 0.15s;}
 .btn-accion-ev:hover{color:var(--text);border-color:var(--muted);background:#273549;}
 
@@ -246,6 +246,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
   .evento-dia { font-size: 22px; }
   .evento-body { padding-right: 0; padding-bottom: 44px; }
   .evento-acciones { left: 0; right: auto; top: auto; bottom: 0; transform: none; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .evento-efemeride .evento-acciones { left:0; right:auto; width:100%; display:grid; grid-template-columns:1fr 1fr; gap:6px; }
   .btn-accion-ev { width: 100%; height: 32px; font-size: 12px; gap: 4px; }
   .btn-accion-ev::after { content: " Copiar"; font-weight: 700; font-size: 11px; }
   .btn-accion-ev.dl-btn::after { content: " Placa" !important; }
