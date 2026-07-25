@@ -804,24 +804,23 @@ function renderizarLista(){
   main.innerHTML=html;
 }
 
- function renderTarjetaEfemeride(ev, idx){
+function renderTarjetaEfemeride(ev, idx){
   const años = hoy.getFullYear() - ev.fecha.getFullYear();
-  const fechaCompleta = `${ev.fecha.getDate()} de ${MESES[ev.fecha.getMonth()]} de ${ev.fecha.getFullYear()}`;
+  const fechaCompleta = `${ev.fecha.getDate()} de ${MESES[ev.fecha.getMonth()]} de ${ev.fecha.getFullYear()} · Hace ${años} años`;
   return `<div class="evento">
     <div class="evento-num"><div class="evento-dia">${ev.fecha.getDate()}</div><div class="evento-diaNom">${MESES[ev.fecha.getMonth()].slice(0,3)}</div></div>
     <div class="evento-barra" style="background:var(--efemeride)"></div>
     <div class="evento-body">
-      <div class="evento-top"><span class="evento-cat" style="color:var(--efemeride)">${fechaCompleta}</span>
+      <div class="evento-top"><span class="evento-cat" style="color:var(--efemeride)">${fechaCompleta}</span></div>
       <div class="evento-desc">${ev.descripcion}</div>
       ${ev.detalle?`<div class="evento-prov">${ev.detalle}</div>`:''}
-      <div class="evento-acciones">
+      <div class="evento-acciones" style="top:14px; transform:none;">
         <button class="btn-accion-ev" onclick="copiarEfemeride(${idx}, this)">📋</button>
         <button class="btn-accion-ev dl-btn" style="border-color:#a855f7; color:#a855f7" onclick="descargarPlacaEfemeride(${idx})">📥</button>
       </div>
     </div>
   </div>`;
 }
-
 function renderizarEfemerides(){
   const mainEf = document.getElementById('mainEfemerides');
   if(!efemerides.length){
