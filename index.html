@@ -47,30 +47,11 @@
         }
 
         /* Encabezado */
-        .toolbox-header {
-            margin-bottom: 40px;
-        }
-
-        .toolbox-logo {
-            width: 75px;
-            height: 75px;
-            object-fit: contain;
-            margin-bottom: 15px;
-        }
-
-        .toolbox-header h1 {
-            font-size: 36px;
-            font-weight: 800;
-            margin: 0 0 10px 0;
-            letter-spacing: -0.5px;
-        }
-
-        .toolbox-header p {
-            color: var(--text-muted);
-            font-size: 16px;
-            margin: 0;
-            font-weight: 500;
-        }
+        .toolbox-header { margin-bottom: 40px; }
+.toolbox-logo { width: 50px; height: 50px; margin-bottom: 8px; }
+.toolbox-header h1 { font-size: 26px; margin: 0 0 6px 0; }
+.toolbox-header p { font-size: 13px; }
+.toolbox-header { margin-bottom: 25px; }
 
         /* Grilla de Herramientas */
         .tools-grid {
@@ -78,6 +59,7 @@
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 20px;
             margin-top: 20px;
+            perspective: 1000px;
         }
 
         /* Tarjeta Base */
@@ -85,7 +67,12 @@
             background-color: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 30px 20px;
+            padding: 18px 12px;
+            height: 130px;      /* alto fijo para que el flip se vea prolijo */
+            position: relative;
+            background: transparent;
+            box-shadow: none;
+            border: none;
             text-decoration: none;
             color: var(--text-main);
             display: flex;
@@ -94,19 +81,10 @@
             justify-content: center;
             transition: all 0.25s ease-in-out;
             cursor: pointer;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
-        .tool-icon {
-            font-size: 36px;
-            margin-bottom: 15px;
-        }
-
-        .tool-card h3 {
-            font-size: 18px;
-            font-weight: 700;
-            margin: 0 0 8px 0;
-        }
+        .tool-icon { font-size: 26px; margin-bottom: 8px; }
+.tool-card h3 { font-size: 14px; margin: 0; }
 
         .tool-card p {
             font-size: 13px;
@@ -114,55 +92,91 @@
             margin: 0;
             line-height: 1.4;
         }
+        .tool-card {
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+}
+.card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+}
+.tool-card:hover .card-inner {
+    transform: rotateY(180deg);
+}
+.card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: 15px;
+    background-color: var(--bg-card);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+.card-back {
+    transform: rotateY(180deg);
+}
+.card-back p {
+    font-size: 12px;
+    color: var(--text-main);
+    line-height: 1.4;
+    margin: 0;
+}
 
         /* === Estilos y Hovers Individuales con Colores Propios === */
 
         /* 1. Congresómetro (Azul) */
-        .card-congreso:hover {
-            transform: translateY(-5px); /* Elevación suave */
-            border-color: var(--color-congreso);
-            /* Sombra sutil con baja opacidad */
-            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.55); 
-        }
-        .card-congreso h3 { color: #1e40af; }
+.card-congreso .card-front,
+.card-congreso .card-back {
+    border-color: var(--color-congreso);
+}
+.card-congreso h3 { color: #1e40af; }
 
         /* 2. Calendómetro (Amarillo) */
-        .card-calendario:hover {
-            transform: translateY(-5px);
+        .card-calendario .card-front,
+        .card-calendario .card-back {
             border-color: var(--color-calendario);
-            box-shadow: 0 10px 20px rgba(217, 119, 6, 0.55);
         }
         .card-calendario h3 { color: #92400e; }
 
         /* 3. D'Hondt (Rojo) */
-        .card-dhondt:hover {
-            transform: translateY(-5px);
+        .card-dhondt .card-front,
+        .card-dhondt .card-back {
             border-color: var(--color-dhondt);
-            box-shadow: 0 10px 20px rgba(220, 38, 38, 0.55);
         }
         .card-dhondt h3 { color: #991b1b; }
 
         /* 4. Hare (Verde) */
-        .card-hare:hover {
-            transform: translateY(-5px);
+        .card-hare .card-front,
+        .card-hare .card-back {
             border-color: var(--color-hare);
-            box-shadow: 0 10px 20px rgba(22, 163, 74, 0.55);
         }
         .card-hare h3 { color: #166534; }
 
         /* 5. Radar Electoral (Celeste/Turquesa) */
-        .card-radar:hover {
-            transform: translateY(-5px);
+        .card-radar .card-front,
+        .card-radar .card-back {
             border-color: var(--color-radar);
-            box-shadow: 0 10px 20px rgba(6, 182, 212, 0.55);
         }
         .card-radar h3 { color: #0891b2; }
 
         /* 6. Generador de Hemiciclos (Violeta / Púrpura) */
-        .card-hemicicloarg:hover {
-            transform: translateY(-5px);
+        .card-hemicicloarg .card-front,
+        .card-radar .card-back {
             border-color: var(--color-hemicicloarg);
-            box-shadow: 0 10px 20px rgba(168, 85, 247, 0.55);
         }
         .card-hemicicloarg h3 { color: #6b21a8; }
 
@@ -192,41 +206,77 @@
         </header>
 
         <div class="tools-grid">
-            
-            <a href="congresometro.html" class="tool-card card-congreso">
-                <div class="tool-icon">🏛️</div>
-                <h3>Congresómetro</h3>
-                <p>Monitoreo dinámico de votaciones para ambas cámaras del Congreso y "busca quórum".</p>
-            </a>
 
             <a href="electoagenda_v2.html" class="tool-card card-calendario">
+                <div class="card-inner">
+                <div class="card-front">
                 <div class="tool-icon">📅</div>
                 <h3>Electoagenda</h3>
+                    </div>
+                <div class="card-back">
                 <p>Cronograma y seguimiento del calendario electoral nacional y provincial.</p>
-            </a>
+            </div>
+  </div>
+</a>
+
+            <a href="Radar-electoral.html" class="tool-card card-radar">
+                  <div class="card-inner">
+                <div class="card-front">
+                <div class="tool-icon">📡</div>
+                <h3>Radar Electoral</h3>
+                    </div>
+                       <div class="card-back">
+                <p>Últimas noticias y encuestas publicadas sobre reforma y proceso electoral en tiempo real.</p>
+           </div>
+  </div>
+</a>
+
+            <a href="congresometro.html" class="tool-card card-congreso">
+  <div class="card-inner">
+    <div class="card-front">
+      <div class="tool-icon">🏛️</div>
+      <h3>Congresómetro</h3>
+    </div>
+    <div class="card-back">
+      <p>Monitoreo dinámico de votaciones para ambas cámaras del Congreso y "busca quórum".</p>
+    </div>
+  </div>
+</a>
 
             <a href="DHondt_v2.html" class="tool-card card-dhondt">
+                <div class="card-inner">
+    <div class="card-front">
                 <div class="tool-icon">📊</div>
                 <h3>Sistema D'Hondt</h3>
+        </div>
+    <div class="card-back">
                 <p>Distribución de bancas mediante cocientes proporcionales.</p>
+         </div>
+  </div>
             </a>
 
             <a href="hare.html" class="tool-card card-hare">
+                 <div class="card-inner">
+    <div class="card-front">
                 <div class="tool-icon">🧮</div>
                 <h3>Cociente Hare</h3>
+         </div>
+    <div class="card-back">
                 <p>Cálculo de reparto por residuo mayor (Provincia de Bs. As.).</p>
-            </a>
-
-            <a href="Radar-electoral.html" class="tool-card card-radar">
-                <div class="tool-icon">📡</div>
-                <h3>Radar Electoral</h3>
-                <p>Últimas noticias y encuestas publicadas sobre reforma y proceso electoral en tiempo real.</p>
+             </div>
+  </div>
             </a>
 
             <a href="https://argelecciones.github.io/hemiciclo-arg/" class="tool-card card-hemicicloarg">
+                 <div class="card-inner">
+    <div class="card-front">
                 <div class="tool-icon">✏️</div>
                 <h3> Generador de hemiciclos</h3>
+         </div>
+    <div class="card-back">
                 <p>Visualización y diseño de cámaras legislativas.</p>
+            </div>
+  </div>
             </a>
 
         </div>
