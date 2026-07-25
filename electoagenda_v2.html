@@ -12,7 +12,7 @@
   --bg:#0b1220;--surface:#111827;--border:#1e2d45;--text:#f0f4ff;
   --muted:#4a5878;--subtle:#1a2540;
   --nacional:#3b82f6;--provincial:#a855f7;--municipal:#f59e0b;
-  --partidos:#10b981;--destacado:#f43f5e;
+  --partidos:#10b981;--destacado:#f43f5e;--efemeride:#ca8a04;
 }
 body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;min-height:100vh}
 
@@ -26,6 +26,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
 .btn-header{background:#1e293b;border:1px solid #334155;color:#94a3b8;padding:6px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px;}
 .btn-header:hover{color:var(--text);border-color:var(--muted)}
 .btn-header.active{background:var(--destacado);border-color:var(--destacado);color:#fff}
+  #btnEfem{border-color:var(--efemeride);color:var(--efemeride)}
+#btnEfem.active{background:var(--efemeride);border-color:var(--efemeride);color:#0f172a}
 .spin{display:inline-block;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
@@ -641,12 +643,12 @@ document.fonts.ready.then(() => {
   const ev = efemerides[idx];
   if(!ev) return;
 
-  document.getElementById('placaProxAccent').style.background = '#f59e0b';
+  document.getElementById('placaProxAccent').style.background = '#ca8a04';
 
   const años = hoy.getFullYear() - ev.fecha.getFullYear();
 
-  document.getElementById('placaProxDiasNum').textContent = años;
-  document.getElementById('placaProxDiasLbl').textContent = 'años';
+  document.getElementById('placaProxDiasNum').textContent = ev.fecha.getFullYear();
+  document.getElementById('placaProxDiasLbl').textContent = `Hace ${años} años`;
   document.getElementById('placaProxTitle').textContent = ev.descripcion;
 
   const fechaStr = `${ev.fecha.getDate()} de ${MESES[ev.fecha.getMonth()]} de ${ev.fecha.getFullYear()}`;
@@ -802,13 +804,14 @@ function renderizarLista(){
   main.innerHTML=html;
 }
 
-  function renderTarjetaEfemeride(ev, idx){
+ function renderTarjetaEfemeride(ev, idx){
   const años = hoy.getFullYear() - ev.fecha.getFullYear();
+  const fechaCompleta = `${ev.fecha.getDate()} de ${MESES[ev.fecha.getMonth()]} de ${ev.fecha.getFullYear()}`;
   return `<div class="evento">
     <div class="evento-num"><div class="evento-dia">${ev.fecha.getDate()}</div><div class="evento-diaNom">${MESES[ev.fecha.getMonth()].slice(0,3)}</div></div>
-    <div class="evento-barra" style="background:var(--municipal)"></div>
+    <div class="evento-barra" style="background:var(--efemeride)"></div>
     <div class="evento-body">
-      <div class="evento-top"><span class="evento-cat" style="color:var(--municipal)">Hace ${años} años</span></div>
+      <div class="evento-top"><span class="evento-cat" style="color:var(--efemeride)">${fechaCompleta}</span>
       <div class="evento-desc">${ev.descripcion}</div>
       ${ev.detalle?`<div class="evento-prov">${ev.detalle}</div>`:''}
       <div class="evento-acciones">
