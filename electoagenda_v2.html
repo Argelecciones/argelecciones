@@ -305,9 +305,10 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
       <div class="header-tag">Agenda electoral · @argelecciones</div>
     </div>
   </div>
-  <div class="header-right">
+<div class="header-right">
     <button class="btn-header" id="btnLista" onclick="setVista('lista')">☰ Lista</button>
     <button class="btn-header" id="btnCal" onclick="setVista('calendario')">📅 Calendario</button>
+    <button class="btn-header" id="btnEfem" onclick="setVista('efemerides')">🏛 Efemérides</button>
     <button class="btn-header" onclick="cargar()" id="btnRefresh">
       <span id="refreshIcon">↻</span> Actualizar
     </button>
@@ -377,6 +378,10 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
     <button class="btn-descarga" onclick="descargarPlacaCal()">📥 Descargar placa del mes</button>
   </div>
 </div>
+  <!-- VISTA EFEMÉRIDES -->
+<div id="vistaEfemerides" style="display:none">
+  <div class="main" id="mainEfemerides"></div>
+</div>
 
 <!-- PLACA CALENDARIO EXPORTABLE OCULTA -->
 <div id="placaCalendario">
@@ -432,11 +437,13 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
 
 <script>
 const CSV_URL = 'https://script.google.com/macros/s/AKfycbzNeoVgpRk3Luck2mPhe86zJqkRssY7zQGAeQ-AmawGn3HJGlKeprxC3dNcp52dSCbZ/exec';
+const CSV_URL_EFEMERIDES = 'https://script.google.com/macros/s/AKfycbzNeoVgpRk3Luck2mPhe86zJqkRssY7zQGAeQ-AmawGn3HJGlKeprxC3dNcp52dSCbZ/exec?hoja=efemerides';
 const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const DIAS  = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
 const DIAS_LARGOS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 
 let eventos = [];
+let efemerides = [];
 let filtro = 'todos';
 let vista = 'lista';
 let mostrarPasados = false;
@@ -485,6 +492,22 @@ function parseCSV(txt){
     res.push({fecha,descripcion,categoria,provincia,destacado});
   }
   res.sort((a,b)=>a.fecha-b.fecha); return res;
+}
+
+  function parseCSVEfemerides(txt){
+  const lines=txt.trim().split('\n'); const res=[];
+  for(let i=1;i<lines.length;i++){
+    const cols=parseCSVLine(lines[i]);
+    if(cols.length<3) continue;
+    const fecha=parseFecha(cols[0]);
+    const descripcion=(cols[1]||'').trim().replace(/^"|"$/g,'');
+    const detalle=(cols[2]||'').trim().replace(/^"|"$/g,'');
+    const categoria=(cols[3]||'').trim().replace(/^"|"$/g,'');
+    if(!fecha||!descripcion) continue;
+    res.push({fecha,descripcion,detalle,categoria});
+  }
+  res.sort((a,b)=> (a.fecha.getMonth()-b.fecha.getMonth()) || (a.fecha.getDate()-b.fecha.getDate()) );
+  return res;
 }
 
 function diasHasta(f){ return Math.round((f-hoy)/(1000*60*60*24)); }
@@ -538,6 +561,20 @@ function copiarEvento(idx, btn) {
     ? `📅ElectoAgenda @Argelecciones |\n\n🗳${ev.descripcion} (${ev.provincia}): ${fechaStr}`
     : `📅ElectoAgenda @Argelecciones |\n\n🗳${ev.descripcion}: ${fechaStr}`;
     
+  navigator.clipboard.writeText(texto).then(() => {
+    const origText = btn.textContent;
+    btn.textContent = '✅';
+    setTimeout(() => { btn.textContent = origText; }, 2000);
+  });
+}
+
+    function copiarEfemeride(idx, btn) {
+  const ev = efemerides[idx];
+  if(!ev) return;
+  const años = hoy.getFullYear() - ev.fecha.getFullYear();
+  const fechaStr = `${ev.fecha.getDate()} de ${MESES[ev.fecha.getMonth()]} de ${ev.fecha.getFullYear()}`;
+  const texto = `📅ElectoAgenda @Argelecciones |\n\n🏛Se cumplen ${años} años: ${ev.descripcion} (${fechaStr})${ev.detalle?`\n\n${ev.detalle}`:''}`;
+
   navigator.clipboard.writeText(texto).then(() => {
     const origText = btn.textContent;
     btn.textContent = '✅';
@@ -600,6 +637,63 @@ document.fonts.ready.then(() => {
 });
 }
 
+  function descargarPlacaEfemeride(idx) {
+  const ev = efemerides[idx];
+  if(!ev) return;
+
+  document.getElementById('placaProxAccent').style.background = '#f59e0b';
+
+  const años = hoy.getFullYear() - ev.fecha.getFullYear();
+
+  document.getElementById('placaProxDiasNum').textContent = años;
+  document.getElementById('placaProxDiasLbl').textContent = 'años';
+  document.getElementById('placaProxTitle').textContent = ev.descripcion;
+
+  const fechaStr = `${ev.fecha.getDate()} de ${MESES[ev.fecha.getMonth()]} de ${ev.fecha.getFullYear()}`;
+  document.getElementById('placaProxDate').textContent = fechaStr + (ev.detalle ? ` · ${ev.detalle}` : '');
+
+  const tagEl = document.querySelector('.placa-prox-tag');
+  const tagOrig = tagEl.textContent;
+  tagEl.textContent = 'Efeméride';
+
+  const placa = document.getElementById('placaProximoExport');
+  const orig = placa.style.cssText;
+
+  placa.style.position = 'fixed';
+  placa.style.left = '0';
+  placa.style.top = '0';
+  placa.style.zIndex = '-1';
+  placa.style.display = 'flex';
+  placa.querySelector('img').style.display = 'block';
+
+  document.fonts.ready.then(() => {
+    setTimeout(() => {
+      html2canvas(placa, {
+        scale: 1,
+        backgroundColor: '#0b1220',
+        width: 1200,
+        height: 1200,
+        useCORS: true,
+        allowTaint: true
+      }).then(canvas => {
+        placa.style.cssText = orig;
+        placa.style.display = 'none';
+        tagEl.textContent = tagOrig;
+
+        const link = document.createElement('a');
+        link.download = `efemeride-${ev.fecha.getFullYear()}-${ev.fecha.getMonth()+1}-${ev.fecha.getDate()}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      }).catch(err => {
+        placa.style.cssText = orig;
+        placa.style.display = 'none';
+        tagEl.textContent = tagOrig;
+        alert('Error generando imagen: ' + err.message);
+      });
+    }, 150);
+  });
+}
+
 function cerrarModalGaleria(){
   document.getElementById('galleryModalEntity').style.display='none';
 }
@@ -644,9 +738,12 @@ function setVista(v){
   vista=v;
   document.getElementById('vistaLista').style.display=v==='lista'?'block':'none';
   document.getElementById('vistaCalendario').style.display=v==='calendario'?'block':'none';
+  document.getElementById('vistaEfemerides').style.display=v==='efemerides'?'block':'none';
   document.getElementById('btnLista').classList.toggle('active',v==='lista');
   document.getElementById('btnCal').classList.toggle('active',v==='calendario');
+  document.getElementById('btnEfem').classList.toggle('active',v==='efemerides');
   if(v==='calendario') renderizarCalendario();
+  if(v==='efemerides') renderizarEfemerides();
 }
 
 function renderizarLista(){
@@ -703,6 +800,48 @@ function renderizarLista(){
     html+=`</div>`;
   });
   main.innerHTML=html;
+}
+
+  function renderTarjetaEfemeride(ev, idx){
+  const años = hoy.getFullYear() - ev.fecha.getFullYear();
+  return `<div class="evento">
+    <div class="evento-num"><div class="evento-dia">${ev.fecha.getDate()}</div><div class="evento-diaNom">${MESES[ev.fecha.getMonth()].slice(0,3)}</div></div>
+    <div class="evento-barra" style="background:var(--municipal)"></div>
+    <div class="evento-body">
+      <div class="evento-top"><span class="evento-cat" style="color:var(--municipal)">Hace ${años} años</span></div>
+      <div class="evento-desc">${ev.descripcion}</div>
+      ${ev.detalle?`<div class="evento-prov">${ev.detalle}</div>`:''}
+      <div class="evento-acciones">
+        <button class="btn-accion-ev" onclick="copiarEfemeride(${idx}, this)">📋</button>
+        <button class="btn-accion-ev dl-btn" style="border-color:#a855f7; color:#a855f7" onclick="descargarPlacaEfemeride(${idx})">📥</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderizarEfemerides(){
+  const mainEf = document.getElementById('mainEfemerides');
+  if(!efemerides.length){
+    mainEf.innerHTML = `<div class="vacio"><div class="vacio-icon">🏛</div><div class="vacio-txt">No hay efemérides cargadas.</div></div>`;
+    return;
+  }
+
+  const mesActual = hoy.getMonth();
+  const delMes = efemerides.filter(e=>e.fecha.getMonth()===mesActual);
+
+  let html='';
+
+  if(delMes.length){
+    html+=`<div class="mes-bloque"><div class="mes-header"><div class="mes-nombre">Efemérides de ${MESES[mesActual]}</div><div class="mes-count">${delMes.length}</div></div>`;
+    delMes.forEach(ev=>{ html+=renderTarjetaEfemeride(ev, efemerides.indexOf(ev)); });
+    html+=`</div>`;
+  }
+
+  html+=`<div class="mes-bloque"><div class="mes-header"><div class="mes-nombre">Todas las efemérides</div><div class="mes-count">${efemerides.length}</div></div>`;
+  efemerides.forEach(ev=>{ html+=renderTarjetaEfemeride(ev, efemerides.indexOf(ev)); });
+  html+=`</div>`;
+
+  mainEf.innerHTML=html;
 }
 
 function cambiarMesCal(d){ calMes+=d; if(calMes>11){calMes=0;calAño++;}else if(calMes<0){calMes=11;calAño--;} renderizarCalendario(); }
@@ -861,12 +1000,24 @@ async function cargar(){
     if(!r.ok) throw new Error('No se pudo conectar con Google Sheets');
     const csv=await r.text();
     eventos=parseCSV(csv);
+
+    try{
+      const rEf=await fetch(CSV_URL_EFEMERIDES);
+      if(rEf.ok){
+        const csvEf=await rEf.text();
+        efemerides=parseCSVEfemerides(csvEf);
+      }
+    }catch(eEf){
+      console.error('Error cargando efemérides:', eEf);
+    }
+
     dot.className='dot ok';
     const hora=new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
     txt.textContent=`${eventos.length} eventos cargados · ${hora}`;
     actualizarBannerProximo();
     renderizarLista();
     if(vista==='calendario') renderizarCalendario();
+    if(vista==='efemerides') renderizarEfemerides();
   }catch(e){
     dot.className='dot error'; txt.textContent=`Error: ${e.message}`;
     document.getElementById('main').innerHTML=`<div class="vacio"><div class="vacio-icon">⚠️</div><div class="vacio-txt">No se pudieron cargar los datos.</div></div>`;
