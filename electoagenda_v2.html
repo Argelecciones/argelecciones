@@ -338,7 +338,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
   </div>
 </div>
 
-<div class="toolbar">
+<div class="toolbar" id="toolbarPrincipal">
   <input class="buscador" type="text" placeholder="🔍 Buscar evento..." id="buscador" oninput="renderizarLista()">
   <div class="filtros">
     <button class="filtro f-todos active" onclick="setFiltro('todos')">Todos</button>
@@ -744,6 +744,7 @@ function setVista(v){
   document.getElementById('vistaLista').style.display=v==='lista'?'block':'none';
   document.getElementById('vistaCalendario').style.display=v==='calendario'?'block':'none';
   document.getElementById('vistaEfemerides').style.display=v==='efemerides'?'block':'none';
+  document.getElementById('toolbarPrincipal').style.display=v==='efemerides'?'none':'flex';
   document.getElementById('btnLista').classList.toggle('active',v==='lista');
   document.getElementById('btnCal').classList.toggle('active',v==='calendario');
   document.getElementById('btnEfem').classList.toggle('active',v==='efemerides');
