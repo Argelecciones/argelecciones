@@ -77,6 +77,17 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
 /* ====== VISTA LISTA ====== */
 .mes-bloque{margin-bottom:36px}
 .mes-header{display:flex;align-items:center;gap:12px;padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:14px;}
+  /* ====== ACORDEÓN EFEMÉRIDES ====== */
+.efem-mes-bloque{margin-bottom:10px;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.efem-mes-header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--surface);cursor:pointer;user-select:none;transition:background .15s;}
+.efem-mes-header:hover{background:#16213a}
+.efem-mes-header .efem-mes-nombre{font-size:12px;font-weight:900;color:var(--text);text-transform:uppercase;letter-spacing:.1em;flex:1}
+.efem-mes-header .efem-mes-count{font-size:10px;font-weight:700;color:var(--muted);background:var(--subtle);padding:2px 7px;border-radius:10px;}
+.efem-mes-header .efem-mes-flecha{font-size:11px;color:var(--muted);transition:transform .2s;}
+.efem-mes-bloque.abierto .efem-mes-flecha{transform:rotate(90deg)}
+.efem-mes-contenido{display:none;padding:0 16px;}
+.efem-mes-bloque.abierto .efem-mes-contenido{display:block;}
+.efem-mes-destacado .efem-mes-header{border-left:3px solid var(--efemeride)}
 .mes-nombre{font-size:12px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:0.12em}
 .mes-count{font-size:10px;font-weight:700;color:var(--muted);background:var(--subtle);padding:2px 7px;border-radius:10px;}
 .evento{display:grid;grid-template-columns:52px 3px 1fr;gap:0 14px;padding:12px 0;border-bottom:1px solid var(--border);align-items:start;transition:opacity .2s;}
@@ -385,6 +396,9 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
 </div>
   <!-- VISTA EFEMÉRIDES -->
 <div id="vistaEfemerides" style="display:none">
+  <div style="max-width:780px;margin:0 auto;padding:20px 20px 0">
+    <input class="buscador" type="text" placeholder="🔍 Buscar efeméride..." id="buscadorEfem" oninput="renderizarEfemerides()" style="width:100%">
+  </div>
   <div class="main" id="mainEfemerides"></div>
 </div>
 
@@ -825,6 +839,11 @@ function renderTarjetaEfemeride(ev, idx){
     </div>
   </div>`;
 }
+function toggleMesEfem(idx){
+  const bloque = document.getElementById(`efemMes-${idx}`);
+  if(bloque) bloque.classList.toggle('abierto');
+}
+
 function renderizarEfemerides(){
   const mainEf = document.getElementById('mainEfemerides');
   if(!efemerides.length){
@@ -832,20 +851,41 @@ function renderizarEfemerides(){
     return;
   }
 
-  const mesActual = hoy.getMonth();
-  const delMes = efemerides.filter(e=>e.fecha.getMonth()===mesActual);
+  const busq = (document.getElementById('buscadorEfem')?.value || '').toLowerCase().trim();
+  let listaConIdx = efemerides.map((ev, idx) => ({ev, idx}));
+  if(busq) listaConIdx = listaConIdx.filter(item =>
+    item.ev.descripcion.toLowerCase().includes(busq) ||
+    (item.ev.detalle||'').toLowerCase().includes(busq)
+  );
 
-  let html='';
-
-  if(delMes.length){
-    html+=`<div class="mes-bloque"><div class="mes-header"><div class="mes-nombre">Efemérides de ${MESES[mesActual]}</div><div class="mes-count">${delMes.length}</div></div>`;
-    delMes.forEach(ev=>{ html+=renderTarjetaEfemeride(ev, efemerides.indexOf(ev)); });
-    html+=`</div>`;
+  if(!listaConIdx.length){
+    mainEf.innerHTML = `<div class="vacio"><div class="vacio-icon">📭</div><div class="vacio-txt">No hay efemérides para esta búsqueda.</div></div>`;
+    return;
   }
 
-  html+=`<div class="mes-bloque"><div class="mes-header"><div class="mes-nombre">Todas las efemérides</div><div class="mes-count">${efemerides.length}</div></div>`;
-  efemerides.forEach(ev=>{ html+=renderTarjetaEfemeride(ev, efemerides.indexOf(ev)); });
-  html+=`</div>`;
+  const mesActual = hoy.getMonth();
+  const porMes = {};
+  listaConIdx.forEach(item=>{
+    const m = item.ev.fecha.getMonth();
+    if(!porMes[m]) porMes[m]=[];
+    porMes[m].push(item);
+  });
+
+  let html='';
+  for(let m=0;m<12;m++){
+    if(!porMes[m]) continue;
+    const esMesActual = m===mesActual;
+    const abierto = esMesActual || busq;
+    html+=`<div class="efem-mes-bloque${abierto?' abierto':''}${esMesActual?' efem-mes-destacado':''}" id="efemMes-${m}">
+      <div class="efem-mes-header" onclick="toggleMesEfem(${m})">
+        <span class="efem-mes-flecha">▶</span>
+        <span class="efem-mes-nombre">${MESES[m]}${esMesActual?' · Este mes':''}</span>
+        <span class="efem-mes-count">${porMes[m].length}</span>
+      </div>
+      <div class="efem-mes-contenido">`;
+    porMes[m].forEach(item=>{ html+=renderTarjetaEfemeride(item.ev, item.idx); });
+    html+=`</div></div>`;
+  }
 
   mainEf.innerHTML=html;
 }
