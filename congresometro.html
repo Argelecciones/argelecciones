@@ -1246,7 +1246,8 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             // 🌟 Sólo hay resultado válido si se alcanzó el quórum reglamentario (129 / 37)
             const totalPresentesActual = t_af + t_neg + t_abs;
             const hayQuorum = totalPresentesActual >= camara.quorum;
-            const alcanzada = hayQuorum && (t_af >= metaVotos);
+            const empateDesempatable = camaraActiva === 'senadores' && tipoMayoria === 'simple' && hayQuorum && t_af === t_neg && t_af > 0;
+            const alcanzada = hayQuorum && (t_af >= metaVotos) && !empateDesempatable;
             const faltan = Math.max(0, metaVotos - t_af);
             const plural = (faltan === 1) ? '' : 's';
 
@@ -1273,6 +1274,8 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             let resultadoTexto = "";
             if (!hayQuorum) {
                 resultadoTexto = "⏳ Esperando votos para calcular el resultado…";
+            } else if (empateDesempatable) {
+                resultadoTexto = `⚖️ Empate (${t_af}-${t_neg}). Se resuelve por el voto de desempate del/la Presidente del Senado`;
             } else if (alcanzada) {
                 resultadoTexto = `✅ Reúne la mayoría requerida (${etiquetaMayoria.toLowerCase()}: ${t_af}/${metaVotos})`;
             } else {
@@ -1295,9 +1298,12 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                 if (modoActivo === 'vote') {
                     banner.style.display = 'block';
                     const reqLabel = `<span class="arb-req">Mayoría requerida: ${etiquetaMayoria}</span>`;
-                    if (!hayQuorum) {
+                   if (!hayQuorum) {
                         banner.className = 'app-result-banner esperando';
                         banner.innerHTML = `${reqLabel}⏳ Esperando votos para calcular…<span class="arb-sub">Se necesita quórum (${camara.quorum} de ${camara.total}) para definir el resultado.</span>`;
+                    } else if (empateDesempatable) {
+                        banner.className = 'app-result-banner esperando';
+                        banner.innerHTML = `${reqLabel}⚖️ Empate (${t_af}-${t_neg})<span class="arb-sub">Se resuelve por el voto de desempate del/la Presidente del Senado</span>`;
                     } else if (alcanzada) {
                         banner.className = 'app-result-banner aprobado';
                         banner.innerHTML = `${reqLabel}✅ Reúne la mayoría requerida<span class="arb-sub">${t_af} de ${metaVotos} votos afirmativos necesarios</span>`;
