@@ -450,10 +450,18 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         font-weight: 800;
         color: #f8fafc;
     }
-    .meta-readout .meta-label { color: #94a3b8; font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 0.04em; }
+   .meta-readout .meta-label { color: #94a3b8; font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 0.04em; }
     .meta-readout .meta-sep { color: #475569; }
     .meta-readout .meta-faltan { color: #f87171; }
     .meta-readout .meta-ok { color: #34d399; }
+
+    .desempate-selector { margin-top: 12px; padding-top: 12px; border-top: 1px dashed #334155; }
+    .desempate-selector-title { font-size: 11px; color: #94a3b8; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px; }
+    .desempate-selector-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .btn-desempate { border: 1px solid #334155; background: #0f172a; color: #e2e8f0; padding: 9px 10px; border-radius: 6px; font-size: 12px; font-weight: 800; cursor: pointer; transition: all 0.15s; }
+    .btn-desempate:hover { border-color: #475569; }
+    .btn-desempate-favor.active { background: #064e3b; border-color: #10b981; color: #6ee7b7; }
+    .btn-desempate-contra.active { background: #450a0a; border-color: #ef4444; color: #fca5a5; }
 
     /* 🌟 BANNER GRANDE DE RESULTADO EN LA APP */
     .app-result-banner {
@@ -696,14 +704,20 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                     <label class="majority-option"><input type="radio" name="tipoMayoria" value="23emitidos" onchange="onCambioMayoria()"><span>2/3 votos emitidos</span></label>
                     <label class="majority-option"><input type="radio" name="tipoMayoria" value="23total" onchange="onCambioMayoria()"><span>2/3 total</span></label>
                 </div>
-                <div class="meta-readout" id="metaReadout">
+               <div class="meta-readout" id="metaReadout">
                     <span class="meta-label">Meta actual</span>
                     <span class="meta-sep">|</span>
                     <span id="metaVotosTxt">0 votos</span>
                     <span class="meta-sep">|</span>
                     <span id="metaFaltanTxt" class="meta-faltan">Faltan 0 votos</span>
                 </div>
-            </div>
+                <div class="desempate-selector" id="desempateSelector" style="display:none;">
+                    <div class="desempate-selector-title">⚖️ Empate — Resolución por desempate del/la Presidente del Senado</div>
+                    <div class="desempate-selector-options">
+                        <button class="btn-desempate btn-desempate-favor" id="btnDesempateFavor" onclick="setDesempate('favor')">✅ Desempató a favor</button>
+                        <button class="btn-desempate btn-desempate-contra" id="btnDesempateContra" onclick="setDesempate('contra')">❌ Desempató en contra</button>
+                    </div>
+                </div>
             <div id="blocksContainer"></div>
         </div>
 
@@ -908,9 +922,11 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
 
     let camaraActiva = 'diputados';
     let modoActivo = 'quorum';
+    let desempateManual = null;
 
     function cambiarCamara(camara) {
         camaraActiva = camara;
+        desempateManual = null;
         document.getElementById('cam-diputados').classList.toggle('active', camara === 'diputados');
         document.getElementById('cam-senadores').classList.toggle('active', camara === 'senadores');
         inicializarEstructura();
@@ -942,6 +958,11 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             op.classList.toggle('checked', radio && radio.checked);
         });
         actualizarLineaReferencia();
+        ejecutarCalculos();
+    }
+
+	function setDesempate(valor) {
+        desempateManual = (desempateManual === valor) ? null : valor;
         ejecutarCalculos();
     }
 
@@ -1332,6 +1353,17 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             const esEmpate = hayQuorum && t_af === t_neg && t_af > 0;
             const empateTxt = esEmpate ? ` (empate ${t_af}-${t_neg})` : '';
             const empateDesempatable = camaraActiva === 'senadores' && tipoMayoria === 'simple' && esEmpate;
+
+            if (!empateDesempatable && desempateManual !== null) desempateManual = null;
+
+            const desempateSelector = document.getElementById('desempateSelector');
+            if (desempateSelector) {
+                desempateSelector.style.display = empateDesempatable ? 'block' : 'none';
+                const btnFavor = document.getElementById('btnDesempateFavor');
+                const btnContra = document.getElementById('btnDesempateContra');
+                if (btnFavor) btnFavor.classList.toggle('active', desempateManual === 'favor');
+                if (btnContra) btnContra.classList.toggle('active', desempateManual === 'contra');
+            }
 			
             // Lectura dinámica de meta (Meta actual | N votos | Faltan X votos)
             const metaVotosTxt = document.getElementById('metaVotosTxt');
@@ -1356,6 +1388,12 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             let resultadoTexto = "";
             if (!hayQuorum) {
                 resultadoTexto = "⏳ Esperando votos para calcular el resultado…";
+            } else if (empateDesempatable && !desempateManual) {
+                resultadoTexto = `⚖️ Empate (${t_af}-${t_neg}). Pendiente del desempate del/la Presidente del Senado`;
+            } else if (empateDesempatable && desempateManual === 'favor') {
+                resultadoTexto = `✅ Aprobado por desempate del/la Presidente del Senado (${t_af}-${t_neg})`;
+            } else if (empateDesempatable && desempateManual === 'contra') {
+                resultadoTexto = `❌ Rechazado por desempate del/la Presidente del Senado (${t_af}-${t_neg})`;
             } else if (alcanzada) {
                 resultadoTexto = `✅ Reúne la mayoría requerida (${etiquetaMayoria.toLowerCase()}: ${t_af}/${metaVotos})`;
             } else {
@@ -1368,7 +1406,12 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                     badgeRes.style.display = 'none';
                 } else {
                     badgeRes.style.display = 'block';
-                    badgeRes.className = 'placa-resultado-badge ' + (alcanzada ? 'resultado-aprobado' : 'resultado-rechazado');
+                    let claseBadge = 'resultado-rechazado';
+                    if (empateDesempatable && !desempateManual) claseBadge = 'resultado-empate';
+                    else if (empateDesempatable && desempateManual === 'favor') claseBadge = 'resultado-aprobado';
+                    else if (empateDesempatable && desempateManual === 'contra') claseBadge = 'resultado-rechazado';
+                    else if (alcanzada) claseBadge = 'resultado-aprobado';
+                    badgeRes.className = 'placa-resultado-badge ' + claseBadge;
                     badgeRes.innerHTML = resultadoTexto;
                 }
             }
@@ -1381,9 +1424,15 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                    if (!hayQuorum) {
                         banner.className = 'app-result-banner esperando';
                         banner.innerHTML = `${reqLabel}⏳ Esperando votos para calcular…<span class="arb-sub">Se necesita quórum (${camara.quorum} de ${camara.total}) para definir el resultado.</span>`;
-                    } else if (empateDesempatable) {
+                    } else if (empateDesempatable && !desempateManual) {
                         banner.className = 'app-result-banner esperando';
-                        banner.innerHTML = `${reqLabel}⚖️ Empate (${t_af}-${t_neg})<span class="arb-sub">Se resuelve por el voto de desempate del/la Presidente del Senado</span>`;
+                        banner.innerHTML = `${reqLabel}⚖️ Empate (${t_af}-${t_neg})<span class="arb-sub">Elegí abajo cómo desempató el/la Presidente del Senado</span>`;
+                    } else if (empateDesempatable && desempateManual === 'favor') {
+                        banner.className = 'app-result-banner aprobado';
+                        banner.innerHTML = `${reqLabel}✅ Aprobado por desempate del/la Presidente<span class="arb-sub">${t_af}-${t_neg}, desempató a favor</span>`;
+                    } else if (empateDesempatable && desempateManual === 'contra') {
+                        banner.className = 'app-result-banner rechazado';
+                        banner.innerHTML = `${reqLabel}❌ Rechazado por desempate del/la Presidente<span class="arb-sub">${t_af}-${t_neg}, desempató en contra</span>`;
                     } else if (alcanzada) {
                         banner.className = 'app-result-banner aprobado';
                         banner.innerHTML = `${reqLabel}✅ Reúne la mayoría requerida<span class="arb-sub">${t_af} de ${metaVotos} votos afirmativos necesarios</span>`;
@@ -1554,6 +1603,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     }
 
     function atajoLimpiarTodo() {
+        desempateManual = null;
         const sliders = document.querySelectorAll('input[id^="q-slide-"]');
         sliders.forEach(slider => {
             slider.value = 0;
