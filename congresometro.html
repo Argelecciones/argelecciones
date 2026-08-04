@@ -1331,6 +1331,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             const plural = (faltan === 1) ? '' : 's';
             const esEmpate = hayQuorum && t_af === t_neg && t_af > 0;
             const empateTxt = esEmpate ? ` (empate ${t_af}-${t_neg})` : '';
+            const empateDesempatable = camaraActiva === 'senadores' && tipoMayoria === 'simple' && esEmpate;
 			
             // Lectura dinámica de meta (Meta actual | N votos | Faltan X votos)
             const metaVotosTxt = document.getElementById('metaVotosTxt');
