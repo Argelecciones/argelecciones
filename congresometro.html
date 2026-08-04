@@ -122,6 +122,12 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         .btn-shortcut:active { transform: scale(0.96); }
 
         .vote-control-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .vote-quick-actions { display: flex; gap: 6px; margin-bottom: 6px; }
+        .vote-quick-actions .btn-action { flex: 1; font-size: 10px; padding: 4px 6px; }
+        .btn-quick-af { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .btn-quick-af:hover { background: rgba(16, 185, 129, 0.35); }
+        .btn-quick-neg { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .btn-quick-neg:hover { background: rgba(239, 68, 68, 0.35); }
         .vote-subfield { display: flex; flex-direction: column; font-size: 11px; font-weight: 800; color: #64748b; }
         .vote-subfield input { padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px; text-align: center; font-weight: 800; margin-top: 4px; }
 
@@ -960,6 +966,10 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                     </div>`;
             } else {
                 controlesHtml = `
+                    <div class="vote-quick-actions">
+                        <button class="btn-action btn-quick-af" onclick="marcarBloqueVoto(${idx}, 'af')">Todos AF</button>
+                        <button class="btn-action btn-quick-neg" onclick="marcarBloqueVoto(${idx}, 'neg')">Todos NEG</button>
+                    </div>
                     <div class="vote-control-grid">
                         <div class="vote-subfield">AF <input type="number" id="v-af-${idx}" min="0" max="${bloque.max}" value="0" oninput="ejecutarCalculos()"></div>
                         <div class="vote-subfield">NEG <input type="number" id="v-neg-${idx}" min="0" max="${bloque.max}" value="0" oninput="ejecutarCalculos()"></div>
@@ -976,6 +986,21 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             `;
             container.appendChild(card);
         });
+
+        ejecutarCalculos();
+    }
+	
+	function marcarBloqueVoto(idx, tipo) {
+        const camara = dataCongreso[camaraActiva];
+        const bloque = camara.blocks[idx];
+        const inputAf = document.getElementById(`v-af-${idx}`);
+        const inputNeg = document.getElementById(`v-neg-${idx}`);
+        const inputAbs = document.getElementById(`v-abs-${idx}`);
+        if (!inputAf || !inputNeg || !inputAbs || !bloque) return;
+
+        inputAf.value = tipo === 'af' ? bloque.max : 0;
+        inputNeg.value = tipo === 'neg' ? bloque.max : 0;
+        inputAbs.value = 0;
 
         ejecutarCalculos();
     }
