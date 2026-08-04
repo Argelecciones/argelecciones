@@ -345,10 +345,11 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         }
 		/* Estilos para el nuevo logo de la placa final */
 .placa-logo-container {
-    margin-top: auto; /* Empuja el logo automáticamente al fondo de la placa */
+    margin-top: auto; /* Empuja el bloque automáticamente al fondo de la placa */
     display: flex;
-    justify-content: flex-start;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
 }
 
 .placa-logo {
@@ -838,9 +839,9 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     </div> <!-- Cierre de graph-legends -->
 
     <!-- 🏛️ EL LOGO VA ACÁ (Como hijo directo de placa-col-left) -->
-    <div class="placa-logo-container">
+   <div class="placa-logo-container">
+    <div id="placaResultadoBadge" class="placa-resultado-badge" style="margin: 0; min-width: 250px; font-size: 16px; padding: 6px 12px;"></div>
     <img src="logo.png" class="placa-logo" alt="Logo ArgElecciones">
-		<div id="placaResultadoBadge" class="placa-resultado-badge" style="margin: 0; min-width: 250px; font-size: 16px; padding: 6px 12px;"></div>
     </div>
 </div> <!-- Cierre de placa-col-left -->
                                                 <div class="placa-col-right">
