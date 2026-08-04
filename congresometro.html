@@ -1246,18 +1246,19 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             // 🌟 Sólo hay resultado válido si se alcanzó el quórum reglamentario (129 / 37)
             const totalPresentesActual = t_af + t_neg + t_abs;
             const hayQuorum = totalPresentesActual >= camara.quorum;
-            const empateDesempatable = camaraActiva === 'senadores' && tipoMayoria === 'simple' && hayQuorum && t_af === t_neg && t_af > 0;
-            const alcanzada = hayQuorum && (t_af >= metaVotos) && !empateDesempatable;
+            const alcanzada = hayQuorum && (t_af >= metaVotos);
             const faltan = Math.max(0, metaVotos - t_af);
             const plural = (faltan === 1) ? '' : 's';
-
+            const esEmpate = hayQuorum && t_af === t_neg && t_af > 0;
+            const empateTxt = esEmpate ? ` (empate ${t_af}-${t_neg})` : '';
+			
             // Lectura dinámica de meta (Meta actual | N votos | Faltan X votos)
             const metaVotosTxt = document.getElementById('metaVotosTxt');
             const metaFaltanTxt = document.getElementById('metaFaltanTxt');
             if (metaVotosTxt) {
                 metaVotosTxt.innerText = tipoMayoria === 'simple' ? `Mayoría simple: superar votos negativos (${t_neg})` : `${etiquetaMayoria}: ${metaVotos} votos`;
             }
-            if (metaFaltanTxt) {
+           if (metaFaltanTxt) {
                 if (!hayQuorum) {
                     metaFaltanTxt.className = 'meta-faltan';
                     metaFaltanTxt.innerText = 'Esperando votos para calcular…';
@@ -1266,7 +1267,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                     metaFaltanTxt.innerText = '✅ Meta alcanzada';
                 } else {
                     metaFaltanTxt.className = 'meta-faltan';
-                    metaFaltanTxt.innerText = `Faltan ${faltan} voto${plural}`;
+                    metaFaltanTxt.innerText = `Faltan ${faltan} voto${plural}${empateTxt}`;
                 }
             }
 
@@ -1274,12 +1275,10 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             let resultadoTexto = "";
             if (!hayQuorum) {
                 resultadoTexto = "⏳ Esperando votos para calcular el resultado…";
-            } else if (empateDesempatable) {
-                resultadoTexto = `⚖️ Empate (${t_af}-${t_neg}). Se resuelve por el voto de desempate del/la Presidente del Senado`;
             } else if (alcanzada) {
                 resultadoTexto = `✅ Reúne la mayoría requerida (${etiquetaMayoria.toLowerCase()}: ${t_af}/${metaVotos})`;
             } else {
-                resultadoTexto = `❌ No reúne la mayoría requerida. Faltan ${faltan} voto${plural} afirmativo${plural} (${t_af}/${metaVotos})`;
+                resultadoTexto = `❌ No reúne la mayoría requerida. Faltan ${faltan} voto${plural} afirmativo${plural} (${t_af}/${metaVotos})${empateTxt}`;
             }
 
             // Cartel chico dentro de la placa-imagen
@@ -1307,9 +1306,9 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                     } else if (alcanzada) {
                         banner.className = 'app-result-banner aprobado';
                         banner.innerHTML = `${reqLabel}✅ Reúne la mayoría requerida<span class="arb-sub">${t_af} de ${metaVotos} votos afirmativos necesarios</span>`;
-                    } else {
+                   } else {
                         banner.className = 'app-result-banner rechazado';
-                        banner.innerHTML = `${reqLabel}❌ No reúne la mayoría requerida<span class="arb-sub">Faltan ${faltan} voto${plural} afirmativo${plural} (${t_af}/${metaVotos})</span>`;
+                        banner.innerHTML = `${reqLabel}❌ No reúne la mayoría requerida<span class="arb-sub">Faltan ${faltan} voto${plural} afirmativo${plural} (${t_af}/${metaVotos})${empateTxt}</span>`;
                     }
                 } else {
                     banner.style.display = 'none';
