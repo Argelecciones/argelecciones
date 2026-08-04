@@ -72,6 +72,24 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         .block-header span { color: #f8fafc; }
         .quorum-control-compact div { color: #f8fafc; }
         .quorum-control-compact { display: flex; align-items: center; gap: 4px; width: 100%; }
+        .quorum-num-input {
+            flex: 1;
+            min-width: 0;
+            text-align: center;
+            font-weight: 800;
+            font-size: 13px;
+            background: #0f172a;
+            color: #f8fafc;
+            padding: 4px;
+            border-radius: 4px;
+            border: 1px solid #334155;
+            font-family: inherit;
+        }
+        .quorum-num-input::-webkit-inner-spin-button,
+        .quorum-num-input::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
 
         .btn-action {
             background: #334155;
@@ -935,9 +953,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                     <div class="quorum-control-compact">
                         <button class="btn-action" onclick="setQuorumInput(${idx}, 0)">0</button>
                         <button class="btn-action" onclick="ajustarQuorum(${idx}, -1)">-</button>
-                        <div style="flex: 1; text-align: center; font-weight: 800; font-size: 13px; background: #0f172a; padding: 4px; border-radius: 4px; border: 1px solid #334155;">
-                            <span id="q-val-${idx}">0</span><span style="color:#64748b; font-size:10px;">/${bloque.max}</span>
-                        </div>
+                        <input type="number" id="q-num-${idx}" class="quorum-num-input" min="0" max="${bloque.max}" value="0" onchange="setQuorumInput(${idx}, this.value)" oninput="if(this.value.length>0) setQuorumInput(${idx}, this.value)">
                         <button class="btn-action" onclick="ajustarQuorum(${idx}, 1)">+</button>
                         <button class="btn-action" onclick="setQuorumInput(${idx}, ${bloque.max})">Todos</button>
                         <input type="range" id="q-slide-${idx}" min="0" max="${bloque.max}" value="0" style="display: none;">
@@ -965,8 +981,15 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     }
 
     function setQuorumInput(idx, valor) {
+        let v = parseInt(valor);
+        if (isNaN(v) || v < 0) v = 0;
         const slider = document.getElementById(`q-slide-${idx}`);
-        if(slider) { slider.value = valor; ejecutarCalculos(); }
+        const max = slider ? parseInt(slider.max) : Infinity;
+        if (v > max) v = max;
+        if(slider) slider.value = v;
+        const numInput = document.getElementById(`q-num-${idx}`);
+        if (numInput && parseInt(numInput.value) !== v) numInput.value = v;
+        ejecutarCalculos();
     }
 
  // Actualiza la línea de referencia superior según modo y mayoría elegida
@@ -1146,8 +1169,8 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                 const slider = document.getElementById(`q-slide-${idx}`);
                 const srcVal = slider ? (parseInt(slider.value) || 0) : 0;
                 
-                const valSpan = document.getElementById(`q-val-${idx}`);
-                if (valSpan) valSpan.innerText = srcVal;
+                const numInput = document.getElementById(`q-num-${idx}`);
+                if (numInput && parseInt(numInput.value) !== srcVal) numInput.value = srcVal;
                 
                 totalPresentes += srcVal;
                 if(srcVal > 0) reporteBloques.push(`${bloque.name}: ${srcVal}`);
@@ -1508,8 +1531,8 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         if (nuevoValor > parseInt(slider.max)) nuevoValor = parseInt(slider.max);
         
         slider.value = nuevoValor;
-        const valSpan = document.getElementById(`q-val-${idx}`);
-        if (valSpan) valSpan.innerText = nuevoValor;
+        const numInput = document.getElementById(`q-num-${idx}`);
+        if (numInput) numInput.value = nuevoValor;
         
         ejecutarCalculos();
     }
