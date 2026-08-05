@@ -111,6 +111,16 @@
         background: var(--color-noticia);
     }
     .badge-tema.tema-encuesta { background: var(--color-encuesta); }
+	.badge-nuevo {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: 800;
+        color: #fff;
+        background: #22c55e;
+        margin-left: 6px;
+    }
     .noticia-titulo { font-size: 16px; font-weight: 700; line-height: 1.4; }
 
     .sin-resultados { text-align: center; color: var(--text-muted); padding: 40px 0; font-size: 14px; }
@@ -303,6 +313,14 @@
         return div.innerHTML;
     }
 
+		function esNueva(fechaCargaStr) {
+        if (!fechaCargaStr) return false;
+        const fechaCarga = new Date(fechaCargaStr);
+        const ahora = new Date();
+        const horas = (ahora - fechaCarga) / (1000 * 60 * 60);
+        return horas >= 0 && horas <= 24;
+    }
+
     function renderizarLista() {
         const fTema = document.getElementById('filterTema').value;
         const fMedio = document.getElementById('filterMedio').value;
@@ -340,6 +358,7 @@
             // Codificamos la URL en base64 para asignarla como identificador seguro en la etiqueta HTML
             const urlSegura = btoa(n.URL); 
 
+            const badgeNuevo = esNueva(n.FechaCarga) ? '<span class="badge-nuevo">🆕 Nuevo</span>' : '';
             return `
                 <a class="noticia-card ${claseTema}" href="${escapeHtml(n.URL)}" target="_blank" rel="noopener noreferrer" data-url="${urlSegura}">
                     <button class="btn-ocultar" title="Ocultar esta noticia" onclick="ocultarNoticia(event, '${escapeHtml(n.URL)}')">✕</button>
@@ -349,6 +368,7 @@
                         <span>${escapeHtml(n.Medio || '')}</span>
                         <span>·</span>
                         <span>${fechaFmt}</span>
+                        ${badgeNuevo}
                     </div>
                     <div class="noticia-titulo">${escapeHtml(n.Titulo || '')}</div>
                 </a>
