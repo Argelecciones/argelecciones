@@ -1238,8 +1238,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         });
     }
 
-    function ejecutarCalculos() {
-        const camara = dataCongreso[camaraActiva];
+    function recolectarVotos(camara) {
         let totalPresentes = 0;
         let t_af = 0, t_neg = 0, t_abs = 0, t_aus = 0;
         let reporteBloques = [];
@@ -1248,12 +1247,12 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             if (modoActivo === 'quorum') {
                 const slider = document.getElementById(`q-slide-${idx}`);
                 const srcVal = slider ? (parseInt(slider.value) || 0) : 0;
-                
+
                 const numInput = document.getElementById(`q-num-${idx}`);
                 if (numInput && parseInt(numInput.value) !== srcVal) numInput.value = srcVal;
-                
+
                 totalPresentes += srcVal;
-                if(srcVal > 0) reporteBloques.push(`${bloque.name}: ${srcVal}`);
+                if (srcVal > 0) reporteBloques.push(`${bloque.name}: ${srcVal}`);
             } else {
                 const inputAf = document.getElementById(`v-af-${idx}`);
                 const inputNeg = document.getElementById(`v-neg-${idx}`);
@@ -1272,11 +1271,11 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                 }
 
                 let aus = bloque.max - (af + neg + abs);
-                
+
                 t_af += af; t_neg += neg; t_abs += abs; t_aus += aus;
                 totalPresentes += (bloque.max - aus);
 
-                if(af > 0 || neg > 0 || abs > 0) {
+                if (af > 0 || neg > 0 || abs > 0) {
                     reporteBloques.push(`${bloque.name} [AF:${af} | NEG:${neg} | ABS:${abs}]`);
                 }
             }
@@ -1284,7 +1283,81 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
 
         if (modoActivo === 'quorum') {
             t_aus = camara.total - totalPresentes;
-            // Renderizar placa de quórum
+        }
+
+        return { totalPresentes, t_af, t_neg, t_abs, t_aus, reporteBloques };
+    }
+
+    function calcularMayoria(camara, votos) {
+        const { t_af, t_neg, t_abs } = votos;
+
+        const radioSel = document.querySelector('input[name="tipoMayoria"]:checked');
+        const tipoMayoria = radioSel ? radioSel.value : 'simple';
+
+        const presentes = t_af + t_neg + t_abs;
+        const emitidos = t_af + t_neg;
+        const totalCamara = camara.total;
+
+        let metaVotos = 0;
+        let etiquetaMayoria = '';
+        switch (tipoMayoria) {
+            case 'absoluta':
+                metaVotos = Math.floor(totalCamara / 2) + 1;
+                etiquetaMayoria = 'Mayoría absoluta';
+                break;
+            case '23presentes':
+                metaVotos = Math.ceil((presentes * 2) / 3);
+                etiquetaMayoria = '2/3 de presentes';
+                break;
+            case '23emitidos':
+                metaVotos = Math.ceil((emitidos * 2) / 3);
+                etiquetaMayoria = '2/3 de votos emitidos';
+                break;
+            case '23total':
+                metaVotos = Math.ceil((totalCamara * 2) / 3);
+                etiquetaMayoria = '2/3 del total';
+                break;
+            default:
+                metaVotos = t_neg + 1;
+                etiquetaMayoria = 'Mayoría simple';
+                break;
+        }
+
+        const totalPresentesActual = t_af + t_neg + t_abs;
+        const hayQuorum = totalPresentesActual >= camara.quorum;
+        const alcanzada = hayQuorum && (t_af >= metaVotos);
+        const faltan = Math.max(0, metaVotos - t_af);
+        const plural = (faltan === 1) ? '' : 's';
+        const esEmpate = hayQuorum && t_af === t_neg && t_af > 0;
+        const empateTxt = esEmpate ? ` (empate ${t_af}-${t_neg})` : '';
+        const empateDesempatable = camaraActiva === 'senadores' && tipoMayoria === 'simple' && esEmpate;
+
+        if (!empateDesempatable && desempateManual !== null) desempateManual = null;
+
+        let resultadoTexto = "";
+        if (!hayQuorum) {
+            resultadoTexto = "⏳ Esperando votos para calcular el resultado…";
+        } else if (empateDesempatable && !desempateManual) {
+            resultadoTexto = `⚖️ Empate (${t_af}-${t_neg}). Pendiente del desempate del/la Presidente del Senado`;
+        } else if (empateDesempatable && desempateManual === 'favor') {
+            resultadoTexto = `✅ Aprobado por desempate del/la Presidente del Senado (${t_af}-${t_neg})`;
+        } else if (empateDesempatable && desempateManual === 'contra') {
+            resultadoTexto = `❌ Rechazado por desempate del/la Presidente del Senado (${t_af}-${t_neg})`;
+        } else if (alcanzada) {
+            resultadoTexto = `✅ Reúne la mayoría requerida (${etiquetaMayoria.toLowerCase()}: ${t_af}/${metaVotos})`;
+        } else {
+            resultadoTexto = `❌ No reúne la mayoría requerida. Faltan ${faltan} voto${plural} afirmativo${plural} (${t_af}/${metaVotos})${empateTxt}`;
+        }
+
+        return { tipoMayoria, metaVotos, etiquetaMayoria, hayQuorum, alcanzada, faltan, plural, esEmpate, empateTxt, empateDesempatable, resultadoTexto };
+    }
+
+    function ejecutarCalculos() {
+        const camara = dataCongreso[camaraActiva];
+        const votos = recolectarVotos(camara);
+        const { totalPresentes, t_af, t_neg, t_abs, t_aus, reporteBloques } = votos;
+
+        if (modoActivo === 'quorum') {
             renderizarPlacaQuorum(totalPresentes, reporteBloques);
         }
 
@@ -1305,58 +1378,12 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             if(document.getElementById('seg-neg')) document.getElementById('seg-neg').style.width = `${pctNeg}%`;
             if(document.getElementById('seg-abs')) document.getElementById('seg-abs').style.width = `${pctAbs}%`;
             if(document.getElementById('seg-aus')) document.getElementById('seg-aus').style.width = `${pctAus}%`;
-			
-			// 🌟 LÓGICA DE MAYORÍAS REQUERIDAS (configurable)
+
             const badgeRes = document.getElementById('placaResultadoBadge');
             const banner = document.getElementById('appResultadoBanner');
-            const hayVotos = (t_af > 0 || t_neg > 0 || t_abs > 0);
 
-            // Tipo de mayoría seleccionada en el panel
-            const radioSel = document.querySelector('input[name="tipoMayoria"]:checked');
-            const tipoMayoria = radioSel ? radioSel.value : 'simple';
-
-            // Bases de cálculo
-            const presentes = t_af + t_neg + t_abs;        // presentes que votaron (sin ausentes)
-            const emitidos = t_af + t_neg;                 // votos emitidos (sin abstenciones)
-            const totalCamara = camara.total;              // total de bancas de la cámara
-
-            // Umbral de votos afirmativos necesarios según el tipo de mayoría
-            let metaVotos = 0;
-            let etiquetaMayoria = '';
-            switch (tipoMayoria) {
-                case 'absoluta':
-                    metaVotos = Math.floor(totalCamara / 2) + 1; // más de la mitad del total
-                    etiquetaMayoria = 'Mayoría absoluta';
-                    break;
-                case '23presentes':
-                    metaVotos = Math.ceil((presentes * 2) / 3);
-                    etiquetaMayoria = '2/3 de presentes';
-                    break;
-                case '23emitidos':
-                    metaVotos = Math.ceil((emitidos * 2) / 3);
-                    etiquetaMayoria = '2/3 de votos emitidos';
-                    break;
-                case '23total':
-                    metaVotos = Math.ceil((totalCamara * 2) / 3);
-                    etiquetaMayoria = '2/3 del total';
-                    break;
-                default: // simple: superar a los negativos
-                    metaVotos = t_neg + 1;
-                    etiquetaMayoria = 'Mayoría simple';
-                    break;
-            }
-
-            // 🌟 Sólo hay resultado válido si se alcanzó el quórum reglamentario (129 / 37)
-            const totalPresentesActual = t_af + t_neg + t_abs;
-            const hayQuorum = totalPresentesActual >= camara.quorum;
-            const alcanzada = hayQuorum && (t_af >= metaVotos);
-            const faltan = Math.max(0, metaVotos - t_af);
-            const plural = (faltan === 1) ? '' : 's';
-            const esEmpate = hayQuorum && t_af === t_neg && t_af > 0;
-            const empateTxt = esEmpate ? ` (empate ${t_af}-${t_neg})` : '';
-            const empateDesempatable = camaraActiva === 'senadores' && tipoMayoria === 'simple' && esEmpate;
-
-            if (!empateDesempatable && desempateManual !== null) desempateManual = null;
+            const mayoria = calcularMayoria(camara, votos);
+            const { tipoMayoria, metaVotos, etiquetaMayoria, hayQuorum, alcanzada, faltan, plural, empateTxt, empateDesempatable, resultadoTexto } = mayoria;
 
             const desempateSelector = document.getElementById('desempateSelector');
             if (desempateSelector) {
@@ -1366,14 +1393,13 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                 if (btnFavor) btnFavor.classList.toggle('active', desempateManual === 'favor');
                 if (btnContra) btnContra.classList.toggle('active', desempateManual === 'contra');
             }
-			
-            // Lectura dinámica de meta (Meta actual | N votos | Faltan X votos)
+
             const metaVotosTxt = document.getElementById('metaVotosTxt');
             const metaFaltanTxt = document.getElementById('metaFaltanTxt');
             if (metaVotosTxt) {
                 metaVotosTxt.innerText = tipoMayoria === 'simple' ? `Mayoría simple: superar votos negativos (${t_neg})` : `${etiquetaMayoria}: ${metaVotos} votos`;
             }
-           if (metaFaltanTxt) {
+            if (metaFaltanTxt) {
                 if (!hayQuorum) {
                     metaFaltanTxt.className = 'meta-faltan';
                     metaFaltanTxt.innerText = 'Esperando votos para calcular…';
@@ -1386,23 +1412,6 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                 }
             }
 
-            // Texto reutilizable (placa, banner y copete de redes)
-            let resultadoTexto = "";
-            if (!hayQuorum) {
-                resultadoTexto = "⏳ Esperando votos para calcular el resultado…";
-            } else if (empateDesempatable && !desempateManual) {
-                resultadoTexto = `⚖️ Empate (${t_af}-${t_neg}). Pendiente del desempate del/la Presidente del Senado`;
-            } else if (empateDesempatable && desempateManual === 'favor') {
-                resultadoTexto = `✅ Aprobado por desempate del/la Presidente del Senado (${t_af}-${t_neg})`;
-            } else if (empateDesempatable && desempateManual === 'contra') {
-                resultadoTexto = `❌ Rechazado por desempate del/la Presidente del Senado (${t_af}-${t_neg})`;
-            } else if (alcanzada) {
-                resultadoTexto = `✅ Reúne la mayoría requerida (${etiquetaMayoria.toLowerCase()}: ${t_af}/${metaVotos})`;
-            } else {
-                resultadoTexto = `❌ No reúne la mayoría requerida. Faltan ${faltan} voto${plural} afirmativo${plural} (${t_af}/${metaVotos})${empateTxt}`;
-            }
-
-            // Cartel chico dentro de la placa-imagen
             if (badgeRes) {
                 if (!hayQuorum) {
                     badgeRes.style.display = 'none';
@@ -1418,12 +1427,11 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                 }
             }
 
-            // Banner grande dentro del aplicativo (solo modo votación)
             if (banner) {
                 if (modoActivo === 'vote') {
                     banner.style.display = 'block';
                     const reqLabel = `<span class="arb-req">Mayoría requerida: ${etiquetaMayoria}</span>`;
-                   if (!hayQuorum) {
+                    if (!hayQuorum) {
                         banner.className = 'app-result-banner esperando';
                         banner.innerHTML = `${reqLabel}⏳ Esperando votos para calcular…<span class="arb-sub">Se necesita quórum (${camara.quorum} de ${camara.total}) para definir el resultado.</span>`;
                     } else if (empateDesempatable && !desempateManual) {
@@ -1438,7 +1446,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                     } else if (alcanzada) {
                         banner.className = 'app-result-banner aprobado';
                         banner.innerHTML = `${reqLabel}✅ Reúne la mayoría requerida<span class="arb-sub">${t_af} de ${metaVotos} votos afirmativos necesarios</span>`;
-                   } else {
+                    } else {
                         banner.className = 'app-result-banner rechazado';
                         banner.innerHTML = `${reqLabel}❌ No reúne la mayoría requerida<span class="arb-sub">Faltan ${faltan} voto${plural} afirmativo${plural} (${t_af}/${metaVotos})${empateTxt}</span>`;
                     }
@@ -1447,7 +1455,6 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                 }
             }
 
-            // Línea de resumen debajo de la barra de quórum (Sí | No | Abst. | Aus.)
             const voteSummary = document.getElementById('voteSummaryLine');
             if (voteSummary) {
                 if (modoActivo === 'vote') {
@@ -1462,7 +1469,6 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                 }
             }
 
-            // Lo dejamos accesible para el copete de redes sociales
             window.__resultadoVotacionTexto = resultadoTexto;
 
             const hoy = new Date();
@@ -1470,7 +1476,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             const mes = String(hoy.getMonth() + 1).padStart(2, '0');
             const anio = hoy.getFullYear();
             const camaraNombre = camaraActiva.charAt(0).toUpperCase() + camaraActiva.slice(1);
-            
+
             if(document.getElementById('placaVolantaText')) {
                 document.getElementById('placaVolantaText').innerText = `Resultado votación - ${camaraNombre} (${dia}/${mes}/${anio})`;
             }
@@ -1478,12 +1484,12 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             const placaBlocksDetail = document.getElementById('placaBlocksDetail');
             if (placaBlocksDetail) {
                 placaBlocksDetail.innerHTML = '';
-                
+
                 camara.blocks.forEach((bloque, idx) => {
                     const valAf = document.getElementById(`v-af-${idx}`) ? (parseInt(document.getElementById(`v-af-${idx}`).value) || 0) : 0;
                     const valNeg = document.getElementById(`v-neg-${idx}`) ? (parseInt(document.getElementById(`v-neg-${idx}`).value) || 0) : 0;
                     const valAbs = document.getElementById(`v-abs-${idx}`) ? (parseInt(document.getElementById(`v-abs-${idx}`).value) || 0) : 0;
-                    
+
                     const valAus = bloque.max - (valAf + valNeg + valAbs);
 
                     const fila = document.createElement('div');
@@ -1502,19 +1508,19 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                     placaBlocksDetail.appendChild(fila);
                 });
             }
-            
+
             ajustarEscalaPlaca();
-            
+
         } catch (error) {
             console.log("Error al renderizar la placa gráfica:", error);
         }
 
         if (document.getElementById('qTotal')) document.getElementById('qTotal').innerText = totalPresentes;
-        
+
         const fillPercent = (totalPresentes / camara.total) * 100;
         const barFill = document.getElementById('qFill');
         if (barFill) barFill.style.width = `${Math.min(fillPercent, 100)}%`;
-        
+
         const badge = document.getElementById('qBadge');
         let statusTextReport = "";
 
@@ -1530,7 +1536,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
 
         const txArea = document.getElementById('socialText');
         if (txArea) {
-            const camLabel = camara.label; 
+            const camLabel = camara.label;
             if (modoActivo === 'quorum') {
                 txArea.value = `🏛 CONGRESO | Sesión en ${camLabel}:\n\n${statusTextReport}\nPresentes en sus bancas: ${totalPresentes}/${camara.total}\n\nDetalle de asistencia:\n${reporteBloques.join('\n') || 'Ninguno en el recinto'}\n\n#Congresómetro vía @argelecciones`;
             } else {
