@@ -440,8 +440,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
     <div class="placa-prox-badge-date" id="placaProxDate">—</div>
   </div>
   <div class="placa-prox-footer">
-    <div style="font-size: 20px; color: #4a5878; font-weight: 700;">ElectoAgenda</div>
-    <img src="logo.png" alt="Logo" style="height:90px; width:auto;">
+    <img src="logo.png" alt="Logo" style="height:110px; width:auto; margin-left:auto;">
 </div>
 </div>
 
@@ -575,10 +574,10 @@ function actualizarBannerProximo(){
 function copiarEvento(idx, btn) {
   const ev = eventos[idx];
   if(!ev) return;
-  const fechaStr = `${DIAS[ev.fecha.getDay()]} ${ev.fecha.getDate()} de ${MESES[ev.fecha.getMonth()]} de ${ev.fecha.getFullYear()}`;
+  const fechaStr = `${DIAS_LARGOS[ev.fecha.getDay()]} ${ev.fecha.getDate()} de ${MESES[ev.fecha.getMonth()]} de ${ev.fecha.getFullYear()}`;
   const texto = ev.provincia
-    ? `📅ElectoAgenda @Argelecciones |\n\n🗳${ev.descripcion} (${ev.provincia}): ${fechaStr}`
-    : `📅ElectoAgenda @Argelecciones |\n\n🗳${ev.descripcion}: ${fechaStr}`;
+    ? `📅 ElectoAgenda @Argelecciones\n\n🗳 ${ev.descripcion} (${ev.provincia}): ${fechaStr}`
+    : `📅 ElectoAgenda @Argelecciones\n\n🗳 ${ev.descripcion}: ${fechaStr}`;
     
   navigator.clipboard.writeText(texto).then(() => {
     const origText = btn.textContent;
@@ -662,10 +661,8 @@ document.fonts.ready.then(() => {
 
   document.getElementById('placaProxAccent').style.background = '#ca8a04';
 
-  const años = hoy.getFullYear() - ev.fecha.getFullYear();
-
-  document.getElementById('placaProxDiasNum').textContent = ev.fecha.getFullYear();
-  document.getElementById('placaProxDiasLbl').textContent = `Hace ${años} años`;
+  document.getElementById('placaProxDiasNum').textContent = ev.fecha.getDate();
+  document.getElementById('placaProxDiasLbl').textContent = MESES[ev.fecha.getMonth()];
   document.getElementById('placaProxTitle').textContent = ev.descripcion;
 
   const fechaStr = `${ev.fecha.getDate()} de ${MESES[ev.fecha.getMonth()]} de ${ev.fecha.getFullYear()}`;
