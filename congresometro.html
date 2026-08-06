@@ -1352,13 +1352,104 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         return { tipoMayoria, metaVotos, etiquetaMayoria, hayQuorum, alcanzada, faltan, plural, esEmpate, empateTxt, empateDesempatable, resultadoTexto };
     }
 
-    function ejecutarCalculos() {
-        const camara = dataCongreso[camaraActiva];
-        const votos = recolectarVotos(camara);
-        const { totalPresentes, t_af, t_neg, t_abs, t_aus, reporteBloques } = votos;
+    function renderizarPanelIzquierdo(camara, votos, mayoria) {
+        const { t_af, t_neg, t_abs, t_aus, totalPresentes } = votos;
+        const { tipoMayoria, metaVotos, etiquetaMayoria, hayQuorum, alcanzada, faltan, plural, empateTxt, empateDesempatable, resultadoTexto } = mayoria;
+
+        const banner = document.getElementById('appResultadoBanner');
+
+        const desempateSelector = document.getElementById('desempateSelector');
+        if (desempateSelector) {
+            desempateSelector.style.display = empateDesempatable ? 'block' : 'none';
+            const btnFavor = document.getElementById('btnDesempateFavor');
+            const btnContra = document.getElementById('btnDesempateContra');
+            if (btnFavor) btnFavor.classList.toggle('active', desempateManual === 'favor');
+            if (btnContra) btnContra.classList.toggle('active', desempateManual === 'contra');
+        }
+
+        const metaVotosTxt = document.getElementById('metaVotosTxt');
+        const metaFaltanTxt = document.getElementById('metaFaltanTxt');
+        if (metaVotosTxt) {
+            metaVotosTxt.innerText = tipoMayoria === 'simple' ? `Mayoría simple: superar votos negativos (${t_neg})` : `${etiquetaMayoria}: ${metaVotos} votos`;
+        }
+        if (metaFaltanTxt) {
+            if (!hayQuorum) {
+                metaFaltanTxt.className = 'meta-faltan';
+                metaFaltanTxt.innerText = 'Esperando votos para calcular…';
+            } else if (alcanzada) {
+                metaFaltanTxt.className = 'meta-ok';
+                metaFaltanTxt.innerText = '✅ Meta alcanzada';
+            } else {
+                metaFaltanTxt.className = 'meta-faltan';
+                metaFaltanTxt.innerText = `Faltan ${faltan} voto${plural}${empateTxt}`;
+            }
+        }
+
+        if (banner) {
+            if (modoActivo === 'vote') {
+                banner.style.display = 'block';
+                const reqLabel = `<span class="arb-req">Mayoría requerida: ${etiquetaMayoria}</span>`;
+                if (!hayQuorum) {
+                    banner.className = 'app-result-banner esperando';
+                    banner.innerHTML = `${reqLabel}⏳ Esperando votos para calcular…<span class="arb-sub">Se necesita quórum (${camara.quorum} de ${camara.total}) para definir el resultado.</span>`;
+                } else if (empateDesempatable && !desempateManual) {
+                    banner.className = 'app-result-banner esperando';
+                    banner.innerHTML = `${reqLabel}⚖️ Empate (${t_af}-${t_neg})<span class="arb-sub">Elegí abajo cómo desempató el/la Presidente del Senado</span>`;
+                } else if (empateDesempatable && desempateManual === 'favor') {
+                    banner.className = 'app-result-banner aprobado';
+                    banner.innerHTML = `${reqLabel}✅ Aprobado por desempate del/la Presidente<span class="arb-sub">${t_af}-${t_neg}, desempató a favor</span>`;
+                } else if (empateDesempatable && desempateManual === 'contra') {
+                    banner.className = 'app-result-banner rechazado';
+                    banner.innerHTML = `${reqLabel}❌ Rechazado por desempate del/la Presidente<span class="arb-sub">${t_af}-${t_neg}, desempató en contra</span>`;
+                } else if (alcanzada) {
+                    banner.className = 'app-result-banner aprobado';
+                    banner.innerHTML = `${reqLabel}✅ Reúne la mayoría requerida<span class="arb-sub">${t_af} de ${metaVotos} votos afirmativos necesarios</span>`;
+                } else {
+                    banner.className = 'app-result-banner rechazado';
+                    banner.innerHTML = `${reqLabel}❌ No reúne la mayoría requerida<span class="arb-sub">Faltan ${faltan} voto${plural} afirmativo${plural} (${t_af}/${metaVotos})${empateTxt}</span>`;
+                }
+            } else {
+                banner.style.display = 'none';
+            }
+        }
+
+        const voteSummary = document.getElementById('voteSummaryLine');
+        if (voteSummary) {
+            if (modoActivo === 'vote') {
+                voteSummary.style.display = 'block';
+                voteSummary.innerHTML =
+                    `<span class="vs-si">Af.: ${t_af}</span><span class="vs-sep"> | </span>` +
+        `<span class="vs-no">Neg.: ${t_neg}</span><span class="vs-sep"> | </span>` +
+        `<span class="vs-abs">Abst.: ${t_abs}</span><span class="vs-sep"> | </span>` +
+        `<span class="vs-aus">Aus.: ${t_aus}</span>`;
+            } else {
+                voteSummary.style.display = 'none';
+            }
+        }
+
+        if (document.getElementById('qTotal')) document.getElementById('qTotal').innerText = totalPresentes;
+
+        const fillPercent = (totalPresentes / camara.total) * 100;
+        const barFill = document.getElementById('qFill');
+        if (barFill) barFill.style.width = `${Math.min(fillPercent, 100)}%`;
+
+        const badge = document.getElementById('qBadge');
+        if (totalPresentes >= camara.quorum) {
+            if (badge) { badge.innerText = "Con Quórum"; badge.className = "q-badge yes"; }
+            if (barFill) barFill.style.backgroundColor = "#10b981";
+        } else {
+            if (badge) { badge.innerText = "Sin Quórum"; badge.className = "q-badge no"; }
+            if (barFill) barFill.style.backgroundColor = "#3b82f6";
+        }
+    }
+
+    function renderizarPlaca(camara, votos, mayoria) {
+        const { t_af, t_neg, t_abs, t_aus, totalPresentes, reporteBloques } = votos;
+        const { hayQuorum, alcanzada, empateDesempatable, resultadoTexto } = mayoria;
 
         if (modoActivo === 'quorum') {
             renderizarPlacaQuorum(totalPresentes, reporteBloques);
+            return;
         }
 
         try {
@@ -1380,38 +1471,6 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             if(document.getElementById('seg-aus')) document.getElementById('seg-aus').style.width = `${pctAus}%`;
 
             const badgeRes = document.getElementById('placaResultadoBadge');
-            const banner = document.getElementById('appResultadoBanner');
-
-            const mayoria = calcularMayoria(camara, votos);
-            const { tipoMayoria, metaVotos, etiquetaMayoria, hayQuorum, alcanzada, faltan, plural, empateTxt, empateDesempatable, resultadoTexto } = mayoria;
-
-            const desempateSelector = document.getElementById('desempateSelector');
-            if (desempateSelector) {
-                desempateSelector.style.display = empateDesempatable ? 'block' : 'none';
-                const btnFavor = document.getElementById('btnDesempateFavor');
-                const btnContra = document.getElementById('btnDesempateContra');
-                if (btnFavor) btnFavor.classList.toggle('active', desempateManual === 'favor');
-                if (btnContra) btnContra.classList.toggle('active', desempateManual === 'contra');
-            }
-
-            const metaVotosTxt = document.getElementById('metaVotosTxt');
-            const metaFaltanTxt = document.getElementById('metaFaltanTxt');
-            if (metaVotosTxt) {
-                metaVotosTxt.innerText = tipoMayoria === 'simple' ? `Mayoría simple: superar votos negativos (${t_neg})` : `${etiquetaMayoria}: ${metaVotos} votos`;
-            }
-            if (metaFaltanTxt) {
-                if (!hayQuorum) {
-                    metaFaltanTxt.className = 'meta-faltan';
-                    metaFaltanTxt.innerText = 'Esperando votos para calcular…';
-                } else if (alcanzada) {
-                    metaFaltanTxt.className = 'meta-ok';
-                    metaFaltanTxt.innerText = '✅ Meta alcanzada';
-                } else {
-                    metaFaltanTxt.className = 'meta-faltan';
-                    metaFaltanTxt.innerText = `Faltan ${faltan} voto${plural}${empateTxt}`;
-                }
-            }
-
             if (badgeRes) {
                 if (!hayQuorum) {
                     badgeRes.style.display = 'none';
@@ -1426,50 +1485,6 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                     badgeRes.innerHTML = resultadoTexto;
                 }
             }
-
-            if (banner) {
-                if (modoActivo === 'vote') {
-                    banner.style.display = 'block';
-                    const reqLabel = `<span class="arb-req">Mayoría requerida: ${etiquetaMayoria}</span>`;
-                    if (!hayQuorum) {
-                        banner.className = 'app-result-banner esperando';
-                        banner.innerHTML = `${reqLabel}⏳ Esperando votos para calcular…<span class="arb-sub">Se necesita quórum (${camara.quorum} de ${camara.total}) para definir el resultado.</span>`;
-                    } else if (empateDesempatable && !desempateManual) {
-                        banner.className = 'app-result-banner esperando';
-                        banner.innerHTML = `${reqLabel}⚖️ Empate (${t_af}-${t_neg})<span class="arb-sub">Elegí abajo cómo desempató el/la Presidente del Senado</span>`;
-                    } else if (empateDesempatable && desempateManual === 'favor') {
-                        banner.className = 'app-result-banner aprobado';
-                        banner.innerHTML = `${reqLabel}✅ Aprobado por desempate del/la Presidente<span class="arb-sub">${t_af}-${t_neg}, desempató a favor</span>`;
-                    } else if (empateDesempatable && desempateManual === 'contra') {
-                        banner.className = 'app-result-banner rechazado';
-                        banner.innerHTML = `${reqLabel}❌ Rechazado por desempate del/la Presidente<span class="arb-sub">${t_af}-${t_neg}, desempató en contra</span>`;
-                    } else if (alcanzada) {
-                        banner.className = 'app-result-banner aprobado';
-                        banner.innerHTML = `${reqLabel}✅ Reúne la mayoría requerida<span class="arb-sub">${t_af} de ${metaVotos} votos afirmativos necesarios</span>`;
-                    } else {
-                        banner.className = 'app-result-banner rechazado';
-                        banner.innerHTML = `${reqLabel}❌ No reúne la mayoría requerida<span class="arb-sub">Faltan ${faltan} voto${plural} afirmativo${plural} (${t_af}/${metaVotos})${empateTxt}</span>`;
-                    }
-                } else {
-                    banner.style.display = 'none';
-                }
-            }
-
-            const voteSummary = document.getElementById('voteSummaryLine');
-            if (voteSummary) {
-                if (modoActivo === 'vote') {
-                    voteSummary.style.display = 'block';
-                    voteSummary.innerHTML =
-                        `<span class="vs-si">Af.: ${t_af}</span><span class="vs-sep"> | </span>` +
-            `<span class="vs-no">Neg.: ${t_neg}</span><span class="vs-sep"> | </span>` +
-            `<span class="vs-abs">Abst.: ${t_abs}</span><span class="vs-sep"> | </span>` +
-            `<span class="vs-aus">Aus.: ${t_aus}</span>`;
-                } else {
-                    voteSummary.style.display = 'none';
-                }
-            }
-
-            window.__resultadoVotacionTexto = resultadoTexto;
 
             const hoy = new Date();
             const dia = String(hoy.getDate()).padStart(2, '0');
@@ -1514,23 +1529,18 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         } catch (error) {
             console.log("Error al renderizar la placa gráfica:", error);
         }
+    }
 
-        if (document.getElementById('qTotal')) document.getElementById('qTotal').innerText = totalPresentes;
+    function armarTextoRedes(camara, votos, mayoria) {
+        const { t_af, t_neg, t_abs, t_aus, totalPresentes, reporteBloques } = votos;
+        const { resultadoTexto } = mayoria;
 
-        const fillPercent = (totalPresentes / camara.total) * 100;
-        const barFill = document.getElementById('qFill');
-        if (barFill) barFill.style.width = `${Math.min(fillPercent, 100)}%`;
+        window.__resultadoVotacionTexto = resultadoTexto;
 
-        const badge = document.getElementById('qBadge');
         let statusTextReport = "";
-
         if (totalPresentes >= camara.quorum) {
-            if (badge) { badge.innerText = "Con Quórum"; badge.className = "q-badge yes"; }
-            if (barFill) barFill.style.backgroundColor = "#10b981";
             statusTextReport = "✅ SESIÓN HABILITADA. Hay quórum en el recinto.";
         } else {
-            if (badge) { badge.innerText = "Sin Quórum"; badge.className = "q-badge no"; }
-            if (barFill) barFill.style.backgroundColor = "#3b82f6";
             statusTextReport = `❌ SIN QUÓRUM. Faltan ${camara.quorum - totalPresentes} legisladores para arrancar.`;
         }
 
@@ -1540,10 +1550,19 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             if (modoActivo === 'quorum') {
                 txArea.value = `🏛 CONGRESO | Sesión en ${camLabel}:\n\n${statusTextReport}\nPresentes en sus bancas: ${totalPresentes}/${camara.total}\n\nDetalle de asistencia:\n${reporteBloques.join('\n') || 'Ninguno en el recinto'}\n\n#Congresómetro vía @argelecciones`;
             } else {
-                const lineaResultado = window.__resultadoVotacionTexto ? `${window.__resultadoVotacionTexto}\n\n` : '';
+                const lineaResultado = resultadoTexto ? `${resultadoTexto}\n\n` : '';
                 txArea.value = `🏛 ${camLabel} - Votación:\n\n${lineaResultado}🟢 A Favor: ${t_af}\n🔴 En Contra: ${t_neg}\n⚪ Abstenciones: ${t_abs}\n⚫ Ausentes: ${t_aus}\n\nDetalle estructural por bloques:\n${reporteBloques.join('\n') || 'Sin votos registrados'}\n\n#Congresómetro vía @argelecciones`;
             }
         }
+    }
+
+    function ejecutarCalculos() {
+        const camara = dataCongreso[camaraActiva];
+        const votos = recolectarVotos(camara);
+        const mayoria = calcularMayoria(camara, votos);
+        renderizarPanelIzquierdo(camara, votos, mayoria);
+        renderizarPlaca(camara, votos, mayoria);
+        armarTextoRedes(camara, votos, mayoria);
     }
 
     function copiarTextoRedes() {
