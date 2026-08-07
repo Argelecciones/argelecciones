@@ -657,6 +657,35 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     .btn-estado-persona.btn-abs.active { background:#3f3f1e; border-color:#eab308; color:#fde68a; }
     .btn-estado-persona.btn-aus.active { background:#334155; border-color:#64748b; color:#e2e8f0; }
     .btn-estado-persona.btn-presente.active { background:#064e3b; border-color:#10b981; color:#6ee7b7; }
+
+		#placaNominalEntity {
+        position: fixed;
+        left: -9999px;
+        top: 0;
+        width: 1920px;
+        background: #f8fafc;
+        color: #0f172a;
+        font-family: 'Inter', sans-serif;
+        box-sizing: border-box;
+        padding: 60px 70px;
+    }
+    .placa-nominal-header { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #e2e8f0; padding-bottom:20px; margin-bottom:25px; }
+    .placa-nominal-titulo { font-size:56px; font-weight:900; line-height:1; }
+    .placa-nominal-titulo span { color:#f43f5e; }
+    .placa-nominal-subtitulo { font-size:20px; color:#64748b; font-weight:700; margin-top:6px; }
+    .placa-nominal-badge { background:#fee2e2; color:#991b1b; font-size:16px; font-weight:800; padding:6px 14px; border-radius:6px; text-transform:uppercase; letter-spacing:.03em; white-space:nowrap; }
+    .placa-nominal-body { column-count:6; column-gap:26px; }
+    .placa-nominal-bloque-titulo { font-weight:900; font-size:15px; color:#fff; padding:4px 8px; border-radius:4px; margin:14px 0 6px; break-inside:avoid-column; }
+    .placa-nominal-fila { display:flex; justify-content:space-between; align-items:center; gap:6px; font-size:13px; padding:3px 0; break-inside:avoid-column; border-bottom:1px dashed #e2e8f0; }
+    .placa-nominal-nombre { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .placa-nominal-tag { font-size:10px; font-weight:900; padding:1px 6px; border-radius:3px; flex-shrink:0; }
+    .tag-af { background:#dcfce7; color:#166534; }
+    .tag-neg { background:#fee2e2; color:#991b1b; }
+    .tag-abs { background:#fef9c3; color:#854d0e; }
+    .tag-aus { background:#e2e8f0; color:#64748b; }
+    .placa-nominal-footer { display:flex; justify-content:space-between; align-items:center; border-top:1px solid #e2e8f0; margin-top:25px; padding-top:15px; }
+    .placa-nominal-footer-logo { height:70px; width:auto; object-fit:contain; }
+    .placa-nominal-footer-txt { font-size:14px; color:#94a3b8; font-weight:700; }
 		
 		@media (max-width: 640px) {
             body { padding: 10px; }
@@ -716,6 +745,11 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             <div class="tab-group" style="margin-bottom:15px;">
                 <button class="tab-btn active" id="btnVistaBloques" onclick="intentarCambiarVista('bloques')">Por bloques</button>
                 <button class="tab-btn" id="btnVistaDetallada" onclick="intentarCambiarVista('detallada')">Vista detallada</button>
+            </div>
+            <div class="global-shortcuts-bar" id="accionesVistaDetallada" style="display:none;">
+                <span class="shortcuts-title">Listado nominal:</span>
+                <button class="btn-shortcut" onclick="previsualizarPlacaNominal()">📸 Vista previa</button>
+                <button class="btn-shortcut" onclick="exportarPlacaNominal()">📥 Descargar PNG</button>
             </div>
             <div class="majority-panel" id="majorityPanel" style="display:none;">
                 <div class="majority-panel-title">Mayoría requerida</div>
@@ -882,6 +916,21 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
 
 
         </div>
+    </div>
+</div>
+
+	<div id="placaNominalEntity">
+    <div class="placa-nominal-header">
+        <div>
+            <div class="placa-nominal-titulo">Congresó<span>metro</span></div>
+            <div class="placa-nominal-subtitulo" id="pn-volanta">Cámara — Detalle nominal</div>
+        </div>
+        <div class="placa-nominal-badge">Sólo para difusión</div>
+    </div>
+    <div class="placa-nominal-body" id="placaNominalBody"></div>
+    <div class="placa-nominal-footer">
+        <img class="placa-nominal-footer-logo" src="logo.png" alt="Logo">
+        <div class="placa-nominal-footer-txt">#Congresómetro — Solo para difusión</div>
     </div>
 </div>
 
@@ -1177,6 +1226,93 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         });
     }
 
+	function armarContenidoPlacaNominal(camara) {
+        const personasCamara = legisladores.filter(p => p.camara === camaraActiva);
+        const hoy = new Date();
+        const fechaTxt = `${String(hoy.getDate()).padStart(2, '0')}/${String(hoy.getMonth() + 1).padStart(2, '0')}/${hoy.getFullYear()}`;
+
+        const volanta = document.getElementById('pn-volanta');
+        if (volanta) volanta.innerText = `${camara.label} — ${modoActivo === 'quorum' ? 'Asistencia' : 'Votación'} nominal (${fechaTxt})`;
+
+        const body = document.getElementById('placaNominalBody');
+        body.innerHTML = '';
+
+        camara.blocks.forEach(bloque => {
+            const personas = personasCamara
+                .filter(p => p.bloque === bloque.name)
+                .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+            if (personas.length === 0) return;
+
+            const titulo = document.createElement('div');
+            titulo.className = 'placa-nominal-bloque-titulo';
+            titulo.style.background = bloque.color;
+            titulo.innerText = `${bloque.name} (${personas.length})`;
+            body.appendChild(titulo);
+
+            personas.forEach(p => {
+                const estado = estadoIndividual(camaraActiva, p.nombre);
+                let tagClass = 'tag-aus', tagTxt = 'AUS';
+
+                if (modoActivo === 'quorum') {
+                    tagClass = estado === 'presente' ? 'tag-af' : 'tag-aus';
+                    tagTxt = estado === 'presente' ? 'PRES' : 'AUS';
+                } else {
+                    if (estado === 'af') { tagClass = 'tag-af'; tagTxt = 'AF'; }
+                    else if (estado === 'neg') { tagClass = 'tag-neg'; tagTxt = 'NEG'; }
+                    else if (estado === 'abs') { tagClass = 'tag-abs'; tagTxt = 'ABS'; }
+                    else { tagClass = 'tag-aus'; tagTxt = 'AUS'; }
+                }
+
+                const fila = document.createElement('div');
+                fila.className = 'placa-nominal-fila';
+                fila.innerHTML = `<span class="placa-nominal-nombre" title="${p.nombre}">${p.nombre}</span><span class="placa-nominal-tag ${tagClass}">${tagTxt}</span>`;
+                body.appendChild(fila);
+            });
+        });
+    }
+
+    function capturarPlacaNominal(onListo) {
+        const camara = dataCongreso[camaraActiva];
+        armarContenidoPlacaNominal(camara);
+
+        const placa = document.getElementById('placaNominalEntity');
+        placa.style.left = '0';
+        placa.style.zIndex = '-1';
+
+        setTimeout(() => {
+            const alturaReal = placa.scrollHeight;
+            html2canvas(placa, {
+                scale: 1, backgroundColor: '#f8fafc', width: 1920, height: alturaReal, useCORS: true, allowTaint: true
+            }).then(canvas => {
+                placa.style.left = '-9999px';
+                placa.style.zIndex = '';
+                onListo(canvas);
+            }).catch(err => {
+                placa.style.left = '-9999px';
+                placa.style.zIndex = '';
+                alert('Error al generar el listado nominal: ' + err.message);
+            });
+        }, 150);
+    }
+
+    function previsualizarPlacaNominal() {
+        capturarPlacaNominal(canvas => {
+            document.getElementById('galleryStaticImage').src = canvas.toDataURL('image/png');
+            document.getElementById('galleryModalEntity').style.display = 'flex';
+        });
+    }
+
+    function exportarPlacaNominal() {
+        capturarPlacaNominal(canvas => {
+            const hoy = new Date();
+            const fecha = `${hoy.getFullYear()}${String(hoy.getMonth() + 1).padStart(2, '0')}${String(hoy.getDate()).padStart(2, '0')}`;
+            const link = document.createElement('a');
+            link.download = `nominal-${camaraActiva}-${modoActivo}-${fecha}-argelecciones.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+    }
+
     function marcarPersonaEstado(nombre, estado) {
         setEstadoIndividual(camaraActiva, nombre, estado);
         renderizarVistaDetallada(dataCongreso[camaraActiva]);
@@ -1207,6 +1343,9 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         
         const container = document.getElementById('blocksContainer');
         container.innerHTML = '';
+
+        const accionesNominal = document.getElementById('accionesVistaDetallada');
+        if (accionesNominal) accionesNominal.style.display = (vistaActiva === 'detallada') ? 'flex' : 'none';
 
         if (vistaActiva === 'detallada') {
             renderizarVistaDetallada(camara);
