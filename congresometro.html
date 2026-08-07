@@ -640,6 +640,23 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         border: 1px solid #cbd5e1;
         background: #f8fafc;
     }
+
+		.legislador-bloque { margin-bottom: 18px; }
+    .legislador-bloque-header { display:flex; justify-content:space-between; align-items:center; gap:8px; padding: 8px 10px; background:#1e293b; border-radius:6px 6px 0 0; border-left:4px solid; flex-wrap:wrap; }
+    .legislador-bloque-nombre { font-weight:800; font-size:13px; color:#f8fafc; }
+    .legislador-bloque-acciones { display:flex; gap:4px; flex-wrap:wrap; }
+    .legislador-bloque-acciones button { font-size:10px; padding:4px 8px; }
+    .legislador-lista { border:1px solid #334155; border-top:none; border-radius:0 0 6px 6px; overflow:hidden; }
+    .legislador-fila { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:6px 10px; border-bottom:1px solid #334155; background:#0f172a; }
+    .legislador-fila:last-child { border-bottom:none; }
+    .legislador-nombre { font-size:12px; color:#e2e8f0; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .legislador-botones { display:flex; gap:3px; flex-shrink:0; }
+    .btn-estado-persona { border:1px solid #334155; background:#1e293b; color:#94a3b8; font-size:9px; font-weight:800; padding:4px 6px; border-radius:4px; cursor:pointer; }
+    .btn-estado-persona.btn-af.active { background:#064e3b; border-color:#10b981; color:#6ee7b7; }
+    .btn-estado-persona.btn-neg.active { background:#450a0a; border-color:#ef4444; color:#fca5a5; }
+    .btn-estado-persona.btn-abs.active { background:#3f3f1e; border-color:#eab308; color:#fde68a; }
+    .btn-estado-persona.btn-aus.active { background:#334155; border-color:#64748b; color:#e2e8f0; }
+    .btn-estado-persona.btn-presente.active { background:#064e3b; border-color:#10b981; color:#6ee7b7; }
 		
 		@media (max-width: 640px) {
             body { padding: 10px; }
@@ -1088,6 +1105,90 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
 
     window.addEventListener('resize', ajustarEscalaPlaca);
 
+	function renderizarVistaDetallada(camara) {
+        const container = document.getElementById('blocksContainer');
+        const personasCamara = legisladores.filter(p => p.camara === camaraActiva);
+
+        const btnMarcar = document.getElementById('btn-marcar-todos');
+        if (btnMarcar) btnMarcar.style.display = (modoActivo === 'quorum') ? 'inline-block' : 'none';
+
+        if (personasCamara.length === 0) {
+            container.innerHTML = `<div style="padding:20px; color:#64748b; font-size:13px;">No hay legisladores cargados todavía para esta cámara.</div>`;
+            return;
+        }
+
+        camara.blocks.forEach(bloque => {
+            const personas = personasCamara
+                .filter(p => p.bloque === bloque.name)
+                .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+            if (personas.length === 0) return;
+
+            const wrap = document.createElement('div');
+            wrap.className = 'legislador-bloque';
+
+            let accionesHtml = '';
+            if (modoActivo === 'quorum') {
+                accionesHtml = `
+                    <button class="btn-action" onclick="marcarBloqueDetallado('${bloque.name.replace(/'/g, "\\'")}', 'presente')">Todos presentes</button>
+                    <button class="btn-action" onclick="marcarBloqueDetallado('${bloque.name.replace(/'/g, "\\'")}', 'ausente')">Todos ausentes</button>`;
+            } else {
+                accionesHtml = `
+                    <button class="btn-action btn-quick-af" onclick="marcarBloqueDetallado('${bloque.name.replace(/'/g, "\\'")}', 'af')">Todos AF</button>
+                    <button class="btn-action btn-quick-neg" onclick="marcarBloqueDetallado('${bloque.name.replace(/'/g, "\\'")}', 'neg')">Todos NEG</button>`;
+            }
+
+            const header = document.createElement('div');
+            header.className = 'legislador-bloque-header';
+            header.style.borderLeftColor = bloque.color;
+            header.innerHTML = `
+                <span class="legislador-bloque-nombre">${bloque.name} (${personas.length})</span>
+                <div class="legislador-bloque-acciones">${accionesHtml}</div>`;
+            wrap.appendChild(header);
+
+            const lista = document.createElement('div');
+            lista.className = 'legislador-lista';
+
+            personas.forEach(p => {
+                const estado = estadoIndividual(camaraActiva, p.nombre);
+                const fila = document.createElement('div');
+                fila.className = 'legislador-fila';
+
+                let botonesHtml = '';
+                if (modoActivo === 'quorum') {
+                    botonesHtml = `
+                        <button class="btn-estado-persona btn-presente ${estado === 'presente' ? 'active' : ''}" onclick="marcarPersonaEstado('${p.nombre.replace(/'/g, "\\'")}', 'presente')">PRES</button>
+                        <button class="btn-estado-persona btn-aus ${estado !== 'presente' ? 'active' : ''}" onclick="marcarPersonaEstado('${p.nombre.replace(/'/g, "\\'")}', 'ausente')">AUS</button>`;
+                } else {
+                    botonesHtml = `
+                        <button class="btn-estado-persona btn-af ${estado === 'af' ? 'active' : ''}" onclick="marcarPersonaEstado('${p.nombre.replace(/'/g, "\\'")}', 'af')">AF</button>
+                        <button class="btn-estado-persona btn-neg ${estado === 'neg' ? 'active' : ''}" onclick="marcarPersonaEstado('${p.nombre.replace(/'/g, "\\'")}', 'neg')">NEG</button>
+                        <button class="btn-estado-persona btn-abs ${estado === 'abs' ? 'active' : ''}" onclick="marcarPersonaEstado('${p.nombre.replace(/'/g, "\\'")}', 'abs')">ABS</button>
+                        <button class="btn-estado-persona btn-aus ${estado === 'ausente' ? 'active' : ''}" onclick="marcarPersonaEstado('${p.nombre.replace(/'/g, "\\'")}', 'ausente')">AUS</button>`;
+                }
+
+                fila.innerHTML = `
+                    <span class="legislador-nombre" title="${p.nombre}">${p.nombre}</span>
+                    <div class="legislador-botones">${botonesHtml}</div>`;
+                lista.appendChild(fila);
+            });
+
+            wrap.appendChild(lista);
+            container.appendChild(wrap);
+        });
+    }
+
+    function marcarPersonaEstado(nombre, estado) {
+        setEstadoIndividual(camaraActiva, nombre, estado);
+        inicializarEstructura();
+    }
+
+    function marcarBloqueDetallado(bloqueName, estado) {
+        legisladores
+            .filter(p => p.camara === camaraActiva && p.bloque === bloqueName)
+            .forEach(p => setEstadoIndividual(camaraActiva, p.nombre, estado));
+        inicializarEstructura();
+    }
+
     function inicializarEstructura() {
         const camara = dataCongreso[camaraActiva];
         document.getElementById('panel-title').innerText = `Gestión de Bloques (${camara.label})`;
@@ -1105,6 +1206,12 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         
         const container = document.getElementById('blocksContainer');
         container.innerHTML = '';
+
+        if (vistaActiva === 'detallada') {
+            renderizarVistaDetallada(camara);
+            ejecutarCalculos();
+            return;
+        }
 
         camara.blocks.forEach((bloque, idx) => {
             const card = document.createElement('div');
