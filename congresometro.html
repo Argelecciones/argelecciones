@@ -691,10 +691,14 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         <!-- COLUMNA IZQUIERDA (CONTROLES) -->
         <div>
             <h3 id="panel-title" style="margin-top:0; font-size:16px; color:#475569;">Cargando bloques...</h3>
-            <div class="global-shortcuts-bar">
+           <div class="global-shortcuts-bar">
                 <span class="shortcuts-title">Acciones rápidas:</span>
                 <button class="btn-shortcut" onclick="atajoLimpiarTodo()">❌ Limpiar Todo</button>
                 <button id="btn-marcar-todos" class="btn-shortcut" onclick="atajoMarcarTodos()">✅ Marcar Todos</button>
+            </div>
+            <div class="tab-group" style="margin-bottom:15px;">
+                <button class="tab-btn active" id="btnVistaBloques" onclick="intentarCambiarVista('bloques')">Por bloques</button>
+                <button class="tab-btn" id="btnVistaDetallada" onclick="intentarCambiarVista('detallada')">Vista detallada</button>
             </div>
             <div class="majority-panel" id="majorityPanel" style="display:none;">
                 <div class="majority-panel-title">Mayoría requerida</div>
@@ -928,6 +932,35 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     let camaraActiva = 'diputados';
     let modoActivo = 'quorum';
     let desempateManual = null;
+    let vistaActiva = 'bloques';
+    let votosIndividuales = {};
+
+    function claveIndividual(camaraKey, nombre) {
+        return `${camaraKey}::${nombre}`;
+    }
+
+    function estadoIndividual(camaraKey, nombre) {
+        return votosIndividuales[claveIndividual(camaraKey, nombre)] || 'ausente';
+    }
+
+    function setEstadoIndividual(camaraKey, nombre, estado) {
+        votosIndividuales[claveIndividual(camaraKey, nombre)] = estado;
+    }
+
+    function intentarCambiarVista(nuevaVista) {
+        if (nuevaVista === vistaActiva) return;
+        const confirmado = confirm('Vas a cambiar de Panel y se perderán los datos cargados. ¿Continuar?');
+        if (!confirmado) return;
+
+        votosIndividuales = {};
+        desempateManual = null;
+
+        vistaActiva = nuevaVista;
+        document.getElementById('btnVistaBloques').classList.toggle('active', vistaActiva === 'bloques');
+        document.getElementById('btnVistaDetallada').classList.toggle('active', vistaActiva === 'detallada');
+
+        inicializarEstructura();
+    }
 
     function parseCSVLineLeg(line) {
         const cols = [];
