@@ -120,6 +120,8 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         .btn-shortcut { background: #334155; color: #f8fafc; border: none; padding: 6px 12px; border-radius: 5px; font-size: 12px; font-weight: 700; cursor: pointer; transition: background 0.2s, transform 0.1s; }
         .btn-shortcut:hover { background: #475569; }
         .btn-shortcut:active { transform: scale(0.96); }
+		.input-nombre-votacion { background:#0f172a; border:1px solid #334155; color:#f8fafc; padding:6px 10px; border-radius:5px; font-size:12px; font-family:inherit; flex:1; min-width:160px; }
+        .input-nombre-votacion::placeholder { color:#64748b; }
 
         .vote-control-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
         .vote-quick-actions { display: flex; gap: 6px; margin-bottom: 6px; }
@@ -283,6 +285,13 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         .legend-value { font-size: 48px; font-weight: 900; color: #0f172a; }
 
         .placa-footer { text-align: right; font-size: 16px; color: #94a3b8; font-weight: 700; }
+		.marca-agua-difusion {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='560' height='240'><text x='0' y='160' font-family='Inter, sans-serif' font-size='30' font-weight='800' fill='rgba(15,23,42,0.05)' transform='rotate(-28 280 120)'>@ArgElecciones · Sólo para difusión</text></svg>");
+    background-repeat: repeat;
+}
         
         /* BOTONES DE ACCIÓN */
         .actions-grid-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
@@ -673,8 +682,11 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     .placa-nominal-titulo { font-size:56px; font-weight:900; line-height:1; }
     .placa-nominal-titulo span { color:#f43f5e; }
     .placa-nominal-subtitulo { font-size:20px; color:#64748b; font-weight:700; margin-top:6px; }
+		.placa-nominal-titulo-custom { font-size:26px; color:#0f172a; font-weight:800; margin-top:6px; }
     .placa-nominal-badge { background:#fee2e2; color:#991b1b; font-size:16px; font-weight:800; padding:6px 14px; border-radius:6px; text-transform:uppercase; letter-spacing:.03em; white-space:nowrap; }
-    .placa-nominal-body { column-count:6; column-gap:26px; }
+    .placa-nominal-body { column-gap:26px; }
+    .placa-nominal-body.cols-3 { column-count:3; }
+    .placa-nominal-body.cols-6 { column-count:6; }
     .placa-nominal-bloque-titulo { font-weight:900; font-size:15px; color:#fff; padding:4px 8px; border-radius:4px; margin:14px 0 6px; break-inside:avoid-column; }
     .placa-nominal-fila { display:flex; justify-content:space-between; align-items:center; gap:6px; font-size:13px; padding:3px 0; break-inside:avoid-column; border-bottom:1px dashed #e2e8f0; }
     .placa-nominal-nombre { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -746,8 +758,9 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                 <button class="tab-btn active" id="btnVistaBloques" onclick="intentarCambiarVista('bloques')">Por bloques</button>
                 <button class="tab-btn" id="btnVistaDetallada" onclick="intentarCambiarVista('detallada')">Vista detallada</button>
             </div>
-            <div class="global-shortcuts-bar" id="accionesVistaDetallada" style="display:none;">
+           <div class="global-shortcuts-bar" id="accionesVistaDetallada" style="display:none;">
                 <span class="shortcuts-title">Listado nominal:</span>
+                <input type="text" id="inputNombreVotacionNominal" class="input-nombre-votacion" placeholder="Nombre de la votación...">
                 <button class="btn-shortcut" onclick="previsualizarPlacaNominal()">📸 Vista previa</button>
                 <button class="btn-shortcut" onclick="exportarPlacaNominal()">📥 Descargar PNG</button>
             </div>
@@ -897,6 +910,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                             <div class="placa-footer">Generado por @argelecciones</div>
 							<div class="placa-footer">Sólo para difusión</div>
                         </div>
+                    <div class="marca-agua-difusion"></div>
                     </div>
                 </div>
                 
@@ -1231,11 +1245,25 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         const hoy = new Date();
         const fechaTxt = `${String(hoy.getDate()).padStart(2, '0')}/${String(hoy.getMonth() + 1).padStart(2, '0')}/${hoy.getFullYear()}`;
 
-        const volanta = document.getElementById('pn-volanta');
+       const volanta = document.getElementById('pn-volanta');
         if (volanta) volanta.innerText = `${camara.label} — ${modoActivo === 'quorum' ? 'Asistencia' : 'Votación'} nominal (${fechaTxt})`;
+
+        const nombreInput = document.getElementById('inputNombreVotacionNominal');
+        const nombreVotacion = nombreInput ? nombreInput.value.trim() : '';
+        let tituloCustom = document.getElementById('pn-titulo-custom');
+        if (!tituloCustom) {
+            tituloCustom = document.createElement('div');
+            tituloCustom.id = 'pn-titulo-custom';
+            tituloCustom.className = 'placa-nominal-titulo-custom';
+            volanta.insertAdjacentElement('afterend', tituloCustom);
+        }
+        tituloCustom.style.display = nombreVotacion ? 'block' : 'none';
+        tituloCustom.innerText = nombreVotacion;
 
         const body = document.getElementById('placaNominalBody');
         body.innerHTML = '';
+        body.classList.remove('cols-3', 'cols-6');
+        body.classList.add(personasCamara.length <= 100 ? 'cols-3' : 'cols-6');
 
         camara.blocks.forEach(bloque => {
             const personas = personasCamara
@@ -1346,6 +1374,16 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
 
         const accionesNominal = document.getElementById('accionesVistaDetallada');
         if (accionesNominal) accionesNominal.style.display = (vistaActiva === 'detallada') ? 'flex' : 'none';
+
+        const placaWrapper = document.getElementById('placaWrapperBlock');
+        const placaQuorumWrapper = document.getElementById('placaQuorumWrapperBlock');
+        if (vistaActiva === 'detallada') {
+            if (placaWrapper) placaWrapper.style.display = 'none';
+            if (placaQuorumWrapper) placaQuorumWrapper.style.display = 'none';
+        } else {
+            if (placaWrapper) placaWrapper.style.display = (modoActivo === 'vote') ? 'block' : 'none';
+            if (placaQuorumWrapper) placaQuorumWrapper.style.display = (modoActivo === 'quorum') ? 'block' : 'none';
+        }
 
         if (vistaActiva === 'detallada') {
             renderizarVistaDetallada(camara);
