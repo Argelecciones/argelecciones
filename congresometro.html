@@ -900,7 +900,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                 { name: 'Adelante Bs. Aires (Banfi)', max: 1, color: '#f54e8b' }
             ]
         },
-        senadores: {
+       senadores: {
             total: 72, quorum: 37,
             label: "Senadores",
             blocks: [
@@ -922,10 +922,80 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         }
     };
 
+    const CSV_URL_LEGISLADORES = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS9s6gz82vh0Ko6hrR83c5swckr9a6_OOrlW-akQ_ZYABKRZmPnh8fOoosSZ439t8e_Gia5c2ApvNY-/pub?output=csv';
+    let legisladores = [];
+
     let camaraActiva = 'diputados';
     let modoActivo = 'quorum';
     let desempateManual = null;
 
+    function parseCSVLineLeg(line) {
+        const cols = [];
+        let cur = '';
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+            const c = line[i];
+            if (c === '"') {
+                if (inQuotes && line[i + 1] === '"') { cur += '"'; i++; }
+                else inQuotes = !inQuotes;
+            } else if (c === ',' && !inQuotes) {
+                cols.push(cur); cur = '';
+            } else {
+                cur += c;
+            }
+        }
+        cols.push(cur);
+        return cols;
+    }
+
+    function parseCSVLegisladores(txt) {
+        const lines = txt.trim().split('\n');
+        const res = [];
+        for (let i = 1; i < lines.length; i++) {
+            const cols = parseCSVLineLeg(lines[i]);
+            if (cols.length < 4) continue;
+            const camara = (cols[0] || '').trim().toLowerCase();
+            const bloque = (cols[1] || '').trim().replace(/^"|"$/g, '');
+            const color = (cols[2] || '').trim();
+            const nombre = (cols[3] || '').trim().replace(/^"|"$/g, '');
+            if (!camara || !bloque || !nombre) continue;
+            res.push({ camara, bloque, color, nombre });
+        }
+        return res;
+    }
+
+    function reconstruirBloques() {
+        ['diputados', 'senadores'].forEach(camaraKey => {
+            const personas = legisladores.filter(p => p.camara === camaraKey);
+            if (personas.length === 0) return;
+
+            const grupos = {};
+            personas.forEach(p => {
+                if (!grupos[p.bloque]) grupos[p.bloque] = { name: p.bloque, color: p.color || '#64748b', max: 0 };
+                grupos[p.bloque].max++;
+            });
+
+            dataCongreso[camaraKey].blocks = Object.values(grupos).sort((a, b) => b.max - a.max);
+        });
+    }
+
+    async function cargarLegisladores() {
+        try {
+            const r = await fetch(CSV_URL_LEGISLADORES);
+            if (!r.ok) throw new Error('No se pudo conectar con el listado');
+            const csv = await r.text();
+            legisladores = parseCSVLegisladores(csv);
+            reconstruirBloques();
+        } catch (e) {
+            console.error('Error cargando legisladores, se usan los bloques por defecto:', e);
+        } finally {
+            inicializarEstructura();
+            if (modoActivo === 'quorum') {
+                document.getElementById('placaQuorumWrapperBlock').style.display = 'block';
+                setTimeout(ajustarEscalaPlacaQuorum, 50);
+            }
+        }
+    }
     function cambiarCamara(camara) {
         camaraActiva = camara;
         desempateManual = null;
@@ -1685,13 +1755,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         observadorModo.observe(contenedorBloques, { childList: true });
     }
 
-    inicializarEstructura();
-
-    // Mostrar placa quórum si estamos en modo quórum desde el inicio
-    if (modoActivo === 'quorum') {
-        document.getElementById('placaQuorumWrapperBlock').style.display = 'block';
-        setTimeout(ajustarEscalaPlacaQuorum, 50);
-    }
+    cargarLegisladores();
 
 </script>
 
