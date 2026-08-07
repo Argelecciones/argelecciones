@@ -1179,16 +1179,17 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
 
     function marcarPersonaEstado(nombre, estado) {
         setEstadoIndividual(camaraActiva, nombre, estado);
-        inicializarEstructura();
+        renderizarVistaDetallada(dataCongreso[camaraActiva]);
+        ejecutarCalculos();
     }
 
     function marcarBloqueDetallado(bloqueName, estado) {
         legisladores
             .filter(p => p.camara === camaraActiva && p.bloque === bloqueName)
             .forEach(p => setEstadoIndividual(camaraActiva, p.nombre, estado));
-        inicializarEstructura();
+        renderizarVistaDetallada(dataCongreso[camaraActiva]);
+        ejecutarCalculos();
     }
-
     function inicializarEstructura() {
         const camara = dataCongreso[camaraActiva];
         document.getElementById('panel-title').innerText = `Gestión de Bloques (${camara.label})`;
@@ -1453,6 +1454,44 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         let t_af = 0, t_neg = 0, t_abs = 0, t_aus = 0;
         let reporteBloques = [];
 
+        if (vistaActiva === 'detallada') {
+            const personasCamara = legisladores.filter(p => p.camara === camaraActiva);
+
+            camara.blocks.forEach(bloque => {
+                const personas = personasCamara.filter(p => p.bloque === bloque.name);
+                let af = 0, neg = 0, abs = 0, aus = 0, presentes = 0;
+
+                personas.forEach(p => {
+                    const estado = estadoIndividual(camaraActiva, p.nombre);
+                    if (modoActivo === 'quorum') {
+                        if (estado === 'presente') presentes++;
+                    } else {
+                        if (estado === 'af') af++;
+                        else if (estado === 'neg') neg++;
+                        else if (estado === 'abs') abs++;
+                        else aus++;
+                    }
+                });
+
+                if (modoActivo === 'quorum') {
+                    totalPresentes += presentes;
+                    if (presentes > 0) reporteBloques.push(`${bloque.name}: ${presentes}`);
+                } else {
+                    t_af += af; t_neg += neg; t_abs += abs; t_aus += aus;
+                    totalPresentes += (af + neg + abs);
+                    if (af > 0 || neg > 0 || abs > 0) {
+                        reporteBloques.push(`${bloque.name} [AF:${af} | NEG:${neg} | ABS:${abs}]`);
+                    }
+                }
+            });
+
+            if (modoActivo === 'quorum') {
+                t_aus = camara.total - totalPresentes;
+            }
+
+            return { totalPresentes, t_af, t_neg, t_abs, t_aus, reporteBloques };
+        }
+
         camara.blocks.forEach((bloque, idx) => {
             if (modoActivo === 'quorum') {
                 const slider = document.getElementById(`q-slide-${idx}`);
@@ -1497,7 +1536,6 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
 
         return { totalPresentes, t_af, t_neg, t_abs, t_aus, reporteBloques };
     }
-
     function calcularMayoria(camara, votos) {
         const { t_af, t_neg, t_abs } = votos;
 
