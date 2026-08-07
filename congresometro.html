@@ -2137,16 +2137,18 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     const observadorModo = new MutationObserver(() => {
         const btnMarcar = document.getElementById('btn-marcar-todos');
         if (btnMarcar) {
-            const esModoVotacion = document.querySelector('input[id^="v-af-"]') !== null;
-            btnMarcar.style.display = esModoVotacion ? 'none' : 'inline-block';
+            if (vistaActiva === 'detallada') {
+                btnMarcar.style.display = (modoActivo === 'quorum') ? 'inline-block' : 'none';
+            } else {
+                const esModoVotacion = document.querySelector('input[id^="v-af-"]') !== null;
+                btnMarcar.style.display = esModoVotacion ? 'none' : 'inline-block';
+            }
         }
     });
-
     const contenedorBloques = document.getElementById('blocksContainer');
     if (contenedorBloques) {
         observadorModo.observe(contenedorBloques, { childList: true });
     }
-
     cargarLegisladores();
 
 </script>
