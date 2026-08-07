@@ -1173,8 +1173,9 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
 
     window.addEventListener('resize', ajustarEscalaPlaca);
 
-	function renderizarVistaDetallada(camara) {
+function renderizarVistaDetallada(camara) {
         const container = document.getElementById('blocksContainer');
+        container.innerHTML = '';
         const personasCamara = legisladores.filter(p => p.camara === camaraActiva);
 
         const btnMarcar = document.getElementById('btn-marcar-todos');
