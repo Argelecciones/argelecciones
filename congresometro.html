@@ -1465,6 +1465,13 @@ function renderizarVistaDetallada(camara) {
             c.setAttribute('cy', persona.y);
             c.setAttribute('r', colorAro ? rBase * 0.62 : rBase);
             c.setAttribute('fill', persona.color);
+            c.setAttribute('style', 'cursor:pointer;');
+            c.addEventListener('click', () => marcarPersonaDesdeRecinto(persona.nombre));
+
+            const title = document.createElementNS(svgns, 'title');
+            title.textContent = `${persona.nombre} — ${persona.bloque}`;
+            c.appendChild(title);
+
             svg.appendChild(c);
         });
         container.appendChild(svg);
@@ -1483,6 +1490,18 @@ function renderizarVistaDetallada(camara) {
         renderizarVistaDetallada(dataCongreso[camaraActiva]);
         ejecutarCalculos();
     }
+
+	function marcarPersonaDesdeRecinto(nombre) {
+        const camara = dataCongreso[camaraActiva];
+        const estados = modoActivo === 'quorum' ? ['presente', 'ausente'] : ['af', 'neg', 'abs', 'ausente'];
+        const actual = estadoIndividual(camaraActiva, nombre);
+        const idx = estados.indexOf(actual);
+        const siguiente = estados[(idx + 1 + estados.length) % estados.length];
+        setEstadoIndividual(camaraActiva, nombre, siguiente);
+        renderizarVistaRecinto(camara);
+        ejecutarCalculos();
+    }
+	
     function inicializarEstructura() {
         const camara = dataCongreso[camaraActiva];
         document.getElementById('panel-title').innerText = `Gestión de Bloques (${camara.label})`;
