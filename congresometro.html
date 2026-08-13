@@ -776,6 +776,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             <div class="tab-group" style="margin-bottom:15px;">
                 <button class="tab-btn active" id="btnVistaBloques" onclick="intentarCambiarVista('bloques')">Por bloques</button>
                 <button class="tab-btn" id="btnVistaDetallada" onclick="intentarCambiarVista('detallada')">Vista detallada</button>
+                <button class="tab-btn" id="btnVistaRecinto" onclick="intentarCambiarVista('recinto')">Recinto</button>
             </div>
            <div class="global-shortcuts-bar" id="accionesVistaDetallada" style="display:none;">
                 <span class="shortcuts-title">Listado nominal:</span>
@@ -1051,15 +1052,19 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
 
     function intentarCambiarVista(nuevaVista) {
         if (nuevaVista === vistaActiva) return;
-        const confirmado = confirm('Vas a cambiar de Panel y se perderán los datos cargados. ¿Continuar?');
-        if (!confirmado) return;
 
-        votosIndividuales = {};
-        desempateManual = null;
+        const cruzaFronteraBloques = (vistaActiva === 'bloques') !== (nuevaVista === 'bloques');
+        if (cruzaFronteraBloques) {
+            const confirmado = confirm('Vas a cambiar de Panel y se perderán los datos cargados. ¿Continuar?');
+            if (!confirmado) return;
+            votosIndividuales = {};
+            desempateManual = null;
+        }
 
         vistaActiva = nuevaVista;
         document.getElementById('btnVistaBloques').classList.toggle('active', vistaActiva === 'bloques');
         document.getElementById('btnVistaDetallada').classList.toggle('active', vistaActiva === 'detallada');
+        document.getElementById('btnVistaRecinto').classList.toggle('active', vistaActiva === 'recinto');
 
         inicializarEstructura();
     }
@@ -1415,6 +1420,41 @@ function renderizarVistaDetallada(camara) {
         });
     }
 
+							 function renderizarVistaRecinto(camara) {
+        const container = document.getElementById('blocksContainer');
+        container.innerHTML = '';
+
+        const btnMarcar = document.getElementById('btn-marcar-todos');
+        if (btnMarcar) btnMarcar.style.display = 'none';
+
+        const datos = generarOrdenRecinto(camaraActiva);
+        if (datos.length === 0) {
+            container.innerHTML = `<div style="padding:20px; color:#64748b; font-size:13px;">No hay legisladores cargados todavía para esta cámara.</div>`;
+            return;
+        }
+
+        const svgns = 'http://www.w3.org/2000/svg';
+        const svg = document.createElementNS(svgns, 'svg');
+        svg.setAttribute('viewBox', '0 0 360 205');
+        svg.setAttribute('style', 'width:100%; height:auto; background:#0f172a; border-radius:8px;');
+
+        datos.forEach(persona => {
+            const c = document.createElementNS(svgns, 'circle');
+            c.setAttribute('cx', persona.x);
+            c.setAttribute('cy', persona.y);
+            c.setAttribute('r', Math.max(persona.r - 0.3, 0.8));
+            c.setAttribute('fill', persona.color);
+
+            const title = document.createElementNS(svgns, 'title');
+            title.textContent = `${persona.nombre} — ${persona.bloque}`;
+            c.appendChild(title);
+
+            svg.appendChild(c);
+        });
+
+        container.appendChild(svg);
+    }
+
     function marcarPersonaEstado(nombre, estado) {
         setEstadoIndividual(camaraActiva, nombre, estado);
         renderizarVistaDetallada(dataCongreso[camaraActiva]);
@@ -1451,7 +1491,7 @@ function renderizarVistaDetallada(camara) {
 
         const placaWrapper = document.getElementById('placaWrapperBlock');
         const placaQuorumWrapper = document.getElementById('placaQuorumWrapperBlock');
-        if (vistaActiva === 'detallada') {
+        if (vistaActiva === 'detallada' || vistaActiva === 'recinto') {
             if (placaWrapper) placaWrapper.style.display = 'none';
             if (placaQuorumWrapper) placaQuorumWrapper.style.display = 'none';
         } else {
@@ -1459,8 +1499,12 @@ function renderizarVistaDetallada(camara) {
             if (placaQuorumWrapper) placaQuorumWrapper.style.display = (modoActivo === 'quorum') ? 'block' : 'none';
         }
 
-        if (vistaActiva === 'detallada') {
-            renderizarVistaDetallada(camara);
+        if (vistaActiva === 'detallada' || vistaActiva === 'recinto') {
+            if (vistaActiva === 'detallada') {
+                renderizarVistaDetallada(camara);
+            } else {
+                renderizarVistaRecinto(camara);
+            }
             ejecutarCalculos();
             return;
         }
@@ -1705,7 +1749,7 @@ function renderizarVistaDetallada(camara) {
         let t_af = 0, t_neg = 0, t_abs = 0, t_aus = 0;
         let reporteBloques = [];
 
-        if (vistaActiva === 'detallada') {
+        if (vistaActiva === 'detallada' || vistaActiva === 'recinto') {
             const personasCamara = legisladores.filter(p => p.camara === camaraActiva);
 
             camara.blocks.forEach(bloque => {
@@ -2189,10 +2233,12 @@ function renderizarVistaDetallada(camara) {
         ejecutarCalculos();
     }
 
-    const observadorModo = new MutationObserver(() => {
+   const observadorModo = new MutationObserver(() => {
         const btnMarcar = document.getElementById('btn-marcar-todos');
         if (btnMarcar) {
-            if (vistaActiva === 'detallada') {
+            if (vistaActiva === 'recinto') {
+                btnMarcar.style.display = 'none';
+            } else if (vistaActiva === 'detallada') {
                 btnMarcar.style.display = (modoActivo === 'quorum') ? 'inline-block' : 'none';
             } else {
                 const esModoVotacion = document.querySelector('input[id^="v-af-"]') !== null;
