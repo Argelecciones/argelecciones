@@ -1455,6 +1455,7 @@ function renderizarVistaDetallada(camara) {
             const rBase = Math.max(persona.r - 0.3, 0.8);
 
             const rEsc = rBase * 1.35;
+            const factorAro = 0.5;
 
             if (colorAro) {
                 const aro = document.createElementNS(svgns, 'circle');
@@ -1468,7 +1469,7 @@ function renderizarVistaDetallada(camara) {
             const c = document.createElementNS(svgns, 'circle');
             c.setAttribute('cx', persona.x);
             c.setAttribute('cy', persona.y);
-            c.setAttribute('r', colorAro ? rEsc * 0.62 : rEsc);
+            c.setAttribute('r', colorAro ? rEsc * factorAro : rEsc);
 			c.setAttribute('fill', persona.color);
             c.setAttribute('style', 'cursor:pointer;');
             c.addEventListener('click', () => marcarPersonaDesdeRecinto(persona.nombre));
