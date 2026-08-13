@@ -1439,7 +1439,7 @@ function renderizarVistaDetallada(camara) {
         const svgns = 'http://www.w3.org/2000/svg';
         const svg = document.createElementNS(svgns, 'svg');
         svg.setAttribute('viewBox', '0 0 360 205');
-        svg.setAttribute('style', 'width:100%; height:auto; background:#0f172a; border-radius:8px; grid-column: 1 / -1;');
+        svg.setAttribute('style', 'width:100%; max-width:640px; height:auto; background:#0f172a; border-radius:8px; display:block; margin:0 auto;');
 
         const coloresEstado = {
             presente: '#22c55e',
@@ -1454,11 +1454,13 @@ function renderizarVistaDetallada(camara) {
             const colorAro = coloresEstado[estado];
             const rBase = Math.max(persona.r - 0.3, 0.8);
 
+            const rEsc = rBase * 1.35;
+
             if (colorAro) {
                 const aro = document.createElementNS(svgns, 'circle');
                 aro.setAttribute('cx', persona.x);
                 aro.setAttribute('cy', persona.y);
-                aro.setAttribute('r', rBase);
+                aro.setAttribute('r', rEsc);
                 aro.setAttribute('fill', colorAro);
                 svg.appendChild(aro);
             }
@@ -1466,8 +1468,8 @@ function renderizarVistaDetallada(camara) {
             const c = document.createElementNS(svgns, 'circle');
             c.setAttribute('cx', persona.x);
             c.setAttribute('cy', persona.y);
-            c.setAttribute('r', colorAro ? rBase * 0.62 : rBase);
-            c.setAttribute('fill', persona.color);
+            c.setAttribute('r', colorAro ? rEsc * 0.62 : rEsc);
+			c.setAttribute('fill', persona.color);
             c.setAttribute('style', 'cursor:pointer;');
             c.addEventListener('click', () => marcarPersonaDesdeRecinto(persona.nombre));
 
