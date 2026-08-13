@@ -1443,22 +1443,30 @@ function renderizarVistaDetallada(camara) {
             af: '#22c55e',
             neg: '#ef4444',
             abs: '#eab308',
-            ausente: 'transparent'
+            ausente: null
         };
 
         datos.forEach(persona => {
             const estado = estadoIndividual(camaraActiva, persona.nombre);
+            const colorAro = coloresEstado[estado];
+            const rBase = Math.max(persona.r - 0.3, 0.8);
+
+            if (colorAro) {
+                const aro = document.createElementNS(svgns, 'circle');
+                aro.setAttribute('cx', persona.x);
+                aro.setAttribute('cy', persona.y);
+                aro.setAttribute('r', rBase);
+                aro.setAttribute('fill', colorAro);
+                svg.appendChild(aro);
+            }
+
             const c = document.createElementNS(svgns, 'circle');
             c.setAttribute('cx', persona.x);
             c.setAttribute('cy', persona.y);
-            c.setAttribute('r', Math.max(persona.r - 0.3, 0.8));
+            c.setAttribute('r', colorAro ? rBase * 0.62 : rBase);
             c.setAttribute('fill', persona.color);
-            c.setAttribute('stroke', coloresEstado[estado] || 'transparent');
-            c.setAttribute('stroke-width', 0.6);
-
             svg.appendChild(c);
         });
-
         container.appendChild(svg);
     }
 
