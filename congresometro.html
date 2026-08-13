@@ -1438,16 +1438,23 @@ function renderizarVistaDetallada(camara) {
         svg.setAttribute('viewBox', '0 0 360 205');
         svg.setAttribute('style', 'width:100%; height:auto; background:#0f172a; border-radius:8px; grid-column: 1 / -1;');
 
+        const coloresEstado = {
+            presente: '#22c55e',
+            af: '#22c55e',
+            neg: '#ef4444',
+            abs: '#eab308',
+            ausente: 'transparent'
+        };
+
         datos.forEach(persona => {
+            const estado = estadoIndividual(camaraActiva, persona.nombre);
             const c = document.createElementNS(svgns, 'circle');
             c.setAttribute('cx', persona.x);
             c.setAttribute('cy', persona.y);
             c.setAttribute('r', Math.max(persona.r - 0.3, 0.8));
             c.setAttribute('fill', persona.color);
-
-            const title = document.createElementNS(svgns, 'title');
-            title.textContent = `${persona.nombre} — ${persona.bloque}`;
-            c.appendChild(title);
+            c.setAttribute('stroke', coloresEstado[estado] || 'transparent');
+            c.setAttribute('stroke-width', 0.6);
 
             svg.appendChild(c);
         });
