@@ -777,10 +777,9 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                 <button class="btn-shortcut" onclick="atajoLimpiarTodo()">❌ Limpiar Todo</button>
                 <button id="btn-marcar-todos" class="btn-shortcut" onclick="atajoMarcarTodos()">✅ Marcar Todos</button>
             </div>
-            <div class="tab-group" style="margin-bottom:15px;">
+           <div class="tab-group" style="margin-bottom:15px;">
                 <button class="tab-btn active" id="btnVistaBloques" onclick="intentarCambiarVista('bloques')">Por bloques</button>
                 <button class="tab-btn" id="btnVistaDetallada" onclick="intentarCambiarVista('detallada')">Vista detallada</button>
-                <button class="tab-btn" id="btnVistaRecinto" onclick="intentarCambiarVista('recinto')">Recinto</button>
             </div>
            <div class="global-shortcuts-bar" id="accionesVistaDetallada" style="display:none;">
                 <span class="shortcuts-title">Listado nominal:</span>
@@ -788,7 +787,8 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                 <button class="btn-shortcut" onclick="previsualizarPlacaNominal()">📸 Vista previa</button>
                 <button class="btn-shortcut" onclick="exportarPlacaNominal()">📥 Descargar PNG</button>
             </div>
-            <div class="majority-panel" id="majorityPanel" style="display:none;">
+            <div id="recintoContainer" style="display:none; margin-bottom:15px;"></div>
+			<div class="majority-panel" id="majorityPanel" style="display:none;">
                 <div class="majority-panel-title">Mayoría requerida</div>
                 <div class="majority-options" id="majorityOptions">
                     <label class="majority-option checked"><input type="radio" name="tipoMayoria" value="simple" checked onchange="onCambioMayoria()"><span>Mayoría simple</span></label>
@@ -1059,18 +1059,14 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     function intentarCambiarVista(nuevaVista) {
         if (nuevaVista === vistaActiva) return;
 
-        const cruzaFronteraBloques = (vistaActiva === 'bloques') !== (nuevaVista === 'bloques');
-        if (cruzaFronteraBloques) {
-            const confirmado = confirm('Vas a cambiar de Panel y se perderán los datos cargados. ¿Continuar?');
-            if (!confirmado) return;
-            votosIndividuales = {};
-            desempateManual = null;
-        }
+        const confirmado = confirm('Vas a cambiar de Panel y se perderán los datos cargados. ¿Continuar?');
+        if (!confirmado) return;
+        votosIndividuales = {};
+        desempateManual = null;
 
         vistaActiva = nuevaVista;
         document.getElementById('btnVistaBloques').classList.toggle('active', vistaActiva === 'bloques');
         document.getElementById('btnVistaDetallada').classList.toggle('active', vistaActiva === 'detallada');
-        document.getElementById('btnVistaRecinto').classList.toggle('active', vistaActiva === 'recinto');
 
         inicializarEstructura();
     }
@@ -1426,12 +1422,10 @@ function renderizarVistaDetallada(camara) {
         });
     }
 
-							 function renderizarVistaRecinto(camara) {
-        const container = document.getElementById('blocksContainer');
+				function renderizarVistaRecinto(camara) {
+        const container = document.getElementById('recintoContainer');
+        if (!container) return;
         container.innerHTML = '';
-
-        const btnMarcar = document.getElementById('btn-marcar-todos');
-        if (btnMarcar) btnMarcar.style.display = 'none';
 
         const datos = generarOrdenRecinto(camaraActiva);
         if (datos.length === 0) {
@@ -1535,7 +1529,7 @@ function renderizarVistaDetallada(camara) {
         const dashboardLayout = document.getElementById('dashboardLayout');
         const monitorPanel = document.getElementById('monitorPanel');
         const columnaControles = document.getElementById('columnaControles');
-        const esUnificado = (vistaActiva === 'detallada' || vistaActiva === 'recinto');
+        const esUnificado = (vistaActiva === 'detallada');
         if (dashboardLayout) dashboardLayout.classList.toggle('layout-unificado', esUnificado);
         if (esUnificado && columnaControles && monitorPanel && monitorPanel.parentElement !== columnaControles) {
             columnaControles.insertBefore(monitorPanel, columnaControles.firstChild);
@@ -1545,7 +1539,7 @@ function renderizarVistaDetallada(camara) {
 
         const placaWrapper = document.getElementById('placaWrapperBlock');
         const placaQuorumWrapper = document.getElementById('placaQuorumWrapperBlock');
-        if (vistaActiva === 'detallada' || vistaActiva === 'recinto') {
+        if (vistaActiva === 'detallada') {
             if (placaWrapper) placaWrapper.style.display = 'none';
             if (placaQuorumWrapper) placaQuorumWrapper.style.display = 'none';
         } else {
@@ -1553,12 +1547,11 @@ function renderizarVistaDetallada(camara) {
             if (placaQuorumWrapper) placaQuorumWrapper.style.display = (modoActivo === 'quorum') ? 'block' : 'none';
         }
 
-        if (vistaActiva === 'detallada' || vistaActiva === 'recinto') {
-            if (vistaActiva === 'detallada') {
-                renderizarVistaDetallada(camara);
-            } else {
-                renderizarVistaRecinto(camara);
-            }
+        if (vistaActiva === 'detallada') {
+            const recintoContainer = document.getElementById('recintoContainer');
+            if (recintoContainer) recintoContainer.style.display = 'block';
+            renderizarVistaRecinto(camara);
+            renderizarVistaDetallada(camara);
             ejecutarCalculos();
             return;
         }
@@ -1803,7 +1796,7 @@ function renderizarVistaDetallada(camara) {
         let t_af = 0, t_neg = 0, t_abs = 0, t_aus = 0;
         let reporteBloques = [];
 
-        if (vistaActiva === 'detallada' || vistaActiva === 'recinto') {
+        if (vistaActiva === 'detallada') {
             const personasCamara = legisladores.filter(p => p.camara === camaraActiva);
 
             camara.blocks.forEach(bloque => {
@@ -2298,9 +2291,7 @@ function renderizarVistaDetallada(camara) {
    const observadorModo = new MutationObserver(() => {
         const btnMarcar = document.getElementById('btn-marcar-todos');
         if (btnMarcar) {
-            if (vistaActiva === 'recinto') {
-                btnMarcar.style.display = 'none';
-            } else if (vistaActiva === 'detallada') {
+            if (vistaActiva === 'detallada') {
                 btnMarcar.style.display = (modoActivo === 'quorum') ? 'inline-block' : 'none';
             } else {
                 const esModoVotacion = document.querySelector('input[id^="v-af-"]') !== null;
