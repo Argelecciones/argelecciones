@@ -1436,7 +1436,7 @@ function renderizarVistaDetallada(camara) {
         const svgns = 'http://www.w3.org/2000/svg';
         const svg = document.createElementNS(svgns, 'svg');
         svg.setAttribute('viewBox', '0 0 360 205');
-        svg.setAttribute('style', 'width:100%; height:auto; background:#0f172a; border-radius:8px;');
+        svg.setAttribute('style', 'width:100%; height:auto; background:#0f172a; border-radius:8px; grid-column: 1 / -1;');
 
         datos.forEach(persona => {
             const c = document.createElementNS(svgns, 'circle');
