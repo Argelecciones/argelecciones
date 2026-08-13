@@ -742,6 +742,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             .legend-value { font-size: 32px; }
             .legend-label { font-size: 14px; }
 			.app-result-banner .arb-req { font-size: 10px; margin-bottom: 6px; }
+            .dashboard-layout.layout-unificado { max-width: 100%; }
         }
     </style>
 </head>
@@ -945,10 +946,12 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             </div>
 
             <div class="social-box">
-                <h4 id="socialTitle">📝 Copia Rápida para Redes Sociales</h4>
-                <textarea id="socialText" readonly></textarea>
-                <button class="copy-btn" onclick="copiarTextoRedes()">Copiar Copete</button>
-                <div style="clear:both;"></div>
+                <h4 id="socialTitle" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center;" onclick="toggleSocialBox()">📝 Copia Rápida para Redes Sociales <span id="socialToggleIcon">▸</span></h4>
+                <div id="socialBoxContent" style="display:none;">
+                    <textarea id="socialText" readonly></textarea>
+                    <button class="copy-btn" onclick="copiarTextoRedes()">Copiar Copete</button>
+                    <div style="clear:both;"></div>
+                </div>
             </div>
         </div>
 
@@ -2157,6 +2160,14 @@ function renderizarVistaDetallada(camara) {
         renderizarPanelIzquierdo(camara, votos, mayoria);
         renderizarPlaca(camara, votos, mayoria);
         armarTextoRedes(camara, votos, mayoria);
+    }
+
+	function toggleSocialBox() {
+        const content = document.getElementById('socialBoxContent');
+        const icon = document.getElementById('socialToggleIcon');
+        const abierto = content.style.display !== 'none';
+        content.style.display = abierto ? 'none' : 'block';
+        icon.textContent = abierto ? '▸' : '▾';
     }
 
     function copiarTextoRedes() {
