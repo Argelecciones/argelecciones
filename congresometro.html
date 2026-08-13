@@ -772,12 +772,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         <!-- COLUMNA IZQUIERDA (CONTROLES) -->
         <div class="columna-controles-sticky" id="columnaControles">
             <h3 id="panel-title" style="margin-top:0; font-size:16px; color:#475569;">Cargando bloques...</h3>
-           <div class="global-shortcuts-bar">
-                <span class="shortcuts-title">Acciones rápidas:</span>
-                <button class="btn-shortcut" onclick="atajoLimpiarTodo()">❌ Limpiar Todo</button>
-                <button id="btn-marcar-todos" class="btn-shortcut" onclick="atajoMarcarTodos()">✅ Marcar Todos</button>
-            </div>
-           <div class="tab-group" style="margin-bottom:15px;">
+            <div class="tab-group" style="margin-bottom:15px;">
                 <button class="tab-btn active" id="btnVistaBloques" onclick="intentarCambiarVista('bloques')">Por bloques</button>
                 <button class="tab-btn" id="btnVistaDetallada" onclick="intentarCambiarVista('detallada')">Vista detallada</button>
             </div>
@@ -787,7 +782,13 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                 <button class="btn-shortcut" onclick="previsualizarPlacaNominal()">📸 Vista previa</button>
                 <button class="btn-shortcut" onclick="exportarPlacaNominal()">📥 Descargar PNG</button>
             </div>
+           <div class="global-shortcuts-bar">
+                <span class="shortcuts-title">Acciones rápidas:</span>
+                <button class="btn-shortcut" onclick="atajoLimpiarTodo()">❌ Limpiar Todo</button>
+                <button id="btn-marcar-todos" class="btn-shortcut" onclick="atajoMarcarTodos()">✅ Marcar Todos</button>
+            </div>
             <div id="recintoContainer" style="display:none; margin-bottom:15px;"></div>
+            <div id="recintoPopover" style="display:none;position:fixed;z-index:9999;background:#1e293b;border:1px solid #334155;border-radius:8px;padding:10px;box-shadow:0 8px 20px rgba(0,0,0,.4);"></div>
 			<div class="majority-panel" id="majorityPanel" style="display:none;">
                 <div class="majority-panel-title">Mayoría requerida</div>
                 <div class="majority-options" id="majorityOptions">
@@ -1452,7 +1453,7 @@ function renderizarVistaDetallada(camara) {
             const rBase = Math.max(persona.r - 0.3, 0.8);
 
             const rEsc = rBase * 1.35;
-            const factorAro = 0.5;
+            const factorAro = 0.68;
 
             if (colorAro) {
                 const aro = document.createElementNS(svgns, 'circle');
@@ -1463,13 +1464,16 @@ function renderizarVistaDetallada(camara) {
                 svg.appendChild(aro);
             }
 
-            const c = document.createElementNS(svgns, 'circle');
+           const c = document.createElementNS(svgns, 'circle');
             c.setAttribute('cx', persona.x);
             c.setAttribute('cy', persona.y);
             c.setAttribute('r', colorAro ? rEsc * factorAro : rEsc);
-			c.setAttribute('fill', persona.color);
+            c.setAttribute('fill', persona.color);
             c.setAttribute('style', 'cursor:pointer;');
-            c.addEventListener('click', () => marcarPersonaDesdeRecinto(persona.nombre));
+            c.addEventListener('click', (evt) => {
+                evt.stopPropagation();
+                abrirPopoverRecinto(persona.nombre, persona.bloque, evt);
+            });
 
             const title = document.createElementNS(svgns, 'title');
             title.textContent = `${persona.nombre} — ${persona.bloque}`;
@@ -1486,24 +1490,46 @@ function renderizarVistaDetallada(camara) {
         ejecutarCalculos();
     }
 
-    function marcarBloqueDetallado(bloqueName, estado) {
+   function marcarBloqueDetallado(bloqueName, estado) {
         legisladores
             .filter(p => p.camara === camaraActiva && p.bloque === bloqueName)
             .forEach(p => setEstadoIndividual(camaraActiva, p.nombre, estado));
+        renderizarVistaRecinto(dataCongreso[camaraActiva]);
         renderizarVistaDetallada(dataCongreso[camaraActiva]);
         ejecutarCalculos();
     }
 
-	function marcarPersonaDesdeRecinto(nombre) {
-        const camara = dataCongreso[camaraActiva];
-        const estados = modoActivo === 'quorum' ? ['presente', 'ausente'] : ['af', 'neg', 'abs', 'ausente'];
-        const actual = estadoIndividual(camaraActiva, nombre);
-        const idx = estados.indexOf(actual);
-        const siguiente = estados[(idx + 1 + estados.length) % estados.length];
-        setEstadoIndividual(camaraActiva, nombre, siguiente);
-        renderizarVistaRecinto(camara);
+	function abrirPopoverRecinto(nombre, bloque, evt) {
+        const pop = document.getElementById('recintoPopover');
+        const estados = modoActivo === 'quorum'
+            ? [['presente', 'PRES'], ['ausente', 'AUS']]
+            : [['af', 'AF'], ['neg', 'NEG'], ['abs', 'ABS'], ['ausente', 'AUS']];
+        let html = `<div style="font-size:12px;font-weight:800;color:#f8fafc;margin-bottom:2px;">${nombre}</div><div style="font-size:10px;color:#94a3b8;margin-bottom:8px;">${bloque}</div><div style="display:flex;gap:4px;">`;
+        estados.forEach(([val, label]) => {
+            html += `<button class="btn-estado-persona" onclick="event.stopPropagation(); elegirEstadoRecinto('${nombre.replace(/'/g, "\\'")}','${val}')">${label}</button>`;
+        });
+        html += '</div>';
+        pop.innerHTML = html;
+        pop.style.display = 'block';
+        const x = evt.clientX, y = evt.clientY;
+        pop.style.left = Math.min(x + 8, window.innerWidth - 180) + 'px';
+        pop.style.top = Math.min(y + 8, window.innerHeight - 90) + 'px';
+    }
+
+    function elegirEstadoRecinto(nombre, estado) {
+        setEstadoIndividual(camaraActiva, nombre, estado);
+        document.getElementById('recintoPopover').style.display = 'none';
+        renderizarVistaRecinto(dataCongreso[camaraActiva]);
+        renderizarVistaDetallada(dataCongreso[camaraActiva]);
         ejecutarCalculos();
     }
+
+    document.addEventListener('click', (e) => {
+        const pop = document.getElementById('recintoPopover');
+        if (pop && pop.style.display !== 'none' && !pop.contains(e.target) && e.target.tagName !== 'circle') {
+            pop.style.display = 'none';
+        }
+    });
 	
     function inicializarEstructura() {
         const camara = dataCongreso[camaraActiva];
@@ -2230,14 +2256,14 @@ function renderizarVistaDetallada(camara) {
     function atajoLimpiarTodo() {
         desempateManual = null;
 
-        if (vistaActiva === 'detallada') {
+      if (vistaActiva === 'detallada') {
             const personasCamara = legisladores.filter(p => p.camara === camaraActiva);
             personasCamara.forEach(p => setEstadoIndividual(camaraActiva, p.nombre, 'ausente'));
+            renderizarVistaRecinto(dataCongreso[camaraActiva]);
             renderizarVistaDetallada(dataCongreso[camaraActiva]);
             ejecutarCalculos();
             return;
         }
-
         const sliders = document.querySelectorAll('input[id^="q-slide-"]');
         sliders.forEach(slider => {
             slider.value = 0;
@@ -2257,6 +2283,7 @@ function renderizarVistaDetallada(camara) {
             if (modoActivo !== 'quorum') return;
             const personasCamara = legisladores.filter(p => p.camara === camaraActiva);
             personasCamara.forEach(p => setEstadoIndividual(camaraActiva, p.nombre, 'presente'));
+            renderizarVistaRecinto(dataCongreso[camaraActiva]);
             renderizarVistaDetallada(dataCongreso[camaraActiva]);
             ejecutarCalculos();
             return;
