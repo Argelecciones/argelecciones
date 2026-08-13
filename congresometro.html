@@ -6,6 +6,7 @@
     <title>Congresómetro — @argelecciones</title>
     <!-- Librerías Gratuitas: Captura de pantalla y Tipografía Profesional -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="arches.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     
     <style>
@@ -1097,6 +1098,43 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         }
         return res;
     }
+
+					function generarOrdenRecinto(camaraKey) {
+        const camara = dataCongreso[camaraKey];
+        const personas = legisladores.filter(p => p.camara === camaraKey);
+
+        if (personas.length === 0) {
+            console.warn(`No hay legisladores cargados para ${camaraKey} todavía.`);
+            return [];
+        }
+        if (personas.length !== camara.total) {
+            console.warn(`${camaraKey}: hay ${personas.length} legisladores cargados pero la cámara tiene ${camara.total} bancas. Se usan ${personas.length} posiciones.`);
+        }
+
+        const ordenados = [];
+        camara.blocks.forEach(bloque => {
+            const delBloque = personas
+                .filter(p => p.bloque === bloque.name)
+                .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+            ordenados.push(...delBloque);
+        });
+
+        const posiciones = generarHemicicloOficial(ordenados.length, true);
+
+        return ordenados.map((persona, idx) => {
+            const pos = posiciones[idx];
+            return {
+                nombre: persona.nombre,
+                bloque: persona.bloque,
+                color: persona.color,
+                x: pos ? pos.x : 0,
+                y: pos ? pos.y : 0,
+                r: pos ? pos.r : 0
+            };
+        });
+    }
+
+    window.generarOrdenRecinto = generarOrdenRecinto;
 
     function reconstruirBloques() {
         ['diputados', 'senadores'].forEach(camaraKey => {
