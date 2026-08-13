@@ -54,6 +54,9 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         padding-right: 8px;
     }
 }
+        .dashboard-layout.layout-unificado { display: block; max-width: 760px; margin: 0 auto; }
+        .dashboard-layout.layout-unificado .columna-controles-sticky { position: static; max-height: none; overflow: visible; padding-right: 0; }
+        .dashboard-layout.layout-unificado .monitor-panel { margin-bottom: 20px; }
 
         /* CONTROLES (IZQUIERDA) */
         #blocksContainer {
@@ -764,9 +767,9 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         </div>
     </div>
 
-   <div class="dashboard-layout">
+   <div class="dashboard-layout" id="dashboardLayout">
         <!-- COLUMNA IZQUIERDA (CONTROLES) -->
-        <div class="columna-controles-sticky">
+        <div class="columna-controles-sticky" id="columnaControles">
             <h3 id="panel-title" style="margin-top:0; font-size:16px; color:#475569;">Cargando bloques...</h3>
            <div class="global-shortcuts-bar">
                 <span class="shortcuts-title">Acciones rápidas:</span>
@@ -812,7 +815,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         </div>
 
         <!-- COLUMNA DERECHA (MONITORES) -->
-        <div class="monitor-panel">
+        <div class="monitor-panel" id="monitorPanel">
             <div class="app-result-banner" id="appResultadoBanner"></div>
             <div class="quorum-box" id="quorumBoxVisual">
                 <div class="progress-wrapper">
@@ -1522,6 +1525,17 @@ function renderizarVistaDetallada(camara) {
 
         const accionesNominal = document.getElementById('accionesVistaDetallada');
         if (accionesNominal) accionesNominal.style.display = (vistaActiva === 'detallada') ? 'flex' : 'none';
+
+        const dashboardLayout = document.getElementById('dashboardLayout');
+        const monitorPanel = document.getElementById('monitorPanel');
+        const columnaControles = document.getElementById('columnaControles');
+        const esUnificado = (vistaActiva === 'detallada' || vistaActiva === 'recinto');
+        if (dashboardLayout) dashboardLayout.classList.toggle('layout-unificado', esUnificado);
+        if (esUnificado && columnaControles && monitorPanel && monitorPanel.parentElement !== columnaControles) {
+            columnaControles.insertBefore(monitorPanel, columnaControles.firstChild);
+        } else if (!esUnificado && dashboardLayout && monitorPanel && monitorPanel.parentElement !== dashboardLayout) {
+            dashboardLayout.appendChild(monitorPanel);
+        }
 
         const placaWrapper = document.getElementById('placaWrapperBlock');
         const placaQuorumWrapper = document.getElementById('placaQuorumWrapperBlock');
