@@ -1101,22 +1101,27 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             const bloque = (cols[1] || '').trim().replace(/^"|"$/g, '');
             const color = (cols[2] || '').trim();
             const nombre = (cols[3] || '').trim().replace(/^"|"$/g, '');
+            const esPresidente = (cols[4] || '').trim().toLowerCase() === 'si';
             if (!camara || !bloque || !nombre) continue;
-            res.push({ camara, bloque, color, nombre });
+            res.push({ camara, bloque, color, nombre, esPresidente });
         }
         return res;
     }
 
 					function generarOrdenRecinto(camaraKey) {
         const camara = dataCongreso[camaraKey];
-        const personas = legisladores.filter(p => p.camara === camaraKey);
+        const todas = legisladores.filter(p => p.camara === camaraKey);
 
-        if (personas.length === 0) {
+        if (todas.length === 0) {
             console.warn(`No hay legisladores cargados para ${camaraKey} todavía.`);
-            return [];
+            return { presidente: null, bancas: [] };
         }
-        if (personas.length !== camara.total) {
-            console.warn(`${camaraKey}: hay ${personas.length} legisladores cargados pero la cámara tiene ${camara.total} bancas. Se usan ${personas.length} posiciones.`);
+
+        const presidente = todas.find(p => p.esPresidente) || null;
+        const personas = todas.filter(p => !p.esPresidente);
+
+        if (personas.length !== camara.total - (presidente ? 1 : 0)) {
+            console.warn(`${camaraKey}: cantidad de bancas cargadas no coincide exactamente con el total de la cámara.`);
         }
 
         const ordenados = [];
@@ -1127,9 +1132,9 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             ordenados.push(...delBloque);
         });
 
-        const posiciones = generarHemicicloOficial(ordenados.length, true);
+        const posiciones = generarHemicicloOficial(ordenados.length, false);
 
-        return ordenados.map((persona, idx) => {
+        const bancas = ordenados.map((persona, idx) => {
             const pos = posiciones[idx];
             return {
                 nombre: persona.nombre,
@@ -1140,6 +1145,11 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                 r: pos ? pos.r : 0
             };
         });
+
+        return {
+            presidente: presidente ? { nombre: presidente.nombre, bloque: presidente.bloque, color: presidente.color } : null,
+            bancas
+        };
     }
 
     window.generarOrdenRecinto = generarOrdenRecinto;
@@ -1428,7 +1438,9 @@ function renderizarVistaDetallada(camara) {
         if (!container) return;
         container.innerHTML = '';
 
-        const datos = generarOrdenRecinto(camaraActiva);
+        const resultado = generarOrdenRecinto(camaraActiva);
+        const datos = resultado.bancas;
+        const presidente = resultado.presidente;
         if (datos.length === 0) {
             container.innerHTML = `<div style="padding:20px; color:#64748b; font-size:13px;">No hay legisladores cargados todavía para esta cámara.</div>`;
             return;
@@ -1481,6 +1493,27 @@ function renderizarVistaDetallada(camara) {
 
             svg.appendChild(c);
         });
+        if (presidente) {
+            const estadoPres = estadoIndividual(camaraActiva, presidente.nombre);
+            const pres = document.createElementNS(svgns, 'circle');
+            pres.setAttribute('cx', 180);
+            pres.setAttribute('cy', 40);
+            pres.setAttribute('r', 6);
+            pres.setAttribute('fill', estadoPres === 'ausente' ? presidente.color : (coloresEstado[estadoPres] || presidente.color));
+            pres.setAttribute('stroke', '#f8fafc');
+            pres.setAttribute('stroke-dasharray', '2,1.5');
+            pres.setAttribute('stroke-width', 1);
+            pres.setAttribute('style', 'cursor:pointer;');
+            pres.addEventListener('click', (evt) => {
+                evt.stopPropagation();
+                abrirPopoverRecinto(presidente.nombre, presidente.bloque + ' (Presidencia)', evt);
+            });
+            const titlePres = document.createElementNS(svgns, 'title');
+            titlePres.textContent = `${presidente.nombre} — Presidencia`;
+            pres.appendChild(titlePres);
+            svg.appendChild(pres);
+        }
+
         container.appendChild(svg);
     }
 
