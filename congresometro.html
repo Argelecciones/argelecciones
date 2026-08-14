@@ -155,6 +155,9 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         
         /* Barra de Quórum */
         .quorum-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 12px; }
+        @media(min-width: 900px) {
+            .layout-unificado .quorum-box { position: sticky; top: 20px; z-index: 10; }
+        }
         .progress-wrapper { position: relative; margin-bottom: 35px; padding-top: 5px; }
         .progress-bg { background: #e2e8f0; height: 25px; border-radius: 6px; overflow: hidden; }
         .progress-fill { background: #3b82f6; height: 100%; width: 0%; transition: width 0.2s; }
@@ -1448,7 +1451,7 @@ function renderizarVistaDetallada(camara) {
 
         const svgns = 'http://www.w3.org/2000/svg';
         const svg = document.createElementNS(svgns, 'svg');
-        svg.setAttribute('viewBox', '0 0 360 205');
+        svg.setAttribute('viewBox', '0 -18 360 223');
         svg.setAttribute('style', 'width:100%; max-width:640px; height:auto; background:#0f172a; border-radius:8px; display:block; margin:0 auto;');
 
         const coloresEstado = {
@@ -1464,7 +1467,7 @@ function renderizarVistaDetallada(camara) {
             const colorAro = coloresEstado[estado];
             const rBase = Math.max(persona.r - 0.3, 0.8);
 
-            const rEsc = rBase * 1.35;
+            const rEsc = Math.max(rBase * 1.35 - 0.35, rBase * 0.9);
             const factorAro = 0.68;
 
             if (colorAro) {
@@ -1503,15 +1506,15 @@ function renderizarVistaDetallada(camara) {
             if (colorAroPres) {
                 const aroPres = document.createElementNS(svgns, 'circle');
                 aroPres.setAttribute('cx', 180);
-                aroPres.setAttribute('cy', 40);
+                aroPres.setAttribute('cy', 12);
                 aroPres.setAttribute('r', rPres);
                 aroPres.setAttribute('fill', colorAroPres);
                 svg.appendChild(aroPres);
             }
 
-            const pres = document.createElementNS(svgns, 'circle');
+           const pres = document.createElementNS(svgns, 'circle');
             pres.setAttribute('cx', 180);
-            pres.setAttribute('cy', 40);
+            pres.setAttribute('cy', 12);
             pres.setAttribute('r', colorAroPres ? rPres * 0.68 : rPres);
             pres.setAttribute('fill', presidente.color);
             pres.setAttribute('stroke', '#f8fafc');
