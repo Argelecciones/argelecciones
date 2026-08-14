@@ -1452,10 +1452,10 @@ function renderizarVistaDetallada(camara) {
         svg.setAttribute('style', 'width:100%; max-width:640px; height:auto; background:#0f172a; border-radius:8px; display:block; margin:0 auto;');
 
         const coloresEstado = {
-            presente: '#22c55e',
-            af: '#22c55e',
-            neg: '#ef4444',
-            abs: '#eab308',
+            presente: '#16a34a',
+            af: '#16a34a',
+            neg: '#b91c1c',
+            abs: '#ca8a04',
             ausente: null
         };
 
@@ -1473,6 +1473,8 @@ function renderizarVistaDetallada(camara) {
                 aro.setAttribute('cy', persona.y);
                 aro.setAttribute('r', rEsc);
                 aro.setAttribute('fill', colorAro);
+                aro.setAttribute('stroke', '#f8fafc');
+                aro.setAttribute('stroke-width', 0.25);
                 svg.appendChild(aro);
             }
 
@@ -1495,11 +1497,23 @@ function renderizarVistaDetallada(camara) {
         });
         if (presidente) {
             const estadoPres = estadoIndividual(camaraActiva, presidente.nombre);
+            const colorAroPres = coloresEstado[estadoPres];
+            const rPres = 6;
+
+            if (colorAroPres) {
+                const aroPres = document.createElementNS(svgns, 'circle');
+                aroPres.setAttribute('cx', 180);
+                aroPres.setAttribute('cy', 40);
+                aroPres.setAttribute('r', rPres);
+                aroPres.setAttribute('fill', colorAroPres);
+                svg.appendChild(aroPres);
+            }
+
             const pres = document.createElementNS(svgns, 'circle');
             pres.setAttribute('cx', 180);
             pres.setAttribute('cy', 40);
-            pres.setAttribute('r', 6);
-            pres.setAttribute('fill', estadoPres === 'ausente' ? presidente.color : (coloresEstado[estadoPres] || presidente.color));
+            pres.setAttribute('r', colorAroPres ? rPres * 0.68 : rPres);
+            pres.setAttribute('fill', presidente.color);
             pres.setAttribute('stroke', '#f8fafc');
             pres.setAttribute('stroke-dasharray', '2,1.5');
             pres.setAttribute('stroke-width', 1);
