@@ -677,7 +677,9 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         background: #f8fafc;
     }
 
-		.legislador-bloque { margin-bottom: 18px; }
+		.legislador-bloque { margin-bottom: 18px; break-inside: avoid; }
+    .blocks-columnas { display: block; column-count: 2; column-gap: 16px; }
+    @media(min-width: 640px) { .blocks-columnas { column-count: 3; } }
     .legislador-bloque-header { display:flex; justify-content:space-between; align-items:center; gap:8px; padding: 8px 10px; background:#1e293b; border-radius:6px 6px 0 0; border-left:4px solid; flex-wrap:wrap; }
     .legislador-bloque-nombre { font-weight:800; font-size:13px; color:#f8fafc; }
     .legislador-bloque-acciones { display:flex; gap:4px; flex-wrap:wrap; }
@@ -729,6 +731,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     .placa-nominal-footer { display:flex; justify-content:space-between; align-items:center; border-top:1px solid #e2e8f0; margin-top:25px; padding-top:15px; }
     .placa-nominal-footer-logo { height:70px; width:auto; object-fit:contain; }
     .placa-nominal-footer-txt { font-size:14px; color:#94a3b8; font-weight:700; }
+    #placaRecintoEntity { position: fixed; left: -9999px; top: 0; width: 1920px; background: #f8fafc; color: #0f172a; font-family: 'Inter', sans-serif; box-sizing: border-box; padding: 60px 70px; }
 		
 		@media (max-width: 640px) {
             body { padding: 10px; }
@@ -791,6 +794,11 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                 <button class="btn-shortcut" onclick="previsualizarPlacaNominal()">📸 Vista previa</button>
                 <button class="btn-shortcut" onclick="exportarPlacaNominal()">📥 Descargar PNG</button>
             </div>
+           <div class="global-shortcuts-bar" id="accionesRecinto" style="display:none;">
+                <span class="shortcuts-title">Placa de recinto:</span>
+                <button class="btn-shortcut" onclick="previsualizarPlacaRecinto()">📸 Vista previa</button>
+                <button class="btn-shortcut" onclick="exportarPlacaRecinto()">📥 Descargar PNG</button>
+            </div>
            <div class="global-shortcuts-bar">
                 <span class="shortcuts-title">Acciones rápidas:</span>
                 <button class="btn-shortcut" onclick="atajoLimpiarTodo()">❌ Limpiar Todo</button>
@@ -815,7 +823,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                     <span id="metaFaltanTxt" class="meta-faltan">Faltan 0 votos</span>
                 </div>
                <div class="desempate-selector" id="desempateSelector" style="display:none;">
-                    <div class="desempate-selector-title">⚖️ Empate — Resolución por desempate del/la Presidente del Senado</div>
+                    <div class="desempate-selector-title">⚖️ Empate — Resolución por desempate de la Presidencia</div>
                     <div class="desempate-selector-options">
                         <button class="btn-desempate btn-desempate-favor" id="btnDesempateFavor" onclick="setDesempate('favor')">✅ Desempató a favor</button>
                         <button class="btn-desempate btn-desempate-contra" id="btnDesempateContra" onclick="setDesempate('contra')">❌ Desempató en contra</button>
@@ -984,6 +992,23 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     <div class="placa-nominal-footer-txt">Generado por @ArgElecciones</div>
 </div>
 
+<div class="marca-agua-difusion"></div>
+</div>
+
+<div id="placaRecintoEntity">
+    <div class="placa-nominal-header">
+        <div>
+            <div class="placa-nominal-subtitulo" id="pr-volanta">Cámara — Recinto</div>
+            <div class="placa-nominal-titulo-custom" id="pr-titulo-custom" style="display:none;"></div>
+        </div>
+        <div class="placa-nominal-badge">Sólo para difusión</div>
+    </div>
+    <div class="placa-nominal-resumen" id="pr-resumen"></div>
+    <div id="pr-svg-container" style="display:flex; justify-content:center; margin:20px 0;"></div>
+    <div class="placa-nominal-footer">
+    <img class="placa-nominal-footer-logo" src="logo.png" alt="Logo">
+    <div class="placa-nominal-footer-txt">Generado por @ArgElecciones</div>
+</div>
 <div class="marca-agua-difusion"></div>
 </div>
 
@@ -1442,6 +1467,89 @@ function renderizarVistaDetallada(camara) {
         });
     }
 
+			function armarContenidoPlacaRecinto(camara) {
+        const hoy = new Date();
+        const fechaTxt = `${String(hoy.getDate()).padStart(2, '0')}/${String(hoy.getMonth() + 1).padStart(2, '0')}/${hoy.getFullYear()}`;
+
+        const volanta = document.getElementById('pr-volanta');
+        if (volanta) volanta.innerText = `${camara.label} — ${modoActivo === 'quorum' ? 'Asistencia' : 'Votación'} (${fechaTxt})`;
+
+        const nombreInput = document.getElementById('inputNombreVotacionNominal');
+        const nombreVotacion = nombreInput ? nombreInput.value.trim() : '';
+        const tituloCustom = document.getElementById('pr-titulo-custom');
+        if (tituloCustom) {
+            tituloCustom.style.display = nombreVotacion ? 'block' : 'none';
+            tituloCustom.innerText = nombreVotacion;
+        }
+
+        const votos = recolectarVotos(camara);
+        const resumenEl = document.getElementById('pr-resumen');
+        if (resumenEl) {
+            if (modoActivo === 'quorum') {
+                const hayQuorum = votos.totalPresentes >= camara.quorum;
+                resumenEl.className = 'placa-nominal-resumen ' + (hayQuorum ? 'ok' : 'no');
+                resumenEl.innerText = `${hayQuorum ? '✅ Con Quórum' : '❌ Sin Quórum'} — ${votos.totalPresentes} / ${camara.total} presentes`;
+            } else {
+                const mayoria = calcularMayoria(camara, votos);
+                resumenEl.className = 'placa-nominal-resumen ' + (mayoria.hayQuorum && mayoria.alcanzada ? 'ok' : (mayoria.hayQuorum ? 'no' : 'neutro'));
+                resumenEl.innerText = mayoria.resultadoTexto.replace(/[✅❌⏳⚖️]/g, '').trim();
+            }
+        }
+
+        const svgContainer = document.getElementById('pr-svg-container');
+        if (svgContainer) {
+            svgContainer.innerHTML = '';
+            const svgOriginal = document.querySelector('#recintoContainer svg');
+            if (svgOriginal) {
+                const clon = svgOriginal.cloneNode(true);
+                clon.setAttribute('style', 'width:1400px; height:auto; background:#0f172a; border-radius:8px;');
+                svgContainer.appendChild(clon);
+            }
+        }
+    }
+
+    function capturarPlacaRecinto(onListo) {
+        const camara = dataCongreso[camaraActiva];
+        armarContenidoPlacaRecinto(camara);
+
+        const placa = document.getElementById('placaRecintoEntity');
+        placa.style.left = '0';
+        placa.style.zIndex = '-1';
+
+        setTimeout(() => {
+            const alturaReal = placa.scrollHeight;
+            html2canvas(placa, {
+                scale: 1, backgroundColor: '#f8fafc', width: 1920, height: alturaReal, useCORS: true, allowTaint: true
+            }).then(canvas => {
+                placa.style.left = '-9999px';
+                placa.style.zIndex = '';
+                onListo(canvas);
+            }).catch(err => {
+                placa.style.left = '-9999px';
+                placa.style.zIndex = '';
+                alert('Error al generar la placa de recinto: ' + err.message);
+            });
+        }, 150);
+    }
+
+    function previsualizarPlacaRecinto() {
+        capturarPlacaRecinto(canvas => {
+            document.getElementById('galleryStaticImage').src = canvas.toDataURL('image/png');
+            document.getElementById('galleryModalEntity').style.display = 'flex';
+        });
+    }
+
+    function exportarPlacaRecinto() {
+        capturarPlacaRecinto(canvas => {
+            const hoy = new Date();
+            const fecha = `${hoy.getFullYear()}${String(hoy.getMonth() + 1).padStart(2, '0')}${String(hoy.getDate()).padStart(2, '0')}`;
+            const link = document.createElement('a');
+            link.download = `recinto-${camaraActiva}-${modoActivo}-${fecha}-argelecciones.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+    }
+
 				function renderizarVistaRecinto(camara) {
         const container = document.getElementById('recintoContainer');
         if (!container) return;
@@ -1604,9 +1712,12 @@ function renderizarVistaDetallada(camara) {
         
         const container = document.getElementById('blocksContainer');
         container.innerHTML = '';
+        container.classList.toggle('blocks-columnas', vistaActiva === 'detallada');
 
         const accionesNominal = document.getElementById('accionesVistaDetallada');
         if (accionesNominal) accionesNominal.style.display = (vistaActiva === 'detallada') ? 'flex' : 'none';
+        const accionesRecinto = document.getElementById('accionesRecinto');
+        if (accionesRecinto) accionesRecinto.style.display = (vistaActiva === 'detallada') ? 'flex' : 'none';
 
         const dashboardLayout = document.getElementById('dashboardLayout');
         const monitorPanel = document.getElementById('monitorPanel');
@@ -2002,7 +2113,8 @@ function renderizarVistaDetallada(camara) {
         const plural = (faltan === 1) ? '' : 's';
         const esEmpate = hayQuorum && t_af === t_neg && t_af > 0;
         const empateTxt = esEmpate ? ` (empate ${t_af}-${t_neg})` : '';
-        const empateDesempatable = camaraActiva === 'senadores' && tipoMayoria === 'simple' && esEmpate;
+        const empateDesempatable = tipoMayoria === 'simple' && esEmpate;
+        const etiquetaPresidencia = camaraActiva === 'senadores' ? 'Presidente del Senado' : 'Presidente de la Cámara de Diputados';
 
         if (!empateDesempatable && desempateManual !== null) desempateManual = null;
 
@@ -2010,23 +2122,23 @@ function renderizarVistaDetallada(camara) {
         if (!hayQuorum) {
             resultadoTexto = "⏳ Esperando votos para calcular el resultado…";
         } else if (empateDesempatable && !desempateManual) {
-            resultadoTexto = `⚖️ Empate (${t_af}-${t_neg}). Pendiente del desempate del/la Presidente del Senado`;
+            resultadoTexto = `⚖️ Empate (${t_af}-${t_neg}). Pendiente del desempate del/la ${etiquetaPresidencia}`;
         } else if (empateDesempatable && desempateManual === 'favor') {
-            resultadoTexto = `✅ Aprobado por desempate del/la Presidente del Senado (${t_af}-${t_neg})`;
+            resultadoTexto = `✅ Aprobado por desempate del/la ${etiquetaPresidencia} (${t_af}-${t_neg})`;
         } else if (empateDesempatable && desempateManual === 'contra') {
-            resultadoTexto = `❌ Rechazado por desempate del/la Presidente del Senado (${t_af}-${t_neg})`;
+            resultadoTexto = `❌ Rechazado por desempate del/la ${etiquetaPresidencia} (${t_af}-${t_neg})`;
         } else if (alcanzada) {
             resultadoTexto = `✅ Reúne la mayoría requerida (${etiquetaMayoria.toLowerCase()}: ${t_af}/${metaVotos})`;
         } else {
             resultadoTexto = `❌ No reúne la mayoría requerida. Faltan ${faltan} voto${plural} afirmativo${plural} (${t_af}/${metaVotos})${empateTxt}`;
         }
 
-        return { tipoMayoria, metaVotos, etiquetaMayoria, hayQuorum, alcanzada, faltan, plural, esEmpate, empateTxt, empateDesempatable, resultadoTexto };
+        return { tipoMayoria, metaVotos, etiquetaMayoria, hayQuorum, alcanzada, faltan, plural, esEmpate, empateTxt, empateDesempatable, etiquetaPresidencia, resultadoTexto };
     }
 
     function renderizarPanelIzquierdo(camara, votos, mayoria) {
         const { t_af, t_neg, t_abs, t_aus, totalPresentes } = votos;
-        const { tipoMayoria, metaVotos, etiquetaMayoria, hayQuorum, alcanzada, faltan, plural, empateTxt, empateDesempatable, resultadoTexto } = mayoria;
+        const { tipoMayoria, metaVotos, etiquetaMayoria, hayQuorum, alcanzada, faltan, plural, empateTxt, empateDesempatable, etiquetaPresidencia, resultadoTexto } = mayoria;
 
         const banner = document.getElementById('appResultadoBanner');
 
@@ -2066,7 +2178,7 @@ function renderizarVistaDetallada(camara) {
                     banner.innerHTML = `${reqLabel}⏳ Esperando votos para calcular…<span class="arb-sub">Se necesita quórum (${camara.quorum} de ${camara.total}) para definir el resultado.</span>`;
                 } else if (empateDesempatable && !desempateManual) {
                     banner.className = 'app-result-banner esperando';
-                    banner.innerHTML = `${reqLabel}⚖️ Empate (${t_af}-${t_neg})<span class="arb-sub">Elegí abajo cómo desempató el/la Presidente del Senado</span>`;
+                    banner.innerHTML = `${reqLabel}⚖️ Empate (${t_af}-${t_neg})<span class="arb-sub">Elegí abajo cómo desempató el/la ${etiquetaPresidencia}</span>`;
                 } else if (empateDesempatable && desempateManual === 'favor') {
                     banner.className = 'app-result-banner aprobado';
                     banner.innerHTML = `${reqLabel}✅ Aprobado por desempate del/la Presidente<span class="arb-sub">${t_af}-${t_neg}, desempató a favor</span>`;
