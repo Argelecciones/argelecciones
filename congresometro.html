@@ -1304,6 +1304,30 @@ function renderizarVistaDetallada(camara) {
         container.innerHTML = '';
         const personasCamara = legisladores.filter(p => p.camara === camaraActiva);
 
+	    // Ordenar bloques de mayor a menor cantidad de legisladores
+    const bloquesOrdenados = camara.blocks
+        .map(bloque => ({
+            ...bloque,
+            cantidad: personasCamara.filter(p => p.bloque === bloque.name).length
+        }))
+        .filter(bloque => bloque.cantidad > 0)
+        .sort((a, b) => b.cantidad - a.cantidad);
+
+    // Crear las 3 columnas visuales
+    const columnas = [
+        document.createElement('div'),
+        document.createElement('div'),
+        document.createElement('div')
+    ];
+
+    columnas.forEach(columna => {
+        columna.className = 'blocks-columna';
+        container.appendChild(columna);
+    });
+
+    // Peso acumulado de cada columna
+    const pesoColumnas = [0, 0, 0];
+
         const btnMarcar = document.getElementById('btn-marcar-todos');
         if (btnMarcar) btnMarcar.style.display = (modoActivo === 'quorum') ? 'inline-block' : 'none';
 
@@ -1312,7 +1336,7 @@ function renderizarVistaDetallada(camara) {
             return;
         }
 
-        camara.blocks.forEach(bloque => {
+        bloquesOrdenados.forEach(bloque => {
             const personas = personasCamara
                 .filter(p => p.bloque === bloque.name)
                 .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
@@ -1368,7 +1392,20 @@ function renderizarVistaDetallada(camara) {
             });
 
             wrap.appendChild(lista);
-            container.appendChild(wrap);
+
+    // Colocar el bloque en la columna con menor cantidad acumulada
+    let columnaDestino = 0;
+
+    if (pesoColumnas[1] < pesoColumnas[columnaDestino]) {
+        columnaDestino = 1;
+    }
+
+    if (pesoColumnas[2] < pesoColumnas[columnaDestino]) {
+        columnaDestino = 2;
+    }
+
+    columnas[columnaDestino].appendChild(wrap);
+    pesoColumnas[columnaDestino] += bloque.cantidad;
         });
     }
 
