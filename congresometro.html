@@ -1559,7 +1559,7 @@ function renderizarVistaDetallada(camara) {
             const svgOriginal = document.querySelector('#recintoContainer svg');
             if (svgOriginal) {
                 const clon = svgOriginal.cloneNode(true);
-                clon.setAttribute('style', 'width:1400px; height:auto; background:transparent;');
+                clon.setAttribute('style', 'width:1650px; height:auto; background:transparent;');
                 svgContainer.appendChild(clon);
             }
         }
@@ -1569,7 +1569,7 @@ function renderizarVistaDetallada(camara) {
             leyenda.innerHTML = '';
             const items = modoActivo === 'quorum'
                 ? [['PRESENTE', votos.totalPresentes, '#dcfce7', '#166534'], ['AUSENTE', votos.t_aus, '#e2e8f0', '#334155']]
-                : [['A FAVOR', votos.t_af, '#dcfce7', '#166534'], ['EN CONTRA', votos.t_neg, '#fee2e2', '#991b1b'], ['ABSTENCIÓN', votos.t_abs, '#fef9c3', '#854d0e'], ['AUSENTE', votos.t_aus, '#e2e8f0', '#334155']];
+                : [['AFIRMATIVOS', votos.t_af, '#dcfce7', '#166534'], ['NEGATIVOS', votos.t_neg, '#fee2e2', '#991b1b'], ['ABSTENCIÓN', votos.t_abs, '#fef9c3', '#854d0e'], ['AUSENTE', votos.t_aus, '#e2e8f0', '#334155']];
             items.forEach(([label, val, bg, color]) => {
                 const box = document.createElement('div');
                 box.style.cssText = `background:${bg}; color:${color}; border-radius:10px; padding:14px 24px; text-align:center; min-width:120px;`;
@@ -1720,10 +1720,11 @@ function renderizarVistaDetallada(camara) {
     }
 
     function marcarPersonaEstado(nombre, estado) {
-        setEstadoIndividual(camaraActiva, nombre, estado);
-        renderizarVistaDetallada(dataCongreso[camaraActiva]);
-        ejecutarCalculos();
-    }
+    setEstadoIndividual(camaraActiva, nombre, estado);
+    renderizarVistaRecinto(dataCongreso[camaraActiva]);
+    renderizarVistaDetallada(dataCongreso[camaraActiva]);
+    ejecutarCalculos();
+}
 
    function marcarBloqueDetallado(bloqueName, estado) {
         legisladores
