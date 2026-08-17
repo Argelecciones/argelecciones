@@ -196,24 +196,109 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
 .placa-footer-txt{font-size:18px;color:#4a5878;font-weight:700}
 
 /* PLACA EVENTO ÚNICO (1200x1200) */
+/* PLACA EVENTO ÚNICO (1200x1200) — ESTILO ARGELECCIONES */
 #placaProximoExport {
-  position: fixed; left: -9999px; top: 0;
-  width: 1200px; height: 1200px;
-  background: linear-gradient(135deg, #0b1220 0%, #111827 60%, #131b2e 100%);
+  position: fixed;
+  left: -9999px;
+  top: 0;
+  width: 1200px;
+  height: 1200px;
+  background: #ffffff;
   font-family: 'Inter', system-ui, sans-serif;
-  padding: 80px; box-sizing: border-box;
-  display: flex; flex-direction: column; justify-content: space-between;
-  color: #f0f4ff;
+  padding: 70px 80px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: #000000;
 }
-.placa-prox-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #1e2d45; padding-bottom: 30px; }
-.placa-prox-tag { background: #f43f5e; color: #fff; font-size: 20px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; padding: 6px 16px; border-radius: 4px; }
-.placa-prox-body { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 40px; margin-top: -40px; }
-.placa-prox-dias-container { display: flex; align-items: baseline; gap: 15px; }
-.placa-prox-dias-num { font-size: 140px; font-weight: 900; color: #f43f5e; line-height: 1; }
-.placa-prox-dias-lbl { font-size: 32px; font-weight: 800; color: #4a5878; text-transform: uppercase; letter-spacing: 0.05em; }
-.placa-prox-titulo { font-size: 56px; font-weight: 800; color: #fff; line-height: 1.25; max-width: 1000px; }
-.placa-prox-badge-date { background: #1a2540; border: 1px solid #1e2d45; padding: 14px 24px; border-radius: 8px; font-size: 24px; font-weight: 700; color: #a855f7; display: inline-block; align-self: flex-start; }
-.placa-prox-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #1e2d45; padding-top: 30px; }
+
+/* ENCABEZADO */
+.placa-prox-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 3px solid #000000;
+  padding-bottom: 24px;
+}
+
+.placa-prox-tag {
+  background: #19aae5;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 7px 14px;
+  border-radius: 0;
+}
+
+/* CUERPO */
+.placa-prox-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 34px;
+  margin-top: -20px;
+}
+
+/* NÚMERO DE DÍAS */
+.placa-prox-dias-container {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+
+.placa-prox-dias-num {
+  font-size: 120px;
+  font-weight: 900;
+  color: #19aae5;
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+}
+
+.placa-prox-dias-lbl {
+  font-size: 30px;
+  font-weight: 800;
+  color: #000000;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* TÍTULO */
+.placa-prox-titulo {
+  font-size: 58px;
+  font-weight: 900;
+  color: #000000;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  max-width: 1000px;
+}
+
+/* FECHA */
+.placa-prox-badge-date {
+  background: transparent;
+  border: none;
+  border-left: 12px solid #ff6b00;
+  padding: 8px 0 8px 20px;
+  border-radius: 0;
+  font-size: 28px;
+  font-weight: 800;
+  color: #ff6b00;
+  display: inline-block;
+  align-self: flex-start;
+}
+
+/* PIE */
+.placa-prox-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 3px solid #000000;
+  padding-top: 22px;
+  color: #000000;
+}
 
 /* MODAL PREVISUALIZACIÓN */
 .gallery-modal{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(11,12,32,0.96);display:none;justify-content:center;align-items:center;z-index:10000;padding:30px;cursor:zoom-out;}
