@@ -757,13 +757,12 @@ function descargarPlacaEvento(idx) {
 const colorAccent = ev.destacado ? '#f43f5e' : (colores[catKey(ev.categoria)] || '#3b82f6');
 document.getElementById('placaProxAccent').style.background = colorAccent;
   
-  const dias = diasHasta(ev.fecha);
-  const numPlaca = dias < 0 ? "PASADO" : (dias === 0 ? "¡HOY!" : dias);
-  const lblPlaca = dias < 0 ? "" : (dias === 0 ? "" : (dias === 1 ? "día restante" : "días restantes"));
-  
-  document.getElementById('placaProxDiasNum').textContent = numPlaca;
-  document.getElementById('placaProxDiasLbl').textContent = lblPlaca;
-  document.getElementById('placaProxTitle').textContent = ev.descripcion;
+  document.getElementById('placaProxDiasNum').textContent = ev.fecha.getDate();
+
+document.getElementById('placaProxDiasLbl').textContent =
+  MESES[ev.fecha.getMonth()].toUpperCase();
+
+document.getElementById('placaProxTitle').textContent = ev.descripcion;
   
   const fechaStr = `${DIAS_LARGOS[ev.fecha.getDay()]} ${ev.fecha.getDate()} de ${MESES[ev.fecha.getMonth()]} de ${ev.fecha.getFullYear()}`;
   document.getElementById('placaProxDate').textContent = fechaStr + (ev.provincia ? ` · 📍 ${ev.provincia}` : '');
@@ -782,7 +781,7 @@ document.fonts.ready.then(() => {
   setTimeout(() => {
     html2canvas(placa, {
       scale: 1,
-      backgroundColor: '#0b1220',
+      backgroundColor: '#ffffff',
       width: 1200,
       height: 1200,
       useCORS: true,
