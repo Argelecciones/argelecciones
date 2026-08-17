@@ -753,8 +753,19 @@ function copiarEvento(idx, btn) {
 function descargarPlacaEvento(idx) {
   const ev = eventos[idx];
   if(!ev) return;
+const tagEl = document.querySelector('.placa-prox-tag');
+
+let etiquetaPlaca = ev.categoria || 'Agenda electoral';
+
+if (ev.destacado) {
+  etiquetaPlaca = 'Elección destacada';
+}
+
+tagEl.textContent = etiquetaPlaca.toUpperCase();
   const colores = { nacional:'#3b82f6', provincial:'#a855f7', municipal:'#f59e0b', partidos:'#10b981' };
-const colorAccent = ev.destacado ? '#f43f5e' : (colores[catKey(ev.categoria)] || '#3b82f6');
+const colorAccent = ev.destacado
+  ? '#ff6b00'
+  : '#19aae5';
 document.getElementById('placaProxAccent').style.background = colorAccent;
   
   document.getElementById('placaProxDiasNum').textContent = ev.fecha.getDate();
