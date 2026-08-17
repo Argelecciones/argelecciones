@@ -508,27 +508,91 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
 
 <!-- PLACA DE EXPORTACIÓN DINÁMICA DE UN EVENTO -->
 <div id="placaProximoExport">
-  <div id="placaProxAccent" style="position:absolute; top:0; left:0; right:0; height:8px; border-radius:0;"></div>
-  <div class="placa-prox-header">
-    <div>
-      <div style="font-size: 44px; font-weight: 900; letter-spacing: -0.5px;">Electo<span style="color:#f43f5e">Agenda</span></div>
-      <div style="font-size: 18px; color: #4a5878; font-weight: 700; margin-top: 4px;">@ArgElecciones</div>
-    </div>
-    <div class="placa-prox-tag">Evento</div>
-  </div>
-  <div class="placa-prox-body">
-    <div class="placa-prox-dias-container">
-      <div class="placa-prox-dias-num" id="placaProxDiasNum">—</div>
-      <div class="placa-prox-dias-lbl" id="placaProxDiasLbl">días restantes</div>
-    </div>
-    <div class="placa-prox-titulo" id="placaProxTitle">—</div>
-    <div class="placa-prox-badge-date" id="placaProxDate">—</div>
-  </div>
-  <div class="placa-prox-footer">
-    <img src="logo.png" alt="Logo" style="height:110px; width:auto; margin-left:auto;">
-</div>
-</div>
 
+  <div id="placaProxAccent"
+       style="position:absolute; top:0; left:0; right:0; height:10px; border-radius:0;">
+  </div>
+
+  <div class="placa-prox-header">
+
+    <div>
+      <img src="logo.png"
+           alt="ARG elecciones"
+           style="height:90px; width:auto; display:block;">
+
+      <div style="
+        font-size:18px;
+        font-weight:800;
+        color:#000000;
+        margin-top:18px;
+        letter-spacing:0.08em;
+        text-transform:uppercase;
+      ">
+        ElectoAgenda
+      </div>
+    </div>
+
+    <div class="placa-prox-tag">
+      AGENDA ELECTORAL
+    </div>
+
+  </div>
+
+
+  <div class="placa-prox-body">
+
+    <div class="placa-prox-dias-container">
+
+      <div class="placa-prox-dias-num"
+           id="placaProxDiasNum">
+        —
+      </div>
+
+      <div class="placa-prox-dias-lbl"
+           id="placaProxDiasLbl">
+        días restantes
+      </div>
+
+    </div>
+
+
+    <div class="placa-prox-titulo"
+         id="placaProxTitle">
+      —
+    </div>
+
+
+    <div class="placa-prox-badge-date"
+         id="placaProxDate">
+      —
+    </div>
+
+  </div>
+
+
+  <div class="placa-prox-footer">
+
+    <div style="
+      font-size:18px;
+      font-weight:700;
+      color:#000000;
+    ">
+      @ArgElecciones
+    </div>
+
+    <div style="
+      font-size:15px;
+      font-weight:700;
+      color:#777777;
+      text-transform:uppercase;
+      letter-spacing:0.08em;
+    ">
+      Solo para difusión
+    </div>
+
+  </div>
+
+</div>
 <div id="galleryModalEntity" class="gallery-modal" onclick="cerrarModalGaleria()">
   <div class="gallery-content-wrapper" onclick="event.stopPropagation()">
     <button class="gallery-close-btn" onclick="cerrarModalGaleria()">&times;</button>
