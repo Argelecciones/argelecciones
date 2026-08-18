@@ -1830,13 +1830,15 @@ function renderizarVistaDetallada(camara) {
             if (placaQuorumWrapper) placaQuorumWrapper.style.display = (modoActivo === 'quorum') ? 'block' : 'none';
         }
 
+                const recintoContainer = document.getElementById('recintoContainer');
         if (vistaActiva === 'detallada') {
-            const recintoContainer = document.getElementById('recintoContainer');
             if (recintoContainer) recintoContainer.style.display = 'block';
             renderizarVistaRecinto(camara);
             renderizarVistaDetallada(camara);
             ejecutarCalculos();
             return;
+        } else {
+            if (recintoContainer) { recintoContainer.style.display = 'none'; recintoContainer.innerHTML = ''; }
         }
 
         camara.blocks.forEach((bloque, idx) => {
