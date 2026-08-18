@@ -701,7 +701,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
 
 @media(max-width: 639px) {
     .blocks-columnas {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: 1fr;
     }
 }
     .legislador-bloque-header { display:flex; justify-content:space-between; align-items:center; gap:8px; padding: 8px 10px; background:#1e293b; border-radius:6px 6px 0 0; border-left:4px solid; flex-wrap:wrap; }
@@ -766,6 +766,8 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             .tab-btn { font-size: 11px; padding: 8px 6px; }
             .global-shortcuts-bar { flex-wrap: wrap; gap: 8px; }
             .shortcuts-title { width: 100%; margin-right: 0; margin-bottom: 2px; }
+			 .input-nombre-votacion { min-width: 0; width: 100%; order: 1; }
+    .global-shortcuts-bar .btn-shortcut { flex: 1; min-width: 0; }
             #blocksContainer { grid-template-columns: 1fr; }
             .app-result-banner { font-size: 22px; padding: 14px; }
             .app-result-banner .arb-sub { font-size: 12px; }
@@ -779,6 +781,15 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             .legend-label { font-size: 14px; }
 			.app-result-banner .arb-req { font-size: 10px; margin-bottom: 6px; }
             .dashboard-layout.layout-unificado { max-width: 100%; }
+
+			.blocks-columnas { grid-template-columns: 1fr !important; }
+            .legislador-bloque-header { flex-direction: column; align-items: flex-start; gap: 6px; }
+            .legislador-bloque-acciones { width: 100%; }
+            .legislador-bloque-acciones button { flex: 1; text-align: center; }
+            .legislador-fila { padding: 9px 10px; }
+            .legislador-nombre { font-size: 13px; }
+            .btn-estado-persona { font-size: 10px; padding: 6px 8px; flex: 1; }
+            .legislador-botones { width: 100%; }
         }
     </style>
 </head>
