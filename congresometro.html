@@ -1672,10 +1672,12 @@ function renderizarVistaDetallada(camara) {
             c.setAttribute('cy', persona.y);
             c.setAttribute('r', colorAro ? rEsc * factorAro : rEsc);
             c.setAttribute('fill', persona.color);
-            c.setAttribute('style', 'cursor:pointer;');
-            c.addEventListener('click', (evt) => {
-                evt.stopPropagation();
+                        c.setAttribute('style', 'cursor:pointer;');
+            c.addEventListener('mouseenter', (evt) => {
                 abrirPopoverRecinto(persona.nombre, persona.bloque, evt);
+            });
+            c.addEventListener('mouseleave', () => {
+                programarCierrePopover();
             });
 
                         const etiquetasEstado = { presente:'Presente', af:'Afirmativo', neg:'Negativo', abs:'Abstención', ausente:'Ausente' };
@@ -1708,9 +1710,12 @@ function renderizarVistaDetallada(camara) {
             pres.setAttribute('stroke-dasharray', '2,1.5');
             pres.setAttribute('stroke-width', 1);
             pres.setAttribute('style', 'cursor:pointer;');
-            pres.addEventListener('click', (evt) => {
-                evt.stopPropagation();
+                        pres.setAttribute('style', 'cursor:pointer;');
+            pres.addEventListener('mouseenter', (evt) => {
                 abrirPopoverRecinto(presidente.nombre, presidente.bloque + ' (Presidencia)', evt);
+            });
+            pres.addEventListener('mouseleave', () => {
+                programarCierrePopover();
             });
                         const etiquetasEstadoPres = { presente:'Presente', af:'Afirmativo', neg:'Negativo', abs:'Abstención', ausente:'Ausente' };
             const titlePres = document.createElementNS(svgns, 'title');
@@ -1738,26 +1743,44 @@ function renderizarVistaDetallada(camara) {
         ejecutarCalculos();
     }
 
+		let timeoutCierrePopover = null;
+
+	function programarCierrePopover() {
+        timeoutCierrePopover = setTimeout(() => {
+            const pop = document.getElementById('recintoPopover');
+            if (pop) pop.style.display = 'none';
+        }, 250);
+    }
+
+	function cancelarCierrePopover() {
+        if (timeoutCierrePopover) {
+            clearTimeout(timeoutCierrePopover);
+            timeoutCierrePopover = null;
+        }
+    }
+
 	function abrirPopoverRecinto(nombre, bloque, evt) {
+        cancelarCierrePopover();
         const pop = document.getElementById('recintoPopover');
         const estados = modoActivo === 'quorum'
             ? [['presente', 'PRES'], ['ausente', 'AUS']]
             : [['af', 'AF'], ['neg', 'NEG'], ['abs', 'ABS'], ['ausente', 'AUS']];
         let html = `<div style="font-size:12px;font-weight:800;color:#f8fafc;margin-bottom:2px;">${nombre}</div><div style="font-size:10px;color:#94a3b8;margin-bottom:8px;">${bloque}</div><div style="display:flex;gap:4px;">`;
         estados.forEach(([val, label]) => {
-            html += `<button class="btn-estado-persona" onclick="event.stopPropagation(); elegirEstadoRecinto('${nombre.replace(/'/g, "\\'")}','${val}')">${label}</button>`;
+            html += `<button class="btn-estado-persona" onclick="elegirEstadoRecinto('${nombre.replace(/'/g, "\\'")}','${val}')">${label}</button>`;
         });
         html += '</div>';
         pop.innerHTML = html;
         pop.style.display = 'block';
+        pop.onmouseenter = cancelarCierrePopover;
+        pop.onmouseleave = programarCierrePopover;
         const x = evt.clientX, y = evt.clientY;
         pop.style.left = Math.min(x + 8, window.innerWidth - 180) + 'px';
         pop.style.top = Math.min(y + 8, window.innerHeight - 90) + 'px';
     }
 
-    function elegirEstadoRecinto(nombre, estado) {
+        function elegirEstadoRecinto(nombre, estado) {
         setEstadoIndividual(camaraActiva, nombre, estado);
-        document.getElementById('recintoPopover').style.display = 'none';
         renderizarVistaRecinto(dataCongreso[camaraActiva]);
         renderizarVistaDetallada(dataCongreso[camaraActiva]);
         ejecutarCalculos();
