@@ -157,11 +157,16 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         .quorum-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 12px; }
         @media(min-width: 900px) {
     .layout-unificado .quorum-box {
-        position: sticky;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #ffffff;
+    width: 100%;
+}
+
+@media(min-width: 900px) {
+    .layout-unificado .quorum-box {
         top: 20px;
-        z-index: 100;
-        background: #ffffff;
-        width: 100%;
     }
 }
         .progress-wrapper { position: relative; margin-bottom: 35px; padding-top: 5px; }
