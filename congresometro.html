@@ -158,21 +158,19 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         .monitor-panel { display: flex; flex-direction: column; gap: 20px; }
         
         /* Barra de Quórum */
-        .quorum-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 12px; }
+               .quorum-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 12px; }
+        .layout-unificado .quorum-box {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: #ffffff;
+            width: 100%;
+        }
         @media(min-width: 900px) {
-    .layout-unificado .quorum-box {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: #ffffff;
-    width: 100%;
-}
-
-@media(min-width: 900px) {
-    .layout-unificado .quorum-box {
-        top: 20px;
-    }
-}
+            .layout-unificado .quorum-box {
+                top: 20px;
+            }
+        }
         .progress-wrapper { position: relative; margin-bottom: 35px; padding-top: 5px; }
         .progress-bg { background: #e2e8f0; height: 25px; border-radius: 6px; overflow: hidden; }
         .progress-fill { background: #3b82f6; height: 100%; width: 0%; transition: width 0.2s; }
