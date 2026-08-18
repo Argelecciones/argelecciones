@@ -185,6 +185,12 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         .q-badge { padding: 6px 14px; border-radius: 20px; font-weight: 800; font-size: 12px; text-transform: uppercase; }
         .q-badge.no { background: #fee2e2; color: #991b1b; }
         .q-badge.yes { background: #dcfce7; color: #166534; }
+		.vote-summary-line { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+        .vote-summary-line .vs-item { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 800; }
+        .vote-summary-line .vs-si { background: rgba(16, 185, 129, 0.15); color: #059669; }
+        .vote-summary-line .vs-no { background: rgba(239, 68, 68, 0.15); color: #dc2626; }
+        .vote-summary-line .vs-abs { background: rgba(234, 179, 8, 0.15); color: #854d0e; }
+        .vote-summary-line .vs-aus { background: rgba(148, 163, 184, 0.15); color: #475569; }
 
         /* CAJA DE REDES */
         .social-box { background: #eff6ff; border: 1px solid #bfdbfe; padding: 15px; border-radius: 12px; }
@@ -2309,15 +2315,15 @@ function renderizarVistaDetallada(camara) {
             }
         }
 
-        const voteSummary = document.getElementById('voteSummaryLine');
+                const voteSummary = document.getElementById('voteSummaryLine');
         if (voteSummary) {
             if (modoActivo === 'vote') {
-                voteSummary.style.display = 'block';
+                voteSummary.style.display = 'flex';
                 voteSummary.innerHTML =
-                    `<span class="vs-si">Af.: ${t_af}</span><span class="vs-sep"> | </span>` +
-        `<span class="vs-no">Neg.: ${t_neg}</span><span class="vs-sep"> | </span>` +
-        `<span class="vs-abs">Abst.: ${t_abs}</span><span class="vs-sep"> | </span>` +
-        `<span class="vs-aus">Aus.: ${t_aus}</span>`;
+                    `<span class="vs-item vs-si">Af.: ${t_af}</span>` +
+                    `<span class="vs-item vs-no">Neg.: ${t_neg}</span>` +
+                    `<span class="vs-item vs-abs">Abst.: ${t_abs}</span>` +
+                    `<span class="vs-item vs-aus">Aus.: ${t_aus}</span>`;
             } else {
                 voteSummary.style.display = 'none';
             }
