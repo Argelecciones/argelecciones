@@ -748,8 +748,8 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     .tag-abs { background:#fef9c3; color:#854d0e; }
     .tag-aus { background:#e2e8f0; color:#64748b; }
     .placa-nominal-footer { display:flex; justify-content:space-between; align-items:center; border-top:1px solid #e2e8f0; margin-top:25px; padding-top:15px; }
-    .placa-nominal-footer-logo { height:70px; width:auto; object-fit:contain; }
-    .placa-nominal-footer-txt { font-size:14px; color:#94a3b8; font-weight:700; }
+    .placa-nominal-footer-logo { height:90px; width:auto; object-fit:contain; }
+.placa-nominal-footer-txt { font-size:16px; color:#94a3b8; font-weight:700; }
     #placaRecintoEntity { position: fixed; left: -9999px; top: 0; width: 1920px; background: #f8fafc; color: #0f172a; font-family: 'Inter', sans-serif; box-sizing: border-box; padding: 60px 70px; }
 		
 		@media (max-width: 640px) {
@@ -1568,13 +1568,13 @@ function renderizarVistaDetallada(camara) {
         const leyenda = document.getElementById('pr-leyenda');
         if (leyenda) {
             leyenda.innerHTML = '';
-            const items = modoActivo === 'quorum'
-                ? [['PRESENTE', votos.totalPresentes, '#dcfce7', '#166534'], ['AUSENTE', votos.t_aus, '#e2e8f0', '#334155']]
-                : [['AFIRMATIVOS', votos.t_af, '#dcfce7', '#166534'], ['NEGATIVOS', votos.t_neg, '#fee2e2', '#991b1b'], ['ABSTENCIÓN', votos.t_abs, '#fef9c3', '#854d0e'], ['AUSENTE', votos.t_aus, '#e2e8f0', '#334155']];
-            items.forEach(([label, val, bg, color]) => {
+                      const items = modoActivo === 'quorum'
+                ? [['PRESENTE', votos.totalPresentes, 'rgba(16, 185, 129, 0.15)', '#166534', 'rgba(16, 185, 129, 0.3)'], ['AUSENTE', votos.t_aus, 'rgba(148, 163, 184, 0.15)', '#334155', 'rgba(148, 163, 184, 0.3)']]
+                : [['AFIRMATIVOS', votos.t_af, 'rgba(16, 185, 129, 0.15)', '#166534', 'rgba(16, 185, 129, 0.3)'], ['NEGATIVOS', votos.t_neg, 'rgba(239, 68, 68, 0.15)', '#991b1b', 'rgba(239, 68, 68, 0.3)'], ['ABSTENCIÓN', votos.t_abs, 'rgba(234, 179, 8, 0.15)', '#854d0e', 'rgba(234, 179, 8, 0.3)'], ['AUSENTE', votos.t_aus, 'rgba(148, 163, 184, 0.15)', '#334155', 'rgba(148, 163, 184, 0.3)']];
+                        items.forEach(([label, val, bg, color, borderColor]) => {
                 const box = document.createElement('div');
-                box.style.cssText = `background:${bg}; color:${color}; border-radius:10px; padding:14px 24px; text-align:center; min-width:120px;`;
-                box.innerHTML = `<div style="font-size:13px; font-weight:800; letter-spacing:.04em;">${label}</div><div style="font-size:28px; font-weight:900; margin-top:4px;">${val}</div>`;
+                box.style.cssText = `background:${bg}; border:1px solid ${borderColor}; border-radius:12px; padding:22px 24px; text-align:center; min-width:140px;`;
+                box.innerHTML = `<div style="font-size:18px; font-weight:700; color:#64748b;">${label}</div><div style="font-size:40px; font-weight:900; color:#0f172a; margin-top:4px;">${val}</div>`;
                 leyenda.appendChild(box);
             });
         }
