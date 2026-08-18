@@ -11,6 +11,10 @@
     
     <style>
         *, *::before, *::after { box-sizing: border-box; }
+                html, body {
+            overflow-x: hidden;
+            max-width: 100vw;
+        }
         body {
             font-family: 'Inter', sans-serif;
             letter-spacing: -0.02em;
@@ -1499,7 +1503,7 @@ function renderizarVistaDetallada(camara) {
         });
     }
 
-    function capturarPlacaNominal(onListo) {
+        function capturarPlacaNominal(onListo) {
         const camara = dataCongreso[camaraActiva];
         armarContenidoPlacaNominal(camara);
 
@@ -1507,19 +1511,19 @@ function renderizarVistaDetallada(camara) {
         placa.style.left = '0';
         placa.style.zIndex = '-1';
 
-        setTimeout(() => {
+        setTimeout(async () => {
             const alturaReal = placa.scrollHeight;
-            html2canvas(placa, {
-                scale: 1, backgroundColor: '#f8fafc', width: 1920, height: alturaReal, useCORS: true, allowTaint: true
-            }).then(canvas => {
-                placa.style.left = '-9999px';
-                placa.style.zIndex = '';
+            try {
+                const canvas = await html2canvas(placa, {
+                    scale: 1, backgroundColor: '#f8fafc', width: 1920, height: alturaReal, useCORS: true, allowTaint: true
+                });
                 onListo(canvas);
-            }).catch(err => {
+            } catch (err) {
+                alert('Error al generar el listado nominal: ' + err.message);
+            } finally {
                 placa.style.left = '-9999px';
                 placa.style.zIndex = '';
-                alert('Error al generar el listado nominal: ' + err.message);
-            });
+            }
         }, 150);
     }
 
@@ -1604,19 +1608,19 @@ function renderizarVistaDetallada(camara) {
         placa.style.left = '0';
         placa.style.zIndex = '-1';
 
-        setTimeout(() => {
+                setTimeout(async () => {
             const alturaReal = placa.scrollHeight;
-            html2canvas(placa, {
-                scale: 1, backgroundColor: '#f8fafc', width: 1920, height: alturaReal, useCORS: true, allowTaint: true
-            }).then(canvas => {
-                placa.style.left = '-9999px';
-                placa.style.zIndex = '';
+            try {
+                const canvas = await html2canvas(placa, {
+                    scale: 1, backgroundColor: '#f8fafc', width: 1920, height: alturaReal, useCORS: true, allowTaint: true
+                });
                 onListo(canvas);
-            }).catch(err => {
+            } catch (err) {
+                alert('Error al generar la placa de recinto: ' + err.message);
+            } finally {
                 placa.style.left = '-9999px';
                 placa.style.zIndex = '';
-                alert('Error al generar la placa de recinto: ' + err.message);
-            });
+            }
         }, 150);
     }
 
