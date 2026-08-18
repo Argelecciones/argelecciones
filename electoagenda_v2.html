@@ -239,20 +239,21 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 28px;
-  margin-top: -10px;
+  justify-content: flex-start;
+  gap: 24px;
+  margin-top: 70px;
 }
 
 /* NÚMERO DE DÍAS */
 .placa-prox-dias-container {
   display: flex;
   align-items: baseline;
-  gap: 14px;
+  gap: 16px;
+  margin-top: 4px;
 }
 
 .placa-prox-dias-num {
-  font-size: 150px;
+  font-size: 125px;
   font-weight: 900;
   color: #19aae5;
   line-height: 0.82;
@@ -260,19 +261,33 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
 }
 
 .placa-prox-dias-lbl {
-  font-size: 34px;
+  font-size: 32px;
   font-weight: 900;
   color: #000000;
   text-transform: uppercase;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
+}
+
+  .placa-prox-provincia {
+  font-size: 42px;
+  font-weight: 900;
+  color: #ff6b00;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  text-transform: none;
+  min-height: 42px;
+}
+
+  .placa-prox-provincia:empty {
+  display: none;
 }
 
 /* TÍTULO */
 .placa-prox-titulo {
-  font-size: 62px;
+  font-size: 52px;
   font-weight: 900;
   color: #000000;
-  line-height: 1.05;
+  line-height: 1.08;
   letter-spacing: -0.04em;
   max-width: 1000px;
 }
@@ -534,7 +549,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
     <div>
       <img src="logo.png"
      alt="ARG elecciones"
-     style="height:105px; width:auto; display:block;">
+     style="height:135px; width:auto; display:block;">
 
       <div style="
         font-size:18px;
@@ -548,14 +563,16 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
       </div>
     </div>
 
-    <div class="placa-prox-tag">
-      AGENDA ELECTORAL
-    </div>
+    <div class="placa-prox-tag" id="placaProxTag">
+  AGENDA ELECTORAL
+</div>
 
   </div>
 
 
   <div class="placa-prox-body">
+
+    <div id="placaProxProvincia" class="placa-prox-provincia"></div>
 
     <div class="placa-prox-dias-container">
 
@@ -790,6 +807,12 @@ document.getElementById('placaProxDiasLbl').textContent =
   MESES[ev.fecha.getMonth()].toUpperCase();
 
 document.getElementById('placaProxTitle').textContent = ev.descripcion;
+
+  const provinciaEl = document.getElementById('placaProxProvincia');
+
+if (provinciaEl) {
+  provinciaEl.textContent = ev.provincia || '';
+}
   
   const fechaStr = `${DIAS_LARGOS[ev.fecha.getDay()]} ${ev.fecha.getDate()} de ${MESES[ev.fecha.getMonth()]} de ${ev.fecha.getFullYear()}`;
   document.getElementById('placaProxDate').textContent = fechaStr + (ev.provincia ? ` · 📍 ${ev.provincia}` : '');
