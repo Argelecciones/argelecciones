@@ -1678,8 +1678,9 @@ function renderizarVistaDetallada(camara) {
                 abrirPopoverRecinto(persona.nombre, persona.bloque, evt);
             });
 
+                        const etiquetasEstado = { presente:'Presente', af:'Afirmativo', neg:'Negativo', abs:'Abstención', ausente:'Ausente' };
             const title = document.createElementNS(svgns, 'title');
-            title.textContent = `${persona.nombre} — ${persona.bloque}`;
+            title.textContent = `${persona.nombre} — ${persona.bloque} (${etiquetasEstado[estado] || 'Ausente'})`;
             c.appendChild(title);
 
             svg.appendChild(c);
@@ -1711,8 +1712,9 @@ function renderizarVistaDetallada(camara) {
                 evt.stopPropagation();
                 abrirPopoverRecinto(presidente.nombre, presidente.bloque + ' (Presidencia)', evt);
             });
+                        const etiquetasEstadoPres = { presente:'Presente', af:'Afirmativo', neg:'Negativo', abs:'Abstención', ausente:'Ausente' };
             const titlePres = document.createElementNS(svgns, 'title');
-            titlePres.textContent = `${presidente.nombre} — Presidencia`;
+            titlePres.textContent = `${presidente.nombre} — Presidencia (${etiquetasEstadoPres[estadoPres] || 'Ausente'})`;
             pres.appendChild(titlePres);
             svg.appendChild(pres);
         }
