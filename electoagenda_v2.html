@@ -342,6 +342,115 @@ display: none;
   letter-spacing: 0.08em;
 }
 
+  /* PLACA EFEMÉRIDE (1200x1200) — IDENTIDAD PROPIA */
+#placaEfemerideExport {
+  position: fixed;
+  left: -9999px;
+  top: 0;
+  width: 1200px;
+  height: 1200px;
+  background: #ffffff;
+  font-family: 'Inter', system-ui, sans-serif;
+  display: flex;
+  flex-direction: column;
+  color: #000000;
+  border-top: 10px solid #19aae5;
+}
+
+.placa-efem-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 3px solid #000000;
+  padding: 40px 70px 14px;
+}
+
+.placa-efem-brand {
+  font-size: 24px;
+  font-weight: 900;
+  color: #19aae5;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.placa-efem-tag {
+  background: #ff6b00;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding: 10px 14px;
+}
+
+.placa-efem-body {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 30px;
+  padding: 60px 70px 40px;
+}
+
+.placa-efem-fecha-container {
+  display: flex;
+  align-items: baseline;
+  gap: 15px;
+}
+
+.placa-efem-dia {
+  font-size: 160px;
+  font-weight: 900;
+  color: #19aae5;
+  line-height: 0.82;
+  letter-spacing: -0.06em;
+}
+
+.placa-efem-mes {
+  font-size: 36px;
+  font-weight: 900;
+  color: #000000;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+
+.placa-efem-titulo {
+  font-size: 56px;
+  font-weight: 900;
+  color: #000000;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  max-width: 1000px;
+}
+
+.placa-efem-detalle-wrap {
+  flex: 1;
+  background-image: url('papel-efemerides.png');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  padding: 50px 70px;
+  box-sizing: border-box;
+}
+
+.placa-efem-detalle {
+  font-size: 30px;
+  font-weight: 600;
+  color: #1a1a1a;
+  line-height: 1.5;
+  max-width: 950px;
+  overflow-wrap: break-word;
+}
+
+.placa-efem-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 70px 40px;
+  background: #ffffff;
+}
+
 /* MODAL PREVISUALIZACIÓN */
 .gallery-modal{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(11,12,32,0.96);display:none;justify-content:center;align-items:center;z-index:10000;padding:30px;cursor:zoom-out;}
 .gallery-content-wrapper{position:relative;max-width:92%;max-height:90%;display:flex;flex-direction:column;align-items:center;}
@@ -633,6 +742,35 @@ display: none;
 
   </div>
 
+  
+<!-- PLACA EFEMÉRIDE — CONTENEDOR PROPIO -->
+<div id="placaEfemerideExport">
+  <div class="placa-efem-header">
+    <div style="display:flex; align-items:center; gap:16px;">
+      <img src="logo.png" alt="ARG elecciones" style="height:90px; width:auto; display:block;">
+      <div class="placa-efem-brand">ElectoAgenda</div>
+    </div>
+    <div class="placa-efem-tag">Efeméride</div>
+  </div>
+
+  <div class="placa-efem-body">
+    <div class="placa-efem-fecha-container">
+      <div class="placa-efem-dia" id="placaEfemDiasNum">—</div>
+      <div class="placa-efem-mes" id="placaEfemDiasLbl">—</div>
+    </div>
+    <div class="placa-efem-titulo" id="placaEfemTitle">—</div>
+  </div>
+
+  <div class="placa-efem-detalle-wrap">
+    <div class="placa-efem-detalle" id="placaEfemDate">—</div>
+  </div>
+
+  <div class="placa-efem-footer">
+    <div style="font-size:18px; font-weight:700; color:#000000;">@ArgElecciones</div>
+    <div style="font-size:15px; font-weight:700; color:#777777; text-transform:uppercase; letter-spacing:0.08em;">Solo para difusión</div>
+  </div>
+</div>
+
 </div>
 <div id="galleryModalEntity" class="gallery-modal" onclick="cerrarModalGaleria()">
   <div class="gallery-content-wrapper" onclick="event.stopPropagation()">
@@ -875,20 +1013,14 @@ function descargarPlacaEvento(idx) {
   const ev = efemerides[idx];
   if(!ev) return;
 
-  document.getElementById('placaProxAccent').style.background = '#ca8a04';
-
-  document.getElementById('placaProxDiasNum').textContent = ev.fecha.getDate();
-  document.getElementById('placaProxDiasLbl').textContent = MESES[ev.fecha.getMonth()];
-  document.getElementById('placaProxTitle').textContent = ev.descripcion;
+  document.getElementById('placaEfemDiasNum').textContent = ev.fecha.getDate();
+  document.getElementById('placaEfemDiasLbl').textContent = MESES[ev.fecha.getMonth()];
+  document.getElementById('placaEfemTitle').textContent = ev.descripcion;
 
   const fechaStr = `${ev.fecha.getDate()} de ${MESES[ev.fecha.getMonth()]} de ${ev.fecha.getFullYear()}`;
-  document.getElementById('placaProxDate').textContent = fechaStr + (ev.detalle ? ` · ${ev.detalle}` : '');
+  document.getElementById('placaEfemDate').textContent = fechaStr + (ev.detalle ? ` · ${ev.detalle}` : '');
 
-  const tagEl = document.querySelector('.placa-prox-tag');
-  const tagOrig = tagEl.textContent;
-  tagEl.textContent = 'Efeméride';
-
-  const placa = document.getElementById('placaProximoExport');
+  const placa = document.getElementById('placaEfemerideExport');
   const orig = placa.style.cssText;
 
   placa.style.position = 'fixed';
@@ -902,7 +1034,7 @@ function descargarPlacaEvento(idx) {
     setTimeout(() => {
       html2canvas(placa, {
         scale: 1,
-        backgroundColor: '#0b1220',
+        backgroundColor: '#ffffff',
         width: 1200,
         height: 1200,
         useCORS: true,
@@ -910,7 +1042,6 @@ function descargarPlacaEvento(idx) {
       }).then(canvas => {
         placa.style.cssText = orig;
         placa.style.display = 'none';
-        tagEl.textContent = tagOrig;
 
         const link = document.createElement('a');
         link.download = `efemeride-${ev.fecha.getFullYear()}-${ev.fecha.getMonth()+1}-${ev.fecha.getDate()}.png`;
@@ -919,13 +1050,12 @@ function descargarPlacaEvento(idx) {
       }).catch(err => {
         placa.style.cssText = orig;
         placa.style.display = 'none';
-        tagEl.textContent = tagOrig;
         alert('Error generando imagen: ' + err.message);
       });
     }, 150);
   });
 }
-
+  
 function cerrarModalGaleria(){
   document.getElementById('galleryModalEntity').style.display='none';
 }
