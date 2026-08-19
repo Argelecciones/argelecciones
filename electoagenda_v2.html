@@ -798,57 +798,50 @@ function copiarEvento(idx, btn) {
 function descargarPlacaEvento(idx) {
   const ev = eventos[idx];
   if(!ev) return;
-const tagEl = document.querySelector('.placa-prox-tag');
-  
-const categoria = (ev.categoria || '').toLowerCase().trim();
+
+  const tagEl = document.querySelector('.placa-prox-tag');
+
+  const categoria = (ev.categoria || '').toLowerCase().trim();
   let colorCategoria = '#19aae5';
+  if (categoria.includes('municipal')) {
+    colorCategoria = '#ff6b00';
+  } else if (categoria.includes('provincial')) {
+    colorCategoria = '#19aae5';
+  } else if (categoria.includes('nacional')) {
+    colorCategoria = '#000000';
+  } else if (categoria.includes('partido')) {
+    colorCategoria = '#19aae5';
+  }
 
-if (categoria.includes('municipal')) {
-  colorCategoria = '#ff6b00';
-} else if (categoria.includes('provincial')) {
-  colorCategoria = '#19aae5';
-} else if (categoria.includes('nacional')) {
-  colorCategoria = '#000000';
-} else if (categoria.includes('partido')) {
-  colorCategoria = '#19aae5';
-}
+  let etiquetaPlaca = ev.categoria || 'Agenda electoral';
+
+  if (ev.destacado) {
+    etiquetaPlaca = 'Elección destacada';
+    colorCategoria = '#ff6b00';
+  }
+
   tagEl.textContent = etiquetaPlaca.toUpperCase();
-tagEl.style.backgroundColor = colorCategoria;
-
-let etiquetaPlaca = ev.categoria || 'Agenda electoral';
-
-if (ev.destacado) {
-  etiquetaPlaca = 'Elección destacada';
-  colorCategoria = '#ff6b00';
-}
+  tagEl.style.backgroundColor = colorCategoria;
   tagEl.style.color = '#ffffff';
 
-tagEl.textContent = etiquetaPlaca.toUpperCase();
-  const colores = { nacional:'#3b82f6', provincial:'#a855f7', municipal:'#f59e0b', partidos:'#10b981' };
-const colorAccent = ev.destacado
-  ? '#ff6b00'
-  : '#19aae5';
-document.getElementById('placaProxAccent').style.background = colorAccent;
-  
+  const colorAccent = ev.destacado ? '#ff6b00' : '#19aae5';
+  document.getElementById('placaProxAccent').style.background = colorAccent;
+
   document.getElementById('placaProxDiasNum').textContent = ev.fecha.getDate();
-
-document.getElementById('placaProxDiasLbl').textContent =
-  MESES[ev.fecha.getMonth()].toUpperCase();
-
-document.getElementById('placaProxTitle').textContent = ev.descripcion;
+  document.getElementById('placaProxDiasLbl').textContent = MESES[ev.fecha.getMonth()].toUpperCase();
+  document.getElementById('placaProxTitle').textContent = ev.descripcion;
 
   const provinciaEl = document.getElementById('placaProxProvincia');
+  if (provinciaEl) {
+    provinciaEl.textContent = ev.provincia || '';
+  }
 
-if (provinciaEl) {
-  provinciaEl.textContent = ev.provincia || '';
-}
-  
   const fechaStr = `${DIAS_LARGOS[ev.fecha.getDay()]} ${ev.fecha.getDate()} de ${MESES[ev.fecha.getMonth()]} de ${ev.fecha.getFullYear()}`;
   document.getElementById('placaProxDate').textContent = fechaStr + (ev.provincia ? ` · 📍 ${ev.provincia}` : '');
 
   const placa = document.getElementById('placaProximoExport');
   const orig = placa.style.cssText;
-  
+
   placa.style.position = 'fixed';
   placa.style.left = '0';
   placa.style.top = '0';
@@ -856,30 +849,30 @@ if (provinciaEl) {
   placa.style.display = 'flex';
   placa.querySelector('img').style.display = 'block';
 
-document.fonts.ready.then(() => {
-  setTimeout(() => {
-    html2canvas(placa, {
-      scale: 1,
-      backgroundColor: '#ffffff',
-      width: 1200,
-      height: 1200,
-      useCORS: true,
-      allowTaint: true
-    }).then(canvas => {
-      placa.style.cssText = orig;
-      placa.style.display = 'none';
-      
-      const link = document.createElement('a');
-      link.download = `evento-${ev.fecha.getFullYear()}-${ev.fecha.getMonth()+1}-${ev.fecha.getDate()}.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-    }).catch(err => {
-      placa.style.cssText = orig;
-      placa.style.display = 'none';
-      alert('Error generando imagen: ' + err.message);
-    });
-  }, 150);
-});
+  document.fonts.ready.then(() => {
+    setTimeout(() => {
+      html2canvas(placa, {
+        scale: 1,
+        backgroundColor: '#ffffff',
+        width: 1200,
+        height: 1200,
+        useCORS: true,
+        allowTaint: true
+      }).then(canvas => {
+        placa.style.cssText = orig;
+        placa.style.display = 'none';
+
+        const link = document.createElement('a');
+        link.download = `evento-${ev.fecha.getFullYear()}-${ev.fecha.getMonth()+1}-${ev.fecha.getDate()}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      }).catch(err => {
+        placa.style.cssText = orig;
+        placa.style.display = 'none';
+        alert('Error generando imagen: ' + err.message);
+      });
+    }, 150);
+  });
 }
 
   function descargarPlacaEfemeride(idx) {
