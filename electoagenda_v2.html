@@ -203,7 +203,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
   top: 0;
   width: 1200px;
   height: 1200px;
-  background: #ffffff;
+  background: #fcfcfc;
   font-family: 'Inter', system-ui, sans-serif;
   padding: 65px 75px;
   box-sizing: border-box;
@@ -211,6 +211,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
   flex-direction: column;
   justify-content: space-between;
   color: #000000;
+  border-top: 10px solid #19aae5;
 }
 
 /* ENCABEZADO */
@@ -223,13 +224,13 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
 }
 
 .placa-prox-tag {
-  background: #19aae5;
+  background: #000000;
   color: #ffffff;
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 9px 14px;
+  letter-spacing: 0.07em;
+  padding: 10px 14px;
   border-radius: 0;
   margin-top: 4px;
 }
@@ -240,7 +241,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 24px;
+  gap: 30px;
   margin-top: 70px;
 }
 
@@ -248,18 +249,19 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
 .placa-prox-dias-container {
   display: flex;
   align-items: baseline;
-  gap: 16px;
+  gap: 12px;
   margin-top: 4px;
 }
 
   .placa-prox-provincia {
-font-size: 42px;
+font-size: 46px;
 font-weight: 900;
 color: #ff6b00;
 line-height: 1;
 letter-spacing: -0.03em;
-text-transform: none;
+text-transform: uppercase;
 min-height: 42px;
+margin-bottom: 8px;
 }
 
 .placa-prox-provincia:empty {
@@ -275,7 +277,7 @@ display: none;
 }
 
 .placa-prox-dias-lbl {
-  font-size: 32px;
+  font-size: 29px;
   font-weight: 900;
   color: #000000;
   text-transform: uppercase;
@@ -284,12 +286,22 @@ display: none;
 
 /* TÍTULO */
 .placa-prox-titulo {
-  font-size: 52px;
+  font-size: 50px;
   font-weight: 900;
   color: #000000;
-  line-height: 1.08;
+  line-height: 1.02;
   letter-spacing: -0.04em;
-  max-width: 1000px;
+  max-width: 900px;
+  margin-top: 4px;
+}
+
+  .placa-prox-titulo::before {
+  content: "";
+  display: block;
+  width: 55px;
+  height: 7px;
+  background: #19aae5;
+  margin-bottom: 18px;
 }
 
 /* FECHA */
@@ -313,12 +325,12 @@ display: none;
   justify-content: space-between;
   align-items: center;
   border-top: 2px solid #000000;
-  padding-top: 20px;
+  padding-top: 16px;
   color: #000000;
 }
 
 .placa-prox-footer div:first-child {
-  font-size: 20px !important;
+  font-size: 18px !important;
   font-weight: 900 !important;
   color: #000000 !important;
 }
@@ -552,15 +564,15 @@ display: none;
      style="height:135px; width:auto; display:block;">
 
       <div style="
-        font-size:18px;
-        font-weight:800;
-        color:#000000;
-        margin-top:18px;
-        letter-spacing:0.08em;
-        text-transform:uppercase;
-      ">
-        ElectoAgenda
-      </div>
+  font-size:16px;
+  font-weight:900;
+  color:#19aae5;
+  margin-top:14px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+">
+  ElectoAgenda
+</div>
     </div>
 
     <div class="placa-prox-tag" id="placaProxTag">
@@ -787,12 +799,29 @@ function descargarPlacaEvento(idx) {
   const ev = eventos[idx];
   if(!ev) return;
 const tagEl = document.querySelector('.placa-prox-tag');
+  
+const categoria = (ev.categoria || '').toLowerCase().trim();
+  let colorCategoria = '#19aae5';
+
+if (categoria.includes('municipal')) {
+  colorCategoria = '#ff6b00';
+} else if (categoria.includes('provincial')) {
+  colorCategoria = '#19aae5';
+} else if (categoria.includes('nacional')) {
+  colorCategoria = '#000000';
+} else if (categoria.includes('partido')) {
+  colorCategoria = '#19aae5';
+}
+  tagEl.textContent = etiquetaPlaca.toUpperCase();
+tagEl.style.backgroundColor = colorCategoria;
 
 let etiquetaPlaca = ev.categoria || 'Agenda electoral';
 
 if (ev.destacado) {
   etiquetaPlaca = 'Elección destacada';
+  colorCategoria = '#ff6b00';
 }
+  tagEl.style.color = '#ffffff';
 
 tagEl.textContent = etiquetaPlaca.toUpperCase();
   const colores = { nacional:'#3b82f6', provincial:'#a855f7', municipal:'#f59e0b', partidos:'#10b981' };
