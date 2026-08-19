@@ -218,9 +218,9 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
 .placa-prox-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   border-bottom: 3px solid #000000;
-  padding-bottom: 28px;
+  padding-bottom: 14px;
 }
 
 .placa-prox-tag {
@@ -232,7 +232,6 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
   letter-spacing: 0.07em;
   padding: 10px 14px;
   border-radius: 0;
-  margin-top: 4px;
 }
 
 /* CUERPO */
@@ -240,9 +239,9 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  gap: 30px;
-  margin-top: 70px;
+  justify-content: center;
+  gap: 50px;
+  margin-top: 0;
 }
 
 /* NÚMERO DE DÍAS */
@@ -269,7 +268,7 @@ display: none;
 }
 
 .placa-prox-dias-num {
-  font-size: 125px;
+  font-size: 180px;
   font-weight: 900;
   color: #19aae5;
   line-height: 0.82;
@@ -277,7 +276,7 @@ display: none;
 }
 
 .placa-prox-dias-lbl {
-  font-size: 29px;
+  font-size: 40px;
   font-weight: 900;
   color: #000000;
   text-transform: uppercase;
@@ -286,12 +285,12 @@ display: none;
 
 /* TÍTULO */
 .placa-prox-titulo {
-  font-size: 50px;
+  font-size: 68px;
   font-weight: 900;
   color: #000000;
   line-height: 1.02;
   letter-spacing: -0.04em;
-  max-width: 900px;
+  max-width: 1000px;
   margin-top: 4px;
 }
 
@@ -558,17 +557,16 @@ display: none;
 
   <div class="placa-prox-header">
 
-    <div>
+        <div style="display:flex; align-items:center; gap:16px;">
       <img src="logo.png"
      alt="ARG elecciones"
-     style="height:135px; width:auto; display:block;">
+     style="height:90px; width:auto; display:block;">
 
       <div style="
-  font-size:16px;
+  font-size:24px;
   font-weight:900;
   color:#19aae5;
-  margin-top:14px;
-  letter-spacing:0.08em;
+  letter-spacing:0.04em;
   text-transform:uppercase;
 ">
   ElectoAgenda
@@ -582,9 +580,7 @@ display: none;
   </div>
 
 
-  <div class="placa-prox-body">
-
-    <div id="placaProxProvincia" class="placa-prox-provincia"></div>
+    <div class="placa-prox-body">
 
     <div class="placa-prox-dias-container">
 
