@@ -1087,10 +1087,13 @@ function abrirMenuFormato(evt, tipo, idx) {
   pop.style.display = 'flex';
   const rect = evt.currentTarget.getBoundingClientRect();
   const popWidth = 160;
+  const popHeight = 90;
   let left = rect.left + window.scrollX;
   if (left + popWidth > window.innerWidth) left = window.innerWidth - popWidth - 10;
+  let top = rect.bottom + window.scrollY + 6;
+  if (rect.bottom + popHeight > window.innerHeight) top = rect.top + window.scrollY - popHeight - 6;
   pop.style.left = left + 'px';
-  pop.style.top = (rect.bottom + window.scrollY + 6) + 'px';
+  pop.style.top = top + 'px';
 }
 
 function elegirFormato(formato) {
