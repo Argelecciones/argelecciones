@@ -1017,8 +1017,8 @@ function descargarPlacaEvento(idx) {
   document.getElementById('placaEfemDiasLbl').textContent = MESES[ev.fecha.getMonth()];
   document.getElementById('placaEfemTitle').textContent = ev.descripcion;
 
-  const fechaStr = `${ev.fecha.getDate()} de ${MESES[ev.fecha.getMonth()]} de ${ev.fecha.getFullYear()}`;
-  document.getElementById('placaEfemDate').textContent = fechaStr + (ev.detalle ? ` · ${ev.detalle}` : '');
+    const fechaStr = `${ev.fecha.getDate()} de ${MESES[ev.fecha.getMonth()]} de ${ev.fecha.getFullYear()}`;
+  document.getElementById('placaEfemDate').innerHTML = `<strong>${fechaStr}</strong>${ev.detalle ? ` · ${ev.detalle}` : ''}`;
 
   const placa = document.getElementById('placaEfemerideExport');
   const orig = placa.style.cssText;
