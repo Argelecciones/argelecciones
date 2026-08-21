@@ -766,19 +766,6 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     .placa-nominal-footer-logo { height:90px; width:auto; object-fit:contain; }
 .placa-nominal-footer-txt { font-size:16px; color:#94a3b8; font-weight:700; }
     #placaRecintoEntity { position: fixed; left: -9999px; top: 0; width: 1920px; background: #f8fafc; color: #0f172a; font-family: 'Inter', sans-serif; box-sizing: border-box; padding: 60px 70px; }
-
-		@media (max-width: 899px) {
-    .dashboard-layout:not(.layout-unificado) .monitor-panel {
-        order: -1;
-    }
-    .dashboard-layout:not(.layout-unificado) .quorum-box {
-        position: sticky;
-        top: 0;
-        z-index: 100;
-        background: #ffffff;
-        width: 100%;
-    }
-}
 		
 		@media (max-width: 640px) {
             body { padding: 10px; }
@@ -1338,6 +1325,22 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     }
 
     window.addEventListener('resize', ajustarEscalaPlaca);
+
+	    function reubicarMonitorMobile() {
+        const esMobile = window.innerWidth < 900;
+        const dashboardLayout = document.getElementById('dashboardLayout');
+        const monitorPanel = document.getElementById('monitorPanel');
+        const columnaControles = document.getElementById('columnaControles');
+        if (!dashboardLayout || !monitorPanel || !columnaControles) return;
+        if (vistaActiva === 'detallada') return; // ya lo maneja inicializarEstructura
+
+        if (esMobile && monitorPanel.parentElement !== columnaControles) {
+            columnaControles.insertBefore(monitorPanel, columnaControles.firstChild);
+        } else if (!esMobile && monitorPanel.parentElement !== dashboardLayout) {
+            dashboardLayout.appendChild(monitorPanel);
+        }
+    }
+    window.addEventListener('resize', reubicarMonitorMobile);
 
 function renderizarVistaDetallada(camara) {
         const container = document.getElementById('blocksContainer');
@@ -1918,7 +1921,8 @@ function renderizarVistaDetallada(camara) {
             `;
             container.appendChild(card);
         });
-
+		
+		reubicarMonitorMobile();
         ejecutarCalculos();
     }
 	
