@@ -142,6 +142,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         .shortcuts-title { font-size: 11px; color: #64748b; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-right: 5px; }
         .btn-shortcut { background: #334155; color: #f8fafc; border: none; padding: 6px 12px; border-radius: 5px; font-size: 12px; font-weight: 700; cursor: pointer; transition: background 0.2s, transform 0.1s; }
         .btn-shortcut:hover { background: #475569; }
+        .btn-shortcut.active { background: #1e3a8a; color: #93c5fd; }
         .btn-shortcut:active { transform: scale(0.96); }
 		.input-nombre-votacion { background:#0f172a; border:1px solid #334155; color:#f8fafc; padding:6px 10px; border-radius:5px; font-size:12px; font-family:inherit; flex:1; min-width:160px; }
         .input-nombre-votacion::placeholder { color:#64748b; }
@@ -191,6 +192,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         .vote-summary-line .vs-no { background: rgba(239, 68, 68, 0.15); color: #dc2626; }
         .vote-summary-line .vs-abs { background: rgba(234, 179, 8, 0.15); color: #854d0e; }
         .vote-summary-line .vs-aus { background: rgba(148, 163, 184, 0.15); color: #475569; }
+        .vote-summary-line .vs-sv { background: rgba(37, 99, 235, 0.15); color: #1e40af; }
 
         /* CAJA DE REDES */
         .social-box { background: #eff6ff; border: 1px solid #bfdbfe; padding: 15px; border-radius: 12px; }
@@ -297,6 +299,8 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         .voto-item.v-neg { background: rgba(239, 68, 68, 0.15); color: #dc2626; }
         .voto-item.v-abs { background: rgba(148, 163, 184, 0.25); color: #475569; } 
         .voto-item.v-aus { background: rgba(226, 232, 240, 0.9); color: #94a3b8; } 
+		        .voto-item.v-sv { background: rgba(37, 99, 235, 0.15); color: #1e40af; }
+        .badge-sv { font-size:12px; font-weight:800; color:#1e40af; background:rgba(37,99,235,0.15); padding:2px 6px; border-radius:4px; margin-left:6px; }
 
         .bullet-graph-container { 
             width: 100%; 
@@ -314,13 +318,15 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         .bg-neg { background-color: #ef4444; }
         .bg-abs { background-color: #94a3b8; } 
         .bg-aus { background-color: #cbd5e1; } /* Ausentes en gris suave */
+		.bg-sv { background-color: #2563eb; }
 
-        .graph-legends { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .graph-legends { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; }
         .legend-card { padding: 22px 24px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
         .legend-card.af { background-color: rgba(16, 185, 129, 0.45); border: 1px solid rgba(16, 185, 129, 0.3); }
         .legend-card.neg { background-color: rgba(239, 68, 68, 0.45); border: 1px solid rgba(239, 68, 68, 0.3); }
         .legend-card.abs { background-color: rgba(148, 163, 184, 0.3); border: 1px solid rgba(148, 163, 184, 0.3); } 
         .legend-card.aus { background-color: rgba(203, 213, 225, 0.45); border: 1px solid rgba(203, 213, 225, 0.5); }
+        .legend-card.sv { background-color: rgba(37, 99, 235, 0.45); border: 1px solid rgba(37, 99, 235, 0.3); }
         
         .legend-label { font-size: 22px; font-weight: 700; color: #64748b; }
         .legend-value { font-size: 48px; font-weight: 900; color: #0f172a; }
@@ -729,6 +735,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     .btn-estado-persona.btn-abs.active { background:#3f3f1e; border-color:#eab308; color:#fde68a; }
     .btn-estado-persona.btn-aus.active { background:#334155; border-color:#64748b; color:#e2e8f0; }
     .btn-estado-persona.btn-presente.active { background:#064e3b; border-color:#10b981; color:#6ee7b7; }
+    .btn-estado-persona.btn-sv.active { background:#1e3a5f; border-color:#3b82f6; color:#93c5fd; }
 
 		#placaNominalEntity {
         position: fixed;
@@ -762,6 +769,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     .tag-neg { background:#fee2e2; color:#991b1b; }
     .tag-abs { background:#fef9c3; color:#854d0e; }
     .tag-aus { background:#e2e8f0; color:#64748b; }
+	.tag-sv { background:#dbeafe; color:#1e40af; }
     .placa-nominal-footer { display:flex; justify-content:space-between; align-items:center; border-top:1px solid #e2e8f0; margin-top:25px; padding-top:15px; }
     .placa-nominal-footer-logo { height:90px; width:auto; object-fit:contain; }
 .placa-nominal-footer-txt { font-size:16px; color:#94a3b8; font-weight:700; }
@@ -844,10 +852,11 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                 <button class="btn-shortcut" onclick="previsualizarPlacaRecinto()">📸 Vista previa</button>
                 <button class="btn-shortcut" onclick="exportarPlacaRecinto()">📥 Descargar PNG</button>
             </div>
-           <div class="global-shortcuts-bar">
+                      <div class="global-shortcuts-bar">
                 <span class="shortcuts-title">Acciones rápidas:</span>
                 <button class="btn-shortcut" onclick="atajoLimpiarTodo()">❌ Limpiar Todo</button>
                 <button id="btn-marcar-todos" class="btn-shortcut" onclick="atajoMarcarTodos()">✅ Marcar Todos</button>
+                <button id="btn-presidencia-sv" class="btn-shortcut" onclick="togglePresidenciaSinVotar()" style="display:none;">🔵 Presidencia: Sin Votar</button>
             </div>
             <div id="recintoContainer" style="display:none; margin-bottom:15px;"></div>
             <div id="recintoPopover" style="display:none;position:fixed;z-index:9999;background:#1e293b;border:1px solid #334155;border-radius:8px;padding:10px;box-shadow:0 8px 20px rgba(0,0,0,.4);"></div>
@@ -961,14 +970,15 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         <h1 id="placa-titulo-principal" contenteditable="true">Hacé clic acá para cambiar el título</h1>
     </div>
 	
-    <div class="bullet-graph-container">
+        <div class="bullet-graph-container">
         <div id="seg-af" class="graph-segment bg-af" style="width: 0%"></div>
         <div id="seg-neg" class="graph-segment bg-neg" style="width: 0%"></div>
         <div id="seg-abs" class="graph-segment bg-abs" style="width: 0%"></div>
+        <div id="seg-sv" class="graph-segment bg-sv" style="width: 0%"></div>
         <div id="seg-aus" class="graph-segment bg-aus" style="width: 100%"></div>
     </div>
 	
-    <div class="graph-legends">
+        <div class="graph-legends">
         <div class="legend-card af">
             <span class="legend-label">Afirmativos</span>
             <span class="legend-value" id="lbl-placa-af">0</span>
@@ -980,6 +990,10 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         <div class="legend-card abs">
             <span class="legend-label">Abstenciones</span>
             <span class="legend-value" id="lbl-placa-abs">0</span>
+        </div>
+        <div class="legend-card sv" id="legendCardSV" style="display:none;">
+            <span class="legend-label">Sin Votar</span>
+            <span class="legend-value" id="lbl-placa-sv">0</span>
         </div>
         <div class="legend-card aus">
             <span class="legend-label">Ausentes</span>
@@ -1125,6 +1139,21 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     let desempateManual = null;
     let vistaActiva = 'bloques';
     let votosIndividuales = {};
+    let presidenciaSinVotar = false;
+
+    function obtenerIndicePresidente(camaraKey) {
+        const camara = dataCongreso[camaraKey];
+        const presidente = legisladores.find(p => p.camara === camaraKey && p.esPresidente);
+        if (!presidente) return -1;
+        return camara.blocks.findIndex(b => b.name === presidente.bloque);
+    }
+
+    function togglePresidenciaSinVotar() {
+        presidenciaSinVotar = !presidenciaSinVotar;
+        const btn = document.getElementById('btn-presidencia-sv');
+        if (btn) btn.classList.toggle('active', presidenciaSinVotar);
+        ejecutarCalculos();
+    }
 
     function claveIndividual(camaraKey, nombre) {
         return `${camaraKey}::${nombre}`;
@@ -1145,6 +1174,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         if (!confirmado) return;
         votosIndividuales = {};
         desempateManual = null;
+        presidenciaSinVotar = false;
 
         vistaActiva = nuevaVista;
         document.getElementById('btnVistaBloques').classList.toggle('active', vistaActiva === 'bloques');
@@ -1267,16 +1297,18 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             }
         }
     }
-    function cambiarCamara(camara) {
+       function cambiarCamara(camara) {
         camaraActiva = camara;
         desempateManual = null;
+        presidenciaSinVotar = false;
         document.getElementById('cam-diputados').classList.toggle('active', camara === 'diputados');
         document.getElementById('cam-senadores').classList.toggle('active', camara === 'senadores');
         inicializarEstructura();
     }
 
-    function cambiarModo(modo) {
+        function cambiarModo(modo) {
         modoActivo = modo;
+        presidenciaSinVotar = false;
         document.getElementById('mod-quorum').classList.toggle('active', modo === 'quorum');
         document.getElementById('mod-vote').classList.toggle('active', modo === 'vote');
         document.getElementById('placaWrapperBlock').style.display = (modo === 'vote') ? 'block' : 'none';
@@ -1415,7 +1447,7 @@ function renderizarVistaDetallada(camara) {
                 const fila = document.createElement('div');
                 fila.className = 'legislador-fila';
 
-                let botonesHtml = '';
+                                let botonesHtml = '';
                 if (modoActivo === 'quorum') {
                     botonesHtml = `
                         <button class="btn-estado-persona btn-presente ${estado === 'presente' ? 'active' : ''}" onclick="marcarPersonaEstado('${p.nombre.replace(/'/g, "\\'")}', 'presente')">PRES</button>
@@ -1426,6 +1458,10 @@ function renderizarVistaDetallada(camara) {
                         <button class="btn-estado-persona btn-neg ${estado === 'neg' ? 'active' : ''}" onclick="marcarPersonaEstado('${p.nombre.replace(/'/g, "\\'")}', 'neg')">NEG</button>
                         <button class="btn-estado-persona btn-abs ${estado === 'abs' ? 'active' : ''}" onclick="marcarPersonaEstado('${p.nombre.replace(/'/g, "\\'")}', 'abs')">ABS</button>
                         <button class="btn-estado-persona btn-aus ${estado === 'ausente' ? 'active' : ''}" onclick="marcarPersonaEstado('${p.nombre.replace(/'/g, "\\'")}', 'ausente')">AUS</button>`;
+                    if (p.esPresidente) {
+                        botonesHtml += `
+                        <button class="btn-estado-persona btn-sv ${estado === 'sinvotar' ? 'active' : ''}" onclick="marcarPersonaEstado('${p.nombre.replace(/'/g, "\\'")}', 'sinvotar')">S/V</button>`;
+                    }
                 }
 
                 fila.innerHTML = `
@@ -1503,7 +1539,7 @@ function renderizarVistaDetallada(camara) {
             titulo.innerText = `${bloque.name} (${personas.length})`;
             body.appendChild(titulo);
 
-            personas.forEach(p => {
+                        personas.forEach(p => {
                 const estado = estadoIndividual(camaraActiva, p.nombre);
                 let tagClass = 'tag-aus', tagTxt = 'AUS';
 
@@ -1514,6 +1550,7 @@ function renderizarVistaDetallada(camara) {
                     if (estado === 'af') { tagClass = 'tag-af'; tagTxt = 'AF'; }
                     else if (estado === 'neg') { tagClass = 'tag-neg'; tagTxt = 'NEG'; }
                     else if (estado === 'abs') { tagClass = 'tag-abs'; tagTxt = 'ABS'; }
+                    else if (estado === 'sinvotar') { tagClass = 'tag-sv'; tagTxt = 'S/V'; }
                     else { tagClass = 'tag-aus'; tagTxt = 'AUS'; }
                 }
 
@@ -1610,9 +1647,9 @@ function renderizarVistaDetallada(camara) {
         const leyenda = document.getElementById('pr-leyenda');
         if (leyenda) {
             leyenda.innerHTML = '';
-                      const items = modoActivo === 'quorum'
+                                           const items = modoActivo === 'quorum'
                 ? [['PRESENTE', votos.totalPresentes, 'rgba(16, 185, 129, 0.15)', '#166534', 'rgba(16, 185, 129, 0.3)'], ['AUSENTE', votos.t_aus, 'rgba(148, 163, 184, 0.15)', '#334155', 'rgba(148, 163, 184, 0.3)']]
-                : [['AFIRMATIVOS', votos.t_af, 'rgba(16, 185, 129, 0.15)', '#166534', 'rgba(16, 185, 129, 0.3)'], ['NEGATIVOS', votos.t_neg, 'rgba(239, 68, 68, 0.15)', '#991b1b', 'rgba(239, 68, 68, 0.3)'], ['ABSTENCIÓN', votos.t_abs, 'rgba(234, 179, 8, 0.15)', '#854d0e', 'rgba(234, 179, 8, 0.3)'], ['AUSENTE', votos.t_aus, 'rgba(148, 163, 184, 0.15)', '#334155', 'rgba(148, 163, 184, 0.3)']];
+                : [['AFIRMATIVOS', votos.t_af, 'rgba(16, 185, 129, 0.15)', '#166534', 'rgba(16, 185, 129, 0.3)'], ['NEGATIVOS', votos.t_neg, 'rgba(239, 68, 68, 0.15)', '#991b1b', 'rgba(239, 68, 68, 0.3)'], ['ABSTENCIÓN', votos.t_abs, 'rgba(234, 179, 8, 0.15)', '#854d0e', 'rgba(234, 179, 8, 0.3)'], ['SIN VOTAR', votos.t_sv || 0, 'rgba(37, 99, 235, 0.15)', '#1e40af', 'rgba(37, 99, 235, 0.3)'], ['AUSENTE', votos.t_aus, 'rgba(148, 163, 184, 0.15)', '#334155', 'rgba(148, 163, 184, 0.3)']];
                         items.forEach(([label, val, bg, color, borderColor]) => {
                 const box = document.createElement('div');
                 box.style.cssText = `background:${bg}; border:1px solid ${borderColor}; border-radius:12px; padding:22px 24px; text-align:center; min-width:140px;`;
@@ -1682,11 +1719,12 @@ function renderizarVistaDetallada(camara) {
         svg.setAttribute('viewBox', '0 -18 360 223');
         svg.setAttribute('style', 'width:100%; max-width:640px; height:auto; background:#0f172a; border-radius:8px; display:block; margin:0 auto;');
 
-        const coloresEstado = {
+                const coloresEstado = {
             presente: '#16a34a',
             af: '#16a34a',
             neg: '#b91c1c',
             abs: '#ca8a04',
+            sinvotar: '#2563eb',
             ausente: null
         };
 
@@ -1715,8 +1753,8 @@ function renderizarVistaDetallada(camara) {
             c.setAttribute('r', colorAro ? rEsc * factorAro : rEsc);
             c.setAttribute('fill', persona.color);
                         c.setAttribute('style', 'cursor:pointer;');
-            c.addEventListener('mouseenter', (evt) => {
-                abrirPopoverRecinto(persona.nombre, persona.bloque, evt);
+                        c.addEventListener('mouseenter', (evt) => {
+                abrirPopoverRecinto(persona.nombre, persona.bloque, evt, false);
             });
             c.addEventListener('mouseleave', () => {
                 programarCierrePopover();
@@ -1748,8 +1786,8 @@ function renderizarVistaDetallada(camara) {
             pres.setAttribute('stroke-width', 1);
             pres.setAttribute('style', 'cursor:pointer;');
                         pres.setAttribute('style', 'cursor:pointer;');
-            pres.addEventListener('mouseenter', (evt) => {
-                abrirPopoverRecinto(presidente.nombre, presidente.bloque + ' (Presidencia)', evt);
+                        pres.addEventListener('mouseenter', (evt) => {
+                abrirPopoverRecinto(presidente.nombre, presidente.bloque + ' (Presidencia)', evt, true);
             });
             pres.addEventListener('mouseleave', () => {
                 programarCierrePopover();
@@ -1793,13 +1831,14 @@ function renderizarVistaDetallada(camara) {
         }
     }
 
-	function abrirPopoverRecinto(nombre, bloque, evt) {
+		function abrirPopoverRecinto(nombre, bloque, evt, esPresidente) {
         cancelarCierrePopover();
         const pop = document.getElementById('recintoPopover');
         const estados = modoActivo === 'quorum'
             ? [['presente', 'PRES'], ['ausente', 'AUS']]
             : [['af', 'AF'], ['neg', 'NEG'], ['abs', 'ABS'], ['ausente', 'AUS']];
-        let html = `<div style="font-size:12px;font-weight:800;color:#f8fafc;margin-bottom:2px;">${nombre}</div><div style="font-size:10px;color:#94a3b8;margin-bottom:8px;">${bloque}</div><div style="display:flex;gap:4px;">`;
+        if (esPresidente && modoActivo === 'vote') estados.push(['sinvotar', 'S/V']);
+        let html = `<div style="font-size:12px;font-weight:800;color:#f8fafc;margin-bottom:2px;">${nombre}</div><div style="font-size:10px;color:#94a3b8;margin-bottom:8px;">${bloque}</div><div style="display:flex;gap:4px;flex-wrap:wrap;">`;
         estados.forEach(([val, label]) => {
             html += `<button class="btn-estado-persona" onclick="elegirEstadoRecinto('${nombre.replace(/'/g, "\\'")}','${val}')">${label}</button>`;
         });
@@ -1848,8 +1887,11 @@ function renderizarVistaDetallada(camara) {
 
         const accionesNominal = document.getElementById('accionesVistaDetallada');
         if (accionesNominal) accionesNominal.style.display = (vistaActiva === 'detallada') ? 'flex' : 'none';
-        const accionesRecinto = document.getElementById('accionesRecinto');
+                const accionesRecinto = document.getElementById('accionesRecinto');
         if (accionesRecinto) accionesRecinto.style.display = (vistaActiva === 'detallada') ? 'flex' : 'none';
+
+        const btnPresidenciaSV = document.getElementById('btn-presidencia-sv');
+        if (btnPresidenciaSV) btnPresidenciaSV.style.display = (vistaActiva === 'bloques' && modoActivo === 'vote') ? 'inline-block' : 'none';
 
         const dashboardLayout = document.getElementById('dashboardLayout');
         const monitorPanel = document.getElementById('monitorPanel');
@@ -2119,17 +2161,17 @@ function renderizarVistaDetallada(camara) {
         });
     }
 
-    function recolectarVotos(camara) {
+        function recolectarVotos(camara) {
         let totalPresentes = 0;
-        let t_af = 0, t_neg = 0, t_abs = 0, t_aus = 0;
+        let t_af = 0, t_neg = 0, t_abs = 0, t_aus = 0, t_sv = 0;
         let reporteBloques = [];
 
-        if (vistaActiva === 'detallada') {
+                if (vistaActiva === 'detallada') {
             const personasCamara = legisladores.filter(p => p.camara === camaraActiva);
 
             camara.blocks.forEach(bloque => {
                 const personas = personasCamara.filter(p => p.bloque === bloque.name);
-                let af = 0, neg = 0, abs = 0, aus = 0, presentes = 0;
+                let af = 0, neg = 0, abs = 0, aus = 0, sv = 0, presentes = 0;
 
                 personas.forEach(p => {
                     const estado = estadoIndividual(camaraActiva, p.nombre);
@@ -2139,6 +2181,7 @@ function renderizarVistaDetallada(camara) {
                         if (estado === 'af') af++;
                         else if (estado === 'neg') neg++;
                         else if (estado === 'abs') abs++;
+                        else if (estado === 'sinvotar') sv++;
                         else aus++;
                     }
                 });
@@ -2147,20 +2190,22 @@ function renderizarVistaDetallada(camara) {
                     totalPresentes += presentes;
                     if (presentes > 0) reporteBloques.push(`${bloque.name}: ${presentes}`);
                 } else {
-                    t_af += af; t_neg += neg; t_abs += abs; t_aus += aus;
-                    totalPresentes += (af + neg + abs);
-                    if (af > 0 || neg > 0 || abs > 0) {
-                        reporteBloques.push(`${bloque.name} [AF:${af} | NEG:${neg} | ABS:${abs}]`);
+                    t_af += af; t_neg += neg; t_abs += abs; t_aus += aus; t_sv += sv;
+                    totalPresentes += (af + neg + abs + sv);
+                    if (af > 0 || neg > 0 || abs > 0 || sv > 0) {
+                        reporteBloques.push(`${bloque.name} [AF:${af} | NEG:${neg} | ABS:${abs}${sv > 0 ? ' | SV:' + sv : ''}]`);
                     }
                 }
             });
 
-            if (modoActivo === 'quorum') {
-                t_aus = camara.total - totalPresentes;
-            }
-
-            return { totalPresentes, t_af, t_neg, t_abs, t_aus, reporteBloques };
+                    if (modoActivo === 'quorum') {
+            t_aus = camara.total - totalPresentes;
         }
+
+        return { totalPresentes, t_af, t_neg, t_abs, t_aus, t_sv, reporteBloques };
+    }
+
+                const idxPresidente = (modoActivo === 'vote' && presidenciaSinVotar) ? obtenerIndicePresidente(camaraActiva) : -1;
 
         camara.blocks.forEach((bloque, idx) => {
             if (modoActivo === 'quorum') {
@@ -2189,13 +2234,18 @@ function renderizarVistaDetallada(camara) {
                     af = neg = abs = 0;
                 }
 
-                let aus = bloque.max - (af + neg + abs);
+                                let aus = bloque.max - (af + neg + abs);
+                let sv = 0;
+                if (idx === idxPresidente && aus > 0) {
+                    sv = 1;
+                    aus -= 1;
+                }
 
-                t_af += af; t_neg += neg; t_abs += abs; t_aus += aus;
+                t_af += af; t_neg += neg; t_abs += abs; t_aus += aus; t_sv += sv;
                 totalPresentes += (bloque.max - aus);
 
-                if (af > 0 || neg > 0 || abs > 0) {
-                    reporteBloques.push(`${bloque.name} [AF:${af} | NEG:${neg} | ABS:${abs}]`);
+                if (af > 0 || neg > 0 || abs > 0 || sv > 0) {
+                    reporteBloques.push(`${bloque.name} [AF:${af} | NEG:${neg} | ABS:${abs}${sv > 0 ? ' | SV:' + sv : ''}]`);
                 }
             }
         });
@@ -2332,7 +2382,7 @@ function renderizarVistaDetallada(camara) {
             }
         }
 
-                const voteSummary = document.getElementById('voteSummaryLine');
+                        const voteSummary = document.getElementById('voteSummaryLine');
         if (voteSummary) {
             if (modoActivo === 'vote') {
                 voteSummary.style.display = 'flex';
@@ -2340,6 +2390,7 @@ function renderizarVistaDetallada(camara) {
                     `<span class="vs-item vs-si">Af.: ${t_af}</span>` +
                     `<span class="vs-item vs-no">Neg.: ${t_neg}</span>` +
                     `<span class="vs-item vs-abs">Abst.: ${t_abs}</span>` +
+                    (votos.t_sv ? `<span class="vs-item vs-sv">S/V: ${votos.t_sv}</span>` : '') +
                     `<span class="vs-item vs-aus">Aus.: ${t_aus}</span>`;
             } else {
                 voteSummary.style.display = 'none';
@@ -2362,8 +2413,8 @@ function renderizarVistaDetallada(camara) {
         }
     }
 
-    function renderizarPlaca(camara, votos, mayoria) {
-        const { t_af, t_neg, t_abs, t_aus, totalPresentes, reporteBloques } = votos;
+        function renderizarPlaca(camara, votos, mayoria) {
+        const { t_af, t_neg, t_abs, t_aus, t_sv, totalPresentes, reporteBloques } = votos;
         const { hayQuorum, alcanzada, empateDesempatable, resultadoTexto } = mayoria;
 
         if (modoActivo === 'quorum') {
@@ -2374,19 +2425,24 @@ function renderizarVistaDetallada(camara) {
         try {
             const bancasTotales = camara.total;
 
-            if(document.getElementById('lbl-placa-af')) document.getElementById('lbl-placa-af').innerText = t_af;
+                        if(document.getElementById('lbl-placa-af')) document.getElementById('lbl-placa-af').innerText = t_af;
             if(document.getElementById('lbl-placa-neg')) document.getElementById('lbl-placa-neg').innerText = t_neg;
             if(document.getElementById('lbl-placa-abs')) document.getElementById('lbl-placa-abs').innerText = t_abs;
             if(document.getElementById('lbl-placa-aus')) document.getElementById('lbl-placa-aus').innerText = t_aus;
+            const legendSV = document.getElementById('legendCardSV');
+            if (legendSV) legendSV.style.display = (t_sv > 0) ? 'flex' : 'none';
+            if(document.getElementById('lbl-placa-sv')) document.getElementById('lbl-placa-sv').innerText = t_sv || 0;
 
             const pctAf = (t_af / bancasTotales) * 100;
             const pctNeg = (t_neg / bancasTotales) * 100;
             const pctAbs = (t_abs / bancasTotales) * 100;
+            const pctSv = ((t_sv || 0) / bancasTotales) * 100;
             const pctAus = (t_aus / bancasTotales) * 100;
 
             if(document.getElementById('seg-af')) document.getElementById('seg-af').style.width = `${pctAf}%`;
             if(document.getElementById('seg-neg')) document.getElementById('seg-neg').style.width = `${pctNeg}%`;
             if(document.getElementById('seg-abs')) document.getElementById('seg-abs').style.width = `${pctAbs}%`;
+            if(document.getElementById('seg-sv')) document.getElementById('seg-sv').style.width = `${pctSv}%`;
             if(document.getElementById('seg-aus')) document.getElementById('seg-aus').style.width = `${pctAus}%`;
 
             const badgeRes = document.getElementById('placaResultadoBadge');
@@ -2415,27 +2471,34 @@ function renderizarVistaDetallada(camara) {
                 document.getElementById('placaVolantaText').innerText = `Resultado votación - ${camaraNombre} (${dia}/${mes}/${anio})`;
             }
 
-            const placaBlocksDetail = document.getElementById('placaBlocksDetail');
+                        const placaBlocksDetail = document.getElementById('placaBlocksDetail');
             if (placaBlocksDetail) {
                 placaBlocksDetail.innerHTML = '';
+                const idxPresidenteRender = presidenciaSinVotar ? obtenerIndicePresidente(camaraActiva) : -1;
 
                 camara.blocks.forEach((bloque, idx) => {
                     const valAf = document.getElementById(`v-af-${idx}`) ? (parseInt(document.getElementById(`v-af-${idx}`).value) || 0) : 0;
                     const valNeg = document.getElementById(`v-neg-${idx}`) ? (parseInt(document.getElementById(`v-neg-${idx}`).value) || 0) : 0;
                     const valAbs = document.getElementById(`v-abs-${idx}`) ? (parseInt(document.getElementById(`v-abs-${idx}`).value) || 0) : 0;
 
-                    const valAus = bloque.max - (valAf + valNeg + valAbs);
+                    let valAus = bloque.max - (valAf + valNeg + valAbs);
+                    let valSv = 0;
+                    if (idx === idxPresidenteRender && valAus > 0) {
+                        valSv = 1;
+                        valAus -= 1;
+                    }
 
                     const fila = document.createElement('div');
                     fila.className = 'placa-partido-row';
                     fila.style.borderLeftColor = bloque.color || '#64748b';
 
                     fila.innerHTML = `
-                        <span class="partido-nombre">${bloque.name}</span>
+                        <span class="partido-nombre">${bloque.name}${valSv > 0 ? ' <span class="badge-sv">S/V 1</span>' : ''}</span>
                         <div class="partido-votos-grupo">
                             <span class="voto-item v-af" title="A Favor">${valAf}</span>
                             <span class="voto-item v-neg" title="En Contra">${valNeg}</span>
                             <span class="voto-item v-abs" title="Abstención">${valAbs}</span>
+                            ${valSv > 0 ? `<span class="voto-item v-sv" title="Sin Votar">${valSv}</span>` : ''}
                             <span class="voto-item v-aus" title="Ausentes">${valAus}</span>
                         </div>
                     `;
@@ -2450,8 +2513,8 @@ function renderizarVistaDetallada(camara) {
         }
     }
 
-    function armarTextoRedes(camara, votos, mayoria) {
-        const { t_af, t_neg, t_abs, t_aus, totalPresentes, reporteBloques } = votos;
+        function armarTextoRedes(camara, votos, mayoria) {
+        const { t_af, t_neg, t_abs, t_aus, t_sv, totalPresentes, reporteBloques } = votos;
         const { resultadoTexto } = mayoria;
 
         window.__resultadoVotacionTexto = resultadoTexto;
@@ -2469,8 +2532,9 @@ function renderizarVistaDetallada(camara) {
             if (modoActivo === 'quorum') {
                 txArea.value = `🏛 CONGRESO | Sesión en ${camLabel}:\n\n${statusTextReport}\nPresentes en sus bancas: ${totalPresentes}/${camara.total}\n\nDetalle de asistencia:\n${reporteBloques.join('\n') || 'Ninguno en el recinto'}\n\n#Congresómetro vía @argelecciones`;
             } else {
-                const lineaResultado = resultadoTexto ? `${resultadoTexto}\n\n` : '';
-                txArea.value = `🏛 ${camLabel} - Votación:\n\n${lineaResultado}🟢 A Favor: ${t_af}\n🔴 En Contra: ${t_neg}\n⚪ Abstenciones: ${t_abs}\n⚫ Ausentes: ${t_aus}\n\nDetalle estructural por bloques:\n${reporteBloques.join('\n') || 'Sin votos registrados'}\n\n#Congresómetro vía @argelecciones`;
+                                const lineaResultado = resultadoTexto ? `${resultadoTexto}\n\n` : '';
+                const lineaSV = t_sv ? `🔵 Sin Votar: ${t_sv}\n` : '';
+                txArea.value = `🏛 ${camLabel} - Votación:\n\n${lineaResultado}🟢 A Favor: ${t_af}\n🔴 En Contra: ${t_neg}\n⚪ Abstenciones: ${t_abs}\n${lineaSV}⚫ Ausentes: ${t_aus}\n\nDetalle estructural por bloques:\n${reporteBloques.join('\n') || 'Sin votos registrados'}\n\n#Congresómetro vía @argelecciones`;
             }
         }
     }
