@@ -325,7 +325,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
 		.bg-sv { background-color: #2563eb; }
 
         .graph-legends { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; }
-        .legend-card { padding: 22px 24px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .legend-card { padding: 22px 24px; border-radius: 12px; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
         .legend-card.af { background-color: rgba(16, 185, 129, 0.45); border: 1px solid rgba(16, 185, 129, 0.3); }
         .legend-card.neg { background-color: rgba(239, 68, 68, 0.45); border: 1px solid rgba(239, 68, 68, 0.3); }
         .legend-card.abs { background-color: rgba(148, 163, 184, 0.3); border: 1px solid rgba(148, 163, 184, 0.3); } 
@@ -1159,11 +1159,31 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         return camara.blocks.findIndex(b => b.name === presidente.bloque);
     }
 
-    function togglePresidenciaSinVotar() {
+        function togglePresidenciaSinVotar() {
         presidenciaSinVotar = !presidenciaSinVotar;
         const btn = document.getElementById('btn-presidencia-sv');
         if (btn) btn.classList.toggle('active', presidenciaSinVotar);
+        if (presidenciaSinVotar) {
+            const idx = obtenerIndicePresidente(camaraActiva);
+            const nombreBloque = idx >= 0 ? dataCongreso[camaraActiva].blocks[idx].name : 'su bloque';
+            mostrarToastSV(`Recordá cargar 1 voto menos en ${nombreBloque} — el sistema ya descuenta esa banca de "Ausentes" automáticamente.`);
+        }
         ejecutarCalculos();
+    }
+
+    function mostrarToastSV(texto) {
+        const existente = document.getElementById('toastSV');
+        if (existente) existente.remove();
+        const toast = document.createElement('div');
+        toast.id = 'toastSV';
+        toast.style.cssText = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#1e3a8a; color:#fff; padding:12px 20px; border-radius:8px; font-size:13px; font-weight:700; box-shadow:0 8px 20px rgba(0,0,0,.3); z-index:10001; max-width:90%; text-align:center; opacity:0; transition:opacity .3s;';
+        toast.textContent = texto;
+        document.body.appendChild(toast);
+        requestAnimationFrame(() => { toast.style.opacity = '1'; });
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 5000);
     }
 
     function claveIndividual(camaraKey, nombre) {
@@ -2518,13 +2538,12 @@ function renderizarVistaDetallada(camara) {
                     fila.className = 'placa-partido-row';
                     fila.style.borderLeftColor = bloque.color || '#64748b';
 
-                    fila.innerHTML = `
+                                        fila.innerHTML = `
                         <span class="partido-nombre">${bloque.name}${valSv > 0 ? ' <span class="badge-sv">S/V 1</span>' : ''}</span>
                         <div class="partido-votos-grupo">
                             <span class="voto-item v-af" title="A Favor">${valAf}</span>
                             <span class="voto-item v-neg" title="En Contra">${valNeg}</span>
                             <span class="voto-item v-abs" title="Abstención">${valAbs}</span>
-                            ${valSv > 0 ? `<span class="voto-item v-sv" title="Sin Votar">${valSv}</span>` : ''}
                             <span class="voto-item v-aus" title="Ausentes">${valAus}</span>
                         </div>
                     `;
