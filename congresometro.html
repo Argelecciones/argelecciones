@@ -290,11 +290,15 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
 
 .partido-votos-grupo { 
     display: flex; 
-    gap: 5px; 
-    flex-shrink: 0;   /* 🌟 Súper importante: prohíbe que los números se achiquen o deformen */
+    gap: 4px; 
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    row-gap: 4px;
+    max-width: 48%;
 }
 
-        .voto-item { font-size: 18px; font-weight: 800; padding: 4px 6px; border-radius: 6px; min-width: 40px; text-align: center; }
+                .voto-item { font-size: 15px; font-weight: 800; padding: 4px 5px; border-radius: 6px; min-width: 30px; text-align: center; }
         .voto-item.v-af { background: rgba(16, 185, 129, 0.15); color: #059669; }
         .voto-item.v-neg { background: rgba(239, 68, 68, 0.15); color: #dc2626; }
         .voto-item.v-abs { background: rgba(148, 163, 184, 0.25); color: #475569; } 
@@ -754,6 +758,12 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     .placa-nominal-subtitulo { font-size:20px; color:#64748b; font-weight:700; margin-top:6px; }
 		.placa-nominal-titulo-custom { font-size:26px; color:#0f172a; font-weight:800; margin-top:6px; }
 		.placa-nominal-resumen { display:flex; gap:14px; align-items:center; margin:16px 0 6px; padding:12px 16px; border-radius:8px; font-size:18px; font-weight:800; }
+		    .placa-nominal-chip { padding:8px 16px; border-radius:8px; font-size:16px; font-weight:800; }
+    .chip-af { background:#dcfce7; color:#166534; }
+    .chip-neg { background:#fee2e2; color:#991b1b; }
+    .chip-abs { background:#fef9c3; color:#854d0e; }
+    .chip-sv { background:#dbeafe; color:#1e40af; }
+    .chip-aus { background:#e2e8f0; color:#64748b; }
     .placa-nominal-resumen.ok { background:#dcfce7; color:#166534; }
     .placa-nominal-resumen.no { background:#fee2e2; color:#991b1b; }
     .placa-nominal-resumen.neutro { background:#e2e8f0; color:#334155; }
@@ -1045,7 +1055,8 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         </div>
         <div class="placa-nominal-badge">Sólo para difusión</div>
     </div>
-    <div class="placa-nominal-resumen" id="pn-resumen"></div>
+        <div class="placa-nominal-resumen" id="pn-resumen"></div>
+    <div class="placa-nominal-chips" id="pn-chips" style="display:flex; gap:12px; margin-bottom:20px;"></div>
     <div class="placa-nominal-body" id="placaNominalBody"></div>
     <div class="placa-nominal-footer">
     <img class="placa-nominal-footer-logo" src="logo.png" alt="Logo">
@@ -1508,8 +1519,22 @@ function renderizarVistaDetallada(camara) {
         tituloCustom.style.display = nombreVotacion ? 'block' : 'none';
         tituloCustom.innerText = nombreVotacion;
 
-        const votos = recolectarVotos(camara);
+                const votos = recolectarVotos(camara);
         const resumenEl = document.getElementById('pn-resumen');
+        const chipsEl = document.getElementById('pn-chips');
+        if (chipsEl) {
+            if (modoActivo === 'vote') {
+                chipsEl.style.display = 'flex';
+                chipsEl.innerHTML =
+                    `<span class="placa-nominal-chip chip-af">Af.: ${votos.t_af}</span>` +
+                    `<span class="placa-nominal-chip chip-neg">Neg.: ${votos.t_neg}</span>` +
+                    `<span class="placa-nominal-chip chip-abs">Abst.: ${votos.t_abs}</span>` +
+                    (votos.t_sv ? `<span class="placa-nominal-chip chip-sv">S/V: ${votos.t_sv}</span>` : '') +
+                    `<span class="placa-nominal-chip chip-aus">Aus.: ${votos.t_aus}</span>`;
+            } else {
+                chipsEl.style.display = 'none';
+            }
+        }
         if (resumenEl) {
             if (modoActivo === 'quorum') {
                 const hayQuorum = votos.totalPresentes >= camara.quorum;
@@ -2186,7 +2211,7 @@ function renderizarVistaDetallada(camara) {
                     }
                 });
 
-                if (modoActivo === 'quorum') {
+                                if (modoActivo === 'quorum') {
                     totalPresentes += presentes;
                     if (presentes > 0) reporteBloques.push(`${bloque.name}: ${presentes}`);
                 } else {
@@ -2198,14 +2223,14 @@ function renderizarVistaDetallada(camara) {
                 }
             });
 
-                    if (modoActivo === 'quorum') {
-            t_aus = camara.total - totalPresentes;
+            if (modoActivo === 'quorum') {
+                t_aus = camara.total - totalPresentes;
+            }
+
+            return { totalPresentes, t_af, t_neg, t_abs, t_aus, t_sv, reporteBloques };
         }
 
-        return { totalPresentes, t_af, t_neg, t_abs, t_aus, t_sv, reporteBloques };
-    }
-
-                const idxPresidente = (modoActivo === 'vote' && presidenciaSinVotar) ? obtenerIndicePresidente(camaraActiva) : -1;
+        const idxPresidente = (modoActivo === 'vote' && presidenciaSinVotar) ? obtenerIndicePresidente(camaraActiva) : -1;
 
         camara.blocks.forEach((bloque, idx) => {
             if (modoActivo === 'quorum') {
@@ -2250,12 +2275,13 @@ function renderizarVistaDetallada(camara) {
             }
         });
 
-        if (modoActivo === 'quorum') {
+                if (modoActivo === 'quorum') {
             t_aus = camara.total - totalPresentes;
         }
 
-        return { totalPresentes, t_af, t_neg, t_abs, t_aus, reporteBloques };
+        return { totalPresentes, t_af, t_neg, t_abs, t_aus, t_sv, reporteBloques };
     }
+	
     function calcularMayoria(camara, votos) {
         const { t_af, t_neg, t_abs } = votos;
 
