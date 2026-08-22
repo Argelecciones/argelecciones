@@ -2488,7 +2488,7 @@ function renderizarVistaDetallada(camara) {
             if(document.getElementById('seg-af')) document.getElementById('seg-af').style.width = `${pctAf}%`;
             if(document.getElementById('seg-neg')) document.getElementById('seg-neg').style.width = `${pctNeg}%`;
             if(document.getElementById('seg-abs')) document.getElementById('seg-abs').style.width = `${pctAbs}%`;
-            if(document.getElementById('seg-sv')) document.getElementById('seg-sv').style.width = `${pctSv}%`;
+            if(document.getElementById('seg-sv')) document.getElementById('seg-sv').style.width = `${Math.max(pctSv, t_sv > 0 ? 1.5 : 0)}%`;
             if(document.getElementById('seg-aus')) document.getElementById('seg-aus').style.width = `${pctAus}%`;
 
             const badgeRes = document.getElementById('placaResultadoBadge');
