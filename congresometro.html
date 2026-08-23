@@ -821,6 +821,16 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             .btn-estado-persona { font-size: 10px; padding: 6px 8px; flex: 1; }
             .legislador-botones { width: 100%; }
         }
+
+@media (max-width: 899px) {
+    #columnaControles > #monitorPanel .quorum-box {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: #ffffff;
+        width: 100%;
+    }
+}
     </style>
 </head>
 <body>
@@ -1937,8 +1947,9 @@ function renderizarVistaDetallada(camara) {
                 const accionesRecinto = document.getElementById('accionesRecinto');
         if (accionesRecinto) accionesRecinto.style.display = (vistaActiva === 'detallada') ? 'flex' : 'none';
 
+                const idxPresBtn = obtenerIndicePresidente(camaraActiva);
         const btnPresidenciaSV = document.getElementById('btn-presidencia-sv');
-        if (btnPresidenciaSV) btnPresidenciaSV.style.display = (vistaActiva === 'bloques' && modoActivo === 'vote') ? 'inline-block' : 'none';
+        if (btnPresidenciaSV) btnPresidenciaSV.style.display = (vistaActiva === 'bloques' && modoActivo === 'vote' && idxPresBtn >= 0) ? 'inline-block' : 'none';
 
         const dashboardLayout = document.getElementById('dashboardLayout');
         const monitorPanel = document.getElementById('monitorPanel');
