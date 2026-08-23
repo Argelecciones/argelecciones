@@ -215,6 +215,13 @@
                     <option value="">-- Todos los medios --</option>
                 </select>
             </div>
+			            <div class="input-group">
+                <label for="filterNuevo">Novedad:</label>
+                <select id="filterNuevo" onchange="renderizarLista()">
+                    <option value="">-- Todas --</option>
+                    <option value="nuevas">Solo nuevas 🆕</option>
+                </select>
+            </div>
             <div class="input-group">
                 <label for="searchTexto">Buscar por palabra clave:</label>
                 <input type="text" id="searchTexto" placeholder="Ej: balotaje, provincia..." oninput="renderizarLista()">
@@ -326,6 +333,7 @@
         const fTema = document.getElementById('filterTema').value;
         const fMedio = document.getElementById('filterMedio').value;
         const fTexto = document.getElementById('searchTexto').value.toLowerCase().trim();
+        const fNuevo = document.getElementById('filterNuevo').value;
 
         // Obtener las URLs que el usuario ocultó en su navegador
         const ocultas = obtenerOcultas();
@@ -339,10 +347,11 @@
         // Excluir de la lista visual las noticias que están guardadas como "ocultas"
         filtradas = filtradas.filter(n => !ocultas.includes(n.URL));
 
-        if (fTema) filtradas = filtradas.filter(n => n.Tema === fTema);
+                if (fTema) filtradas = filtradas.filter(n => n.Tema === fTema);
         if (fMedio) filtradas = filtradas.filter(n => n.Medio === fMedio);
         if (fTexto) filtradas = filtradas.filter(n => (n.Titulo || "").toLowerCase().includes(fTexto));
-
+        if (fNuevo === 'nuevas') filtradas = filtradas.filter(n => esNueva(n.FechaCarga));
+		
         filtradas.sort((a, b) => new Date(b.Fecha) - new Date(a.Fecha));
 
         const contenedor = document.getElementById('listaNoticias');
