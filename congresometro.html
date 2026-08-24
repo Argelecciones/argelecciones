@@ -486,6 +486,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         letter-spacing: 0.05em;
         margin-bottom: 10px;
     }
+		    #majorityPanelBody { margin-top: 10px; }
     .majority-options {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -905,8 +906,12 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             </div>
             <div id="recintoContainer" style="display:none; margin-bottom:15px;"></div>
             <div id="recintoPopover" style="display:none;position:fixed;z-index:9999;background:#1e293b;border:1px solid #334155;border-radius:8px;padding:10px;box-shadow:0 8px 20px rgba(0,0,0,.4);"></div>
-			<div class="majority-panel" id="majorityPanel" style="display:none;">
-                <div class="majority-panel-title">Mayoría requerida</div>
+						<div class="majority-panel" id="majorityPanel" style="display:none;">
+                <div class="majority-panel-title" id="majorityPanelTitle" onclick="toggleMajorityPanel()" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
+                    <span>Mayoría requerida: <span id="majorityPanelResumen">Mayoría simple</span></span>
+                    <span id="majorityPanelIcono">▾</span>
+                </div>
+                <div id="majorityPanelBody">
                 <div class="majority-options" id="majorityOptions">
                     <label class="majority-option checked"><input type="radio" name="tipoMayoria" value="simple" checked onchange="onCambioMayoria()"><span>Mayoría simple</span></label>
                     <label class="majority-option"><input type="radio" name="tipoMayoria" value="absoluta" onchange="onCambioMayoria()"><span>Mayoría absoluta</span></label>
@@ -921,12 +926,13 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                     <span class="meta-sep">|</span>
                     <span id="metaFaltanTxt" class="meta-faltan">Faltan 0 votos</span>
                 </div>
-               <div class="desempate-selector" id="desempateSelector" style="display:none;">
+                              <div class="desempate-selector" id="desempateSelector" style="display:none;">
                     <div class="desempate-selector-title">⚖️ Empate — Resolución por desempate de la Presidencia</div>
                     <div class="desempate-selector-options">
                         <button class="btn-desempate btn-desempate-favor" id="btnDesempateFavor" onclick="setDesempate('favor')">✅ Desempató a favor</button>
                         <button class="btn-desempate btn-desempate-contra" id="btnDesempateContra" onclick="setDesempate('contra')">❌ Desempató en contra</button>
                     </div>
+                </div>
                 </div>
             </div>
             <div id="blocksContainer"></div>
@@ -1393,13 +1399,25 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     }
 
     // Resalta la opción de mayoría elegida y recalcula
-    function onCambioMayoria() {
+        function onCambioMayoria() {
         document.querySelectorAll('.majority-option').forEach(op => {
             const radio = op.querySelector('input[type="radio"]');
             op.classList.toggle('checked', radio && radio.checked);
         });
+        const radioSel = document.querySelector('input[name="tipoMayoria"]:checked');
+        const etiquetas = { simple: 'Mayoría simple', absoluta: 'Mayoría absoluta', '23presentes': '2/3 presentes', '23emitidos': '2/3 votos emitidos', '23total': '2/3 total' };
+        const resumenEl = document.getElementById('majorityPanelResumen');
+        if (resumenEl && radioSel) resumenEl.textContent = etiquetas[radioSel.value] || 'Mayoría simple';
         actualizarLineaReferencia();
         ejecutarCalculos();
+    }
+
+    function toggleMajorityPanel() {
+        const body = document.getElementById('majorityPanelBody');
+        const icono = document.getElementById('majorityPanelIcono');
+        const abierto = body.style.display !== 'none';
+        body.style.display = abierto ? 'none' : 'block';
+        icono.textContent = abierto ? '▸' : '▾';
     }
 
 	function setDesempate(valor) {
@@ -1949,6 +1967,12 @@ function renderizarVistaDetallada(camara) {
     function inicializarEstructura() {
         const camara = dataCongreso[camaraActiva];
         document.getElementById('panel-title').innerText = `Gestión de Bloques (${camara.label})`;
+		        const majorityBody = document.getElementById('majorityPanelBody');
+        if (majorityBody && !majorityBody.dataset.inicializado) {
+            majorityBody.style.display = 'none';
+            document.getElementById('majorityPanelIcono').textContent = '▸';
+            majorityBody.dataset.inicializado = 'true';
+        }
         
         const qPercent = (camara.quorum / camara.total) * 100;
         document.getElementById('qLine').style.left = `${qPercent}%`;
