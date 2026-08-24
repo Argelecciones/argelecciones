@@ -2033,15 +2033,17 @@ function renderizarVistaDetallada(camara) {
             } else {
                 card.classList.add('block-card-compact');
                 card.innerHTML = `
-                    <span class="block-compact-nombre">${bloque.name} <small>(${bloque.max})</small></span>
+                    <div class="compact-fila-superior">
+                        <span class="block-compact-nombre">${bloque.name} <small>(${bloque.max})</small></span>
+                        <div class="vote-quick-actions-compact">
+                            <button class="btn-action btn-quick-af" onclick="marcarBloqueVoto(${idx}, 'af')">Todos AF</button>
+                            <button class="btn-action btn-quick-neg" onclick="marcarBloqueVoto(${idx}, 'neg')">Todos NEG</button>
+                        </div>
+                    </div>
                     <div class="vote-control-compact">
                         <span>AF</span><input type="number" id="v-af-${idx}" min="0" max="${bloque.max}" value="0" oninput="ejecutarCalculos()">
                         <span>NEG</span><input type="number" id="v-neg-${idx}" min="0" max="${bloque.max}" value="0" oninput="ejecutarCalculos()">
                         <span>ABS</span><input type="number" id="v-abs-${idx}" min="0" max="${bloque.max}" value="0" oninput="ejecutarCalculos()">
-                    </div>
-                    <div class="vote-quick-actions-compact">
-                        <button class="btn-action btn-quick-af" onclick="marcarBloqueVoto(${idx}, 'af')">AF</button>
-                        <button class="btn-action btn-quick-neg" onclick="marcarBloqueVoto(${idx}, 'neg')">NEG</button>
                     </div>
                 `;
             }
