@@ -65,11 +65,14 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
 .dashboard-layout.layout-unificado .monitor-panel { display: contents; }
 
         /* CONTROLES (IZQUIERDA) */
-        #blocksContainer {
+                #blocksContainer {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 10px;
             align-content: start;
+        }
+        #blocksContainer:has(.block-card-compact) {
+            grid-template-columns: 1fr;
         }
 
         .block-card {
@@ -82,6 +85,20 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             justify-content: space-between;
             min-height: 75px;
         }
+
+		        .block-card-compact {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            min-height: unset;
+        }
+        .block-compact-nombre { font-weight: 700; font-size: 13px; color: #f8fafc; min-width: 130px; }
+        .block-compact-nombre small { color: #64748b; font-weight: 400; }
+        .vote-control-compact { display: flex; align-items: center; gap: 4px; font-size: 10px; color: #64748b; font-weight: 800; }
+        .vote-control-compact input { width: 40px; padding: 4px; border: 1px solid #cbd5e1; border-radius: 4px; text-align: center; font-weight: 800; font-family: inherit; }
+        .vote-quick-actions-compact { display: flex; gap: 4px; margin-left: auto; }
+        .vote-quick-actions-compact .btn-action { font-size: 10px; padding: 5px 8px; }
 
         .block-header {
             display: flex;
@@ -1986,14 +2003,13 @@ function renderizarVistaDetallada(camara) {
             if (recintoContainer) { recintoContainer.style.display = 'none'; recintoContainer.innerHTML = ''; }
         }
 
-        camara.blocks.forEach((bloque, idx) => {
+                camara.blocks.forEach((bloque, idx) => {
             const card = document.createElement('div');
             card.className = 'block-card';
             card.style.borderLeftColor = bloque.color;
 
-            let controlesHtml = '';
             if (modoActivo === 'quorum') {
-                controlesHtml = `
+                const controlesHtml = `
                     <div class="quorum-control-compact">
                         <button class="btn-action" onclick="setQuorumInput(${idx}, 0)">0</button>
                         <button class="btn-action" onclick="ajustarQuorum(${idx}, -1)">-</button>
@@ -2002,26 +2018,28 @@ function renderizarVistaDetallada(camara) {
                         <button class="btn-action" onclick="setQuorumInput(${idx}, ${bloque.max})">Todos</button>
                         <input type="range" id="q-slide-${idx}" min="0" max="${bloque.max}" value="0" style="display: none;">
                     </div>`;
-            } else {
-                controlesHtml = `
-                    <div class="vote-quick-actions">
-                        <button class="btn-action btn-quick-af" onclick="marcarBloqueVoto(${idx}, 'af')">Todos AF</button>
-                        <button class="btn-action btn-quick-neg" onclick="marcarBloqueVoto(${idx}, 'neg')">Todos NEG</button>
+                card.innerHTML = `
+                    <div class="block-header">
+                        <span>${bloque.name}</span>
+                        <small style="color:#64748b;">Máximo: ${bloque.max}</small>
                     </div>
-                    <div class="vote-control-grid">
-                        <div class="vote-subfield">AF <input type="number" id="v-af-${idx}" min="0" max="${bloque.max}" value="0" oninput="ejecutarCalculos()"></div>
-                        <div class="vote-subfield">NEG <input type="number" id="v-neg-${idx}" min="0" max="${bloque.max}" value="0" oninput="ejecutarCalculos()"></div>
-                        <div class="vote-subfield">ABS <input type="number" id="v-abs-${idx}" min="0" max="${bloque.max}" value="0" oninput="ejecutarCalculos()"></div>
-                    </div>`;
+                    ${controlesHtml}
+                `;
+            } else {
+                card.classList.add('block-card-compact');
+                card.innerHTML = `
+                    <span class="block-compact-nombre">${bloque.name} <small>(${bloque.max})</small></span>
+                    <div class="vote-control-compact">
+                        <span>AF</span><input type="number" id="v-af-${idx}" min="0" max="${bloque.max}" value="0" oninput="ejecutarCalculos()">
+                        <span>NEG</span><input type="number" id="v-neg-${idx}" min="0" max="${bloque.max}" value="0" oninput="ejecutarCalculos()">
+                        <span>ABS</span><input type="number" id="v-abs-${idx}" min="0" max="${bloque.max}" value="0" oninput="ejecutarCalculos()">
+                    </div>
+                    <div class="vote-quick-actions-compact">
+                        <button class="btn-action btn-quick-af" onclick="marcarBloqueVoto(${idx}, 'af')">AF</button>
+                        <button class="btn-action btn-quick-neg" onclick="marcarBloqueVoto(${idx}, 'neg')">NEG</button>
+                    </div>
+                `;
             }
-
-            card.innerHTML = `
-                <div class="block-header">
-                    <span>${bloque.name}</span>
-                    <small style="color:#64748b;">Máximo: ${bloque.max}</small>
-                </div>
-                ${controlesHtml}
-            `;
             container.appendChild(card);
         });
 		
