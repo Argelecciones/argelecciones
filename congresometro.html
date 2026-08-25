@@ -2717,6 +2717,16 @@ function renderizarVistaDetallada(camara) {
         }
     }
 
+        let categoriaResultadoAnterior = null;
+
+    function categorizarResultado(mayoria) {
+        if (!mayoria.hayQuorum) return 'esperando';
+        if (mayoria.empateDesempatable && !desempateManual) return 'empate';
+        if (mayoria.empateDesempatable && desempateManual === 'favor') return 'aprobado';
+        if (mayoria.empateDesempatable && desempateManual === 'contra') return 'rechazado';
+        return mayoria.alcanzada ? 'aprobado' : 'rechazado';
+    }
+
     function ejecutarCalculos() {
         const camara = dataCongreso[camaraActiva];
         const votos = recolectarVotos(camara);
@@ -2724,6 +2734,37 @@ function renderizarVistaDetallada(camara) {
         renderizarPanelIzquierdo(camara, votos, mayoria);
         renderizarPlaca(camara, votos, mayoria);
         armarTextoRedes(camara, votos, mayoria);
+
+        if (modoActivo === 'vote') {
+            const categoriaActual = categorizarResultado(mayoria);
+            if (categoriaActual !== categoriaResultadoAnterior && categoriaResultadoAnterior !== null) {
+                const mensajes = {
+                    aprobado: '✅ Reúne la mayoría requerida',
+                    rechazado: '❌ No reúne la mayoría requerida',
+                    empate: '⚖️ Empate — requiere desempate de la Presidencia',
+                };
+                mostrarToastResultado(mensajes[categoriaActual] || '');
+            }
+            categoriaResultadoAnterior = categoriaActual;
+        } else {
+            categoriaResultadoAnterior = null;
+        }
+    }
+
+    function mostrarToastResultado(texto) {
+        if (!texto) return;
+        const existente = document.getElementById('toastResultado');
+        if (existente) existente.remove();
+        const toast = document.createElement('div');
+        toast.id = 'toastResultado';
+        toast.style.cssText = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#1e293b; color:#fff; padding:12px 22px; border-radius:8px; font-size:14px; font-weight:800; box-shadow:0 8px 20px rgba(0,0,0,.3); z-index:10001; max-width:90%; text-align:center; opacity:0; transition:opacity .3s;';
+        toast.textContent = texto;
+        document.body.appendChild(toast);
+        requestAnimationFrame(() => { toast.style.opacity = '1'; });
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 2000);
     }
 
 	function toggleSocialBox() {
