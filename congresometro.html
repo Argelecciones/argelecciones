@@ -161,6 +161,8 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         .btn-shortcut:hover { background: #475569; }
         .btn-shortcut.active { background: #1e3a8a; color: #93c5fd; }
         .btn-shortcut:active { transform: scale(0.96); }
+        .btn-filtro-estado { background: #334155; color: #f8fafc; border: none; padding: 5px 10px; border-radius: 5px; font-size: 11px; font-weight: 700; cursor: pointer; }
+        .btn-filtro-estado.active { background: #1e3a8a; color: #93c5fd; }
 		.input-nombre-votacion { background:#0f172a; border:1px solid #334155; color:#f8fafc; padding:6px 10px; border-radius:5px; font-size:12px; font-family:inherit; flex:1; min-width:160px; }
         .input-nombre-votacion::placeholder { color:#64748b; }
 
@@ -936,8 +938,12 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                 <button id="btn-marcar-todos" class="btn-shortcut" onclick="atajoMarcarTodos()">✅ Marcar Todos</button>
                 <button id="btn-presidencia-sv" class="btn-shortcut" onclick="togglePresidenciaSinVotar()" style="display:none;">🔵 Presidencia: Sin Votar</button>
             </div>
-            <div id="recintoContainer" style="display:none; margin-bottom:15px;"></div>
+                        <div id="recintoContainer" style="display:none; margin-bottom:15px;"></div>
             <div id="recintoPopover" style="display:none;position:fixed;z-index:9999;background:#1e293b;border:1px solid #334155;border-radius:8px;padding:10px;box-shadow:0 8px 20px rgba(0,0,0,.4);"></div>
+            <div class="global-shortcuts-bar" id="filtroEstadoBar" style="display:none;">
+                <span class="shortcuts-title">Filtrar por estado:</span>
+                <div id="filtroEstadoBotones" style="display:flex; gap:4px; flex-wrap:wrap;"></div>
+            </div>
             <div id="blocksContainer"></div>
         </div>
 
@@ -1196,9 +1202,26 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     let camaraActiva = 'diputados';
     let modoActivo = 'quorum';
     let desempateManual = null;
-    let vistaActiva = 'bloques';
+        let vistaActiva = 'bloques';
     let votosIndividuales = {};
     let presidenciaSinVotar = false;
+    let filtroEstadoDetallada = 'todos';
+
+    function setFiltroEstadoDetallada(valor) {
+        filtroEstadoDetallada = valor;
+        renderizarVistaDetallada(dataCongreso[camaraActiva]);
+    }
+
+	    function pintarBotonesFiltroEstado() {
+        const cont = document.getElementById('filtroEstadoBotones');
+        if (!cont) return;
+        const opciones = modoActivo === 'quorum'
+            ? [['todos', 'Todos'], ['presente', 'PRES'], ['ausente', 'AUS']]
+            : [['todos', 'Todos'], ['af', 'AF'], ['neg', 'NEG'], ['abs', 'ABS'], ['sinvotar', 'S/V'], ['ausente', 'AUS']];
+        cont.innerHTML = opciones.map(([val, label]) =>
+            `<button class="btn-filtro-estado ${filtroEstadoDetallada === val ? 'active' : ''}" onclick="setFiltroEstadoDetallada('${val}')">${label}</button>`
+        ).join('');
+    }
 
     function obtenerIndicePresidente(camaraKey) {
         const camara = dataCongreso[camaraKey];
@@ -1376,18 +1399,20 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             }
         }
     }
-       function cambiarCamara(camara) {
+           function cambiarCamara(camara) {
         camaraActiva = camara;
         desempateManual = null;
         presidenciaSinVotar = false;
+        filtroEstadoDetallada = 'todos';
         document.getElementById('cam-diputados').classList.toggle('active', camara === 'diputados');
         document.getElementById('cam-senadores').classList.toggle('active', camara === 'senadores');
         inicializarEstructura();
     }
 
-        function cambiarModo(modo) {
+            function cambiarModo(modo) {
         modoActivo = modo;
         presidenciaSinVotar = false;
+        filtroEstadoDetallada = 'todos';
         document.getElementById('mod-quorum').classList.toggle('active', modo === 'quorum');
         document.getElementById('mod-vote').classList.toggle('active', modo === 'vote');
         document.getElementById('placaWrapperBlock').style.display = (modo === 'vote') ? 'block' : 'none';
@@ -1502,10 +1527,13 @@ function renderizarVistaDetallada(camara) {
             return;
         }
 
-        bloquesOrdenados.forEach(bloque => {
-            const personas = personasCamara
+            bloquesOrdenados.forEach(bloque => {
+            let personas = personasCamara
                 .filter(p => p.bloque === bloque.name)
                 .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+            if (filtroEstadoDetallada !== 'todos') {
+                personas = personas.filter(p => estadoIndividual(camaraActiva, p.nombre) === filtroEstadoDetallada);
+            }
             if (personas.length === 0) return;
 
             const wrap = document.createElement('div');
@@ -1998,8 +2026,14 @@ function renderizarVistaDetallada(camara) {
 
         const accionesNominal = document.getElementById('accionesVistaDetallada');
         if (accionesNominal) accionesNominal.style.display = (vistaActiva === 'detallada') ? 'flex' : 'none';
-                const accionesRecinto = document.getElementById('accionesRecinto');
+                        const accionesRecinto = document.getElementById('accionesRecinto');
         if (accionesRecinto) accionesRecinto.style.display = (vistaActiva === 'detallada') ? 'flex' : 'none';
+
+        const filtroBar = document.getElementById('filtroEstadoBar');
+        if (filtroBar) {
+            filtroBar.style.display = (vistaActiva === 'detallada') ? 'flex' : 'none';
+            if (vistaActiva === 'detallada') pintarBotonesFiltroEstado();
+        }
 
                 const idxPresBtn = obtenerIndicePresidente(camaraActiva);
         const btnPresidenciaSV = document.getElementById('btn-presidencia-sv');
