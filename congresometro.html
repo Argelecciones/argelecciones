@@ -884,7 +884,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                 <button class="tab-btn active" id="btnVistaBloques" onclick="intentarCambiarVista('bloques')">Por bloques</button>
                 <button class="tab-btn" id="btnVistaDetallada" onclick="intentarCambiarVista('detallada')">Vista detallada</button>
             </div>
-			<div class="majority-panel" id="majorityPanel" style="display:none;">
+						<div class="majority-panel" id="majorityPanel" style="display:none;">
                 <div class="majority-panel-title" id="majorityPanelTitle" onclick="toggleMajorityPanel()" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
                     <span>Mayoría requerida: <span id="majorityPanelResumen">Mayoría simple</span></span>
                     <span id="majorityPanelIcono">▾</span>
@@ -904,12 +904,15 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                     <span class="meta-sep">|</span>
                     <span id="metaFaltanTxt" class="meta-faltan">Faltan 0 votos</span>
                 </div>
-                              <div class="desempate-selector" id="desempateSelector" style="display:none;">
+               <div class="desempate-selector" id="desempateSelector" style="display:none;">
                     <div class="desempate-selector-title">⚖️ Empate — Resolución por desempate de la Presidencia</div>
                     <div class="desempate-selector-options">
                         <button class="btn-desempate btn-desempate-favor" id="btnDesempateFavor" onclick="setDesempate('favor')">✅ Desempató a favor</button>
                         <button class="btn-desempate btn-desempate-contra" id="btnDesempateContra" onclick="setDesempate('contra')">❌ Desempató en contra</button>
                     </div>
+                </div>
+                </div>
+            </div>
            <div class="global-shortcuts-bar" id="accionesVistaDetallada" style="display:none;">
                 <span class="shortcuts-title">Listado nominal:</span>
                 <input type="text" id="inputNombreVotacionNominal" class="input-nombre-votacion" placeholder="Nombre de la votación...">
@@ -921,7 +924,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                 <button class="btn-shortcut" onclick="previsualizarPlacaRecinto()">📸 Vista previa</button>
                 <button class="btn-shortcut" onclick="exportarPlacaRecinto()">📥 Descargar PNG</button>
             </div>
-                      <div class="global-shortcuts-bar">
+           <div class="global-shortcuts-bar">
                 <span class="shortcuts-title">Acciones rápidas:</span>
                 <button class="btn-shortcut" onclick="atajoLimpiarTodo()">❌ Limpiar Todo</button>
                 <button id="btn-marcar-todos" class="btn-shortcut" onclick="atajoMarcarTodos()">✅ Marcar Todos</button>
@@ -929,9 +932,6 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             </div>
             <div id="recintoContainer" style="display:none; margin-bottom:15px;"></div>
             <div id="recintoPopover" style="display:none;position:fixed;z-index:9999;background:#1e293b;border:1px solid #334155;border-radius:8px;padding:10px;box-shadow:0 8px 20px rgba(0,0,0,.4);"></div>
-                </div>
-                </div>
-            </div>
             <div id="blocksContainer"></div>
         </div>
 
