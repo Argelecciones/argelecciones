@@ -2480,6 +2480,14 @@ function renderizarVistaDetallada(camara) {
         const desempateSelector = document.getElementById('desempateSelector');
         if (desempateSelector) {
             desempateSelector.style.display = empateDesempatable ? 'block' : 'none';
+            if (empateDesempatable && !desempateManual) {
+                const body = document.getElementById('majorityPanelBody');
+                const icono = document.getElementById('majorityPanelIcono');
+                if (body && body.style.display === 'none') {
+                    body.style.display = 'block';
+                    if (icono) icono.textContent = '▾';
+                }
+            }
             const btnFavor = document.getElementById('btnDesempateFavor');
             const btnContra = document.getElementById('btnDesempateContra');
             if (btnFavor) btnFavor.classList.toggle('active', desempateManual === 'favor');
