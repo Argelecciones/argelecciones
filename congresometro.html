@@ -192,10 +192,16 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             }
         }
         .progress-wrapper { position: relative; margin-bottom: 35px; padding-top: 5px; }
-        .progress-bg { background: #e2e8f0; height: 25px; border-radius: 6px; overflow: hidden; }
+        .progress-bg { background: #e2e8f0; height: 25px; border-radius: 6px; overflow: hidden; display: flex; position: relative; }
         .progress-fill { background: #3b82f6; height: 100%; width: 0%; transition: width 0.2s; }
-        .line-marker { position: absolute; top: -3px; bottom: -3px; width: 0; border-left: 2px dashed #ef4444; z-index: 5; }
-        .line-label { position: absolute; font-size: 11px; font-weight: 800; color: #ef4444; top: 34px; transform: translateX(-50%); white-space: nowrap; }
+        .progress-segment { height: 100%; width: 0%; transition: width 0.2s; display: none; }
+        .progress-bg.segmentado .progress-segment { display: block; }
+    	.seg-q-af { background: #10b981; }
+        .seg-q-neg { background: #ef4444; }
+        .seg-q-abs { background: #eab308; }
+        .seg-q-sv { background: #2563eb; }
+        .line-marker { position: absolute; top: -3px; bottom: -3px; width: 0; border-left: 2px dashed #64748b; z-index: 5; }
+        .line-label { position: absolute; font-size: 11px; font-weight: 800; color: #475569; top: 34px; transform: translateX(-50%); white-space: nowrap; }
         .line-marker.two-thirds { border-left: 2px dashed #94a3b8; }
         .line-label.two-thirds { color: #94a3b8; top: -22px; }
         .q-status-bar { display: flex; justify-content: space-between; align-items: center; }
@@ -944,8 +950,12 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                     <div class="line-label two-thirds" id="bLabel">2/3 (172)</div>
                     <div class="line-marker" id="qLine"></div>
                     <div class="line-label" id="qLabel">Quórum (129)</div>
-                    <div class="progress-bg">
+                        <div class="progress-bg" id="qProgressBg">
                         <div class="progress-fill" id="qFill"></div>
+                        <div class="progress-segment seg-q-af" id="qSegAf"></div>
+                        <div class="progress-segment seg-q-neg" id="qSegNeg"></div>
+                        <div class="progress-segment seg-q-abs" id="qSegAbs"></div>
+                        <div class="progress-segment seg-q-sv" id="qSegSv"></div>
                     </div>
                 </div>
                 <div class="vote-summary-line" id="voteSummaryLine" style="display:none;"></div>
@@ -2427,8 +2437,8 @@ function renderizarVistaDetallada(camara) {
         return { tipoMayoria, metaVotos, etiquetaMayoria, hayQuorum, alcanzada, faltan, plural, esEmpate, empateTxt, empateDesempatable, etiquetaPresidencia, resultadoTexto };
     }
 
-    function renderizarPanelIzquierdo(camara, votos, mayoria) {
-        const { t_af, t_neg, t_abs, t_aus, totalPresentes } = votos;
+        function renderizarPanelIzquierdo(camara, votos, mayoria) {
+        const { t_af, t_neg, t_abs, t_aus, t_sv, totalPresentes } = votos;
         const { tipoMayoria, metaVotos, etiquetaMayoria, hayQuorum, alcanzada, faltan, plural, empateTxt, empateDesempatable, etiquetaPresidencia, resultadoTexto } = mayoria;
 
         const banner = document.getElementById('appResultadoBanner');
@@ -2503,11 +2513,32 @@ function renderizarVistaDetallada(camara) {
             }
         }
 
-        if (document.getElementById('qTotal')) document.getElementById('qTotal').innerText = totalPresentes;
+                if (document.getElementById('qTotal')) document.getElementById('qTotal').innerText = totalPresentes;
 
-        const fillPercent = (totalPresentes / camara.total) * 100;
         const barFill = document.getElementById('qFill');
-        if (barFill) barFill.style.width = `${Math.min(fillPercent, 100)}%`;
+        const progressBg = document.getElementById('qProgressBg');
+
+                if (modoActivo === 'vote') {
+            if (progressBg) progressBg.classList.add('segmentado');
+            if (barFill) barFill.style.display = 'none';
+            const pctAf = (t_af / camara.total) * 100;
+            const pctNeg = (t_neg / camara.total) * 100;
+            const pctAbsQ = (t_abs / camara.total) * 100;
+            const pctSvQ = ((t_sv || 0) / camara.total) * 100;
+            const segAfEl = document.getElementById('qSegAf');
+            const segNegEl = document.getElementById('qSegNeg');
+            const segAbsEl = document.getElementById('qSegAbs');
+            const segSvEl = document.getElementById('qSegSv');
+            if (segAfEl) segAfEl.style.width = `${pctAf}%`;
+            if (segNegEl) segNegEl.style.width = `${pctNeg}%`;
+            if (segAbsEl) segAbsEl.style.width = `${pctAbsQ}%`;
+            if (segSvEl) segSvEl.style.width = `${pctSvQ}%`;
+        } else {
+            if (progressBg) progressBg.classList.remove('segmentado');
+            if (barFill) barFill.style.display = 'block';
+            const fillPercent = (totalPresentes / camara.total) * 100;
+            if (barFill) barFill.style.width = `${Math.min(fillPercent, 100)}%`;
+        }
 
         const badge = document.getElementById('qBadge');
         if (totalPresentes >= camara.quorum) {
