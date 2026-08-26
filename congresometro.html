@@ -1855,7 +1855,48 @@ function renderizarVistaDetallada(camara) {
         svg.setAttribute('viewBox', '0 -18 360 223');
         svg.setAttribute('style', 'width:100%; max-width:640px; height:auto; background:#0f172a; border-radius:8px; display:block; margin:0 auto;');
 
-                const coloresEstado = {
+        const defs = document.createElementNS(svgns, 'defs');
+        const glowsConfig = [
+            ['glow-verde', '#16a34a'],
+            ['glow-rojo', '#b91c1c'],
+            ['glow-amarillo', '#ca8a04'],
+            ['glow-azul', '#2563eb']
+        ];
+        glowsConfig.forEach(([id, color]) => {
+            const filtro = document.createElementNS(svgns, 'filter');
+            filtro.setAttribute('id', id);
+            filtro.setAttribute('x', '-100%');
+            filtro.setAttribute('y', '-100%');
+            filtro.setAttribute('width', '300%');
+            filtro.setAttribute('height', '300%');
+            const feFlood = document.createElementNS(svgns, 'feFlood');
+            feFlood.setAttribute('flood-color', color);
+            feFlood.setAttribute('result', 'floodColor');
+            const feComposite = document.createElementNS(svgns, 'feComposite');
+            feComposite.setAttribute('in', 'floodColor');
+            feComposite.setAttribute('in2', 'SourceAlpha');
+            feComposite.setAttribute('operator', 'in');
+            feComposite.setAttribute('result', 'coloredAlpha');
+            const feGaussianBlur = document.createElementNS(svgns, 'feGaussianBlur');
+            feGaussianBlur.setAttribute('in', 'coloredAlpha');
+            feGaussianBlur.setAttribute('stdDeviation', '0.6');
+            feGaussianBlur.setAttribute('result', 'blur');
+            const feMerge = document.createElementNS(svgns, 'feMerge');
+            const feMergeNode1 = document.createElementNS(svgns, 'feMergeNode');
+            feMergeNode1.setAttribute('in', 'blur');
+            const feMergeNode2 = document.createElementNS(svgns, 'feMergeNode');
+            feMergeNode2.setAttribute('in', 'SourceGraphic');
+            feMerge.appendChild(feMergeNode1);
+            feMerge.appendChild(feMergeNode2);
+            filtro.appendChild(feFlood);
+            filtro.appendChild(feComposite);
+            filtro.appendChild(feGaussianBlur);
+            filtro.appendChild(feMerge);
+            defs.appendChild(filtro);
+        });
+        svg.appendChild(defs);
+
+                        const coloresEstado = {
             presente: '#16a34a',
             af: '#16a34a',
             neg: '#b91c1c',
@@ -1864,31 +1905,30 @@ function renderizarVistaDetallada(camara) {
             ausente: null
         };
 
+        const filtrosGlow = {
+            '#16a34a': 'glow-verde',
+            '#b91c1c': 'glow-rojo',
+            '#ca8a04': 'glow-amarillo',
+            '#2563eb': 'glow-azul'
+        };
+
         datos.forEach(persona => {
             const estado = estadoIndividual(camaraActiva, persona.nombre);
-            const colorAro = coloresEstado[estado];
+            const colorGlow = coloresEstado[estado];
             const rBase = Math.max(persona.r - 0.3, 0.8);
-
-            const rEsc = Math.max(rBase * 1.35 - 0.35, rBase * 0.9);
-            const factorAro = 0.68;
-
-            if (colorAro) {
-                const aro = document.createElementNS(svgns, 'circle');
-                aro.setAttribute('cx', persona.x);
-                aro.setAttribute('cy', persona.y);
-                aro.setAttribute('r', rEsc);
-                aro.setAttribute('fill', colorAro);
-                aro.setAttribute('stroke', '#f8fafc');
-                aro.setAttribute('stroke-width', 0.25);
-                svg.appendChild(aro);
-            }
 
            const c = document.createElementNS(svgns, 'circle');
             c.setAttribute('cx', persona.x);
             c.setAttribute('cy', persona.y);
-            c.setAttribute('r', colorAro ? rEsc * factorAro : rEsc);
+            c.setAttribute('r', rBase);
             c.setAttribute('fill', persona.color);
-                        c.setAttribute('style', 'cursor:pointer;');
+            c.setAttribute('style', `cursor:pointer; ${!colorGlow ? 'opacity:0.35;' : ''}`);
+            if (colorGlow) {
+                c.setAttribute('stroke', colorGlow);
+                c.setAttribute('stroke-width', 0.5);
+                const filtroId = filtrosGlow[colorGlow];
+                if (filtroId) c.setAttribute('filter', `url(#${filtroId})`);
+            }
                         c.addEventListener('mouseenter', (evt) => {
                 abrirPopoverRecinto(persona.nombre, persona.bloque, evt, false);
             });
@@ -1903,26 +1943,25 @@ function renderizarVistaDetallada(camara) {
             const colorAroPres = coloresEstado[estadoPres];
             const rPres = 6;
 
-            if (colorAroPres) {
-                const aroPres = document.createElementNS(svgns, 'circle');
-                aroPres.setAttribute('cx', 180);
-                aroPres.setAttribute('cy', 160);
-                aroPres.setAttribute('r', rPres);
-                aroPres.setAttribute('fill', colorAroPres);
-                svg.appendChild(aroPres);
-            }
+                    if (presidente) {
+            const estadoPres = estadoIndividual(camaraActiva, presidente.nombre);
+            const colorGlowPres = coloresEstado[estadoPres];
+            const rPres = 6;
 
            const pres = document.createElementNS(svgns, 'circle');
             pres.setAttribute('cx', 180);
             pres.setAttribute('cy', 160);
-            pres.setAttribute('r', colorAroPres ? rPres * 0.68 : rPres);
+            pres.setAttribute('r', rPres);
             pres.setAttribute('fill', presidente.color);
-            pres.setAttribute('stroke', '#f8fafc');
+            pres.setAttribute('stroke', colorGlowPres || '#f8fafc');
             pres.setAttribute('stroke-dasharray', '2,1.5');
             pres.setAttribute('stroke-width', 1);
-            pres.setAttribute('style', 'cursor:pointer;');
-                        pres.setAttribute('style', 'cursor:pointer;');
-                        pres.addEventListener('mouseenter', (evt) => {
+            pres.setAttribute('style', `cursor:pointer; ${!colorGlowPres ? 'opacity:0.35;' : ''}`);
+            if (colorGlowPres) {
+                const filtroIdPres = filtrosGlow[colorGlowPres];
+                if (filtroIdPres) pres.setAttribute('filter', `url(#${filtroIdPres})`);
+            }
+            pres.addEventListener('mouseenter', (evt) => {
                 abrirPopoverRecinto(presidente.nombre, presidente.bloque + ' (Presidencia)', evt, true);
             });
             pres.addEventListener('mouseleave', () => {
