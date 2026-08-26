@@ -1938,15 +1938,12 @@ function renderizarVistaDetallada(camara) {
 
             svg.appendChild(c);
         });
-        if (presidente) {
-            const estadoPres = estadoIndividual(camaraActiva, presidente.nombre);
-            const colorAroPres = coloresEstado[estadoPres];
-            const rPres = 6;
-
-                    if (presidente) {
+                if (presidente) {
             const estadoPres = estadoIndividual(camaraActiva, presidente.nombre);
             const colorGlowPres = coloresEstado[estadoPres];
             const rPres = 6;
+
+           const pres = document.createElementNS(svgns, 'circle');
 
            const pres = document.createElementNS(svgns, 'circle');
             pres.setAttribute('cx', 180);
