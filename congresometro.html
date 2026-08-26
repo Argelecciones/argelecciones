@@ -811,6 +811,45 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     .placa-nominal-footer-logo { height:90px; width:auto; object-fit:contain; }
 	.placa-nominal-footer-txt { font-size:16px; color:#94a3b8; font-weight:700; }
     #placaRecintoEntity { position: fixed; left: -9999px; top: 0; width: 1920px; height: 1080px; background: #f8fafc; color: #0f172a; font-family: 'Inter', sans-serif; box-sizing: border-box; padding: 60px 70px; display: flex; flex-direction: column; }
+		    #placaInstagramEntity {
+        position: fixed; left: -9999px; top: 0;
+        width: 1080px; height: 1350px;
+        background: #f8fafc; color: #0f172a;
+        font-family: 'Inter', sans-serif;
+        box-sizing: border-box;
+        padding: 50px 55px;
+        display: flex; flex-direction: column;
+    }
+    .igv-header { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #e2e8f0; padding-bottom:18px; margin-bottom:18px; }
+    .igv-volanta { font-size:26px; font-weight:900; color:#0f172a; line-height:1.2; max-width:750px; }
+    .igv-badge { background:#fee2e2; color:#991b1b; font-size:14px; font-weight:800; padding:6px 14px; border-radius:6px; text-transform:uppercase; letter-spacing:.03em; white-space:nowrap; }
+    .igv-resultado { font-size:24px; font-weight:800; padding:14px 18px; border-radius:10px; margin-bottom:20px; }
+    .igv-resultado.aprobado { background:#dcfce7; color:#166534; }
+    .igv-resultado.rechazado { background:#fee2e2; color:#991b1b; }
+    .igv-resultado.esperando { background:#f1f5f9; color:#334155; }
+    .igv-bullet-container { width:100%; height:36px; background:#e2e8f0; border-radius:8px; overflow:hidden; display:flex; margin-bottom:18px; }
+    .igv-bullet-fill { height:100%; width:0%; }
+    #igv-seg-af { background:#10b981; }
+    #igv-seg-neg { background:#ef4444; }
+    #igv-seg-abs { background:#eab308; }
+    #igv-seg-sv { background:#2563eb; }
+    .igv-legend { display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:10px; margin-bottom:24px; }
+    .igv-legend-item { display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-radius:8px; }
+    .igv-legend-item .igv-l-label { font-size:16px; font-weight:800; }
+    .igv-legend-item .igv-l-val { font-size:28px; font-weight:900; color:#0f172a; }
+    .igv-legend-item.af { background:rgba(16,185,129,.15); }
+    .igv-legend-item.neg { background:rgba(239,68,68,.15); }
+    .igv-legend-item.abs { background:rgba(234,179,8,.15); }
+    .igv-legend-item.sv { background:rgba(37,99,235,.15); }
+    .igv-legend-item.aus { background:rgba(148,163,184,.15); }
+    .igv-blocks { flex:1; display:grid; grid-template-columns:1fr 1fr; gap:8px 16px; align-content:start; overflow:hidden; }
+    .igv-block-row { display:flex; justify-content:space-between; align-items:center; background:#f1f5f9; border-radius:8px; padding:9px 14px; border-left:5px solid #64748b; }
+    .igv-block-nombre { font-size:15px; font-weight:700; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px; }
+    .igv-block-votos { display:flex; gap:4px; flex-shrink:0; }
+    .igv-block-votos span { font-size:13px; font-weight:800; padding:3px 6px; border-radius:5px; min-width:24px; text-align:center; }
+    .igv-footer { display:flex; justify-content:space-between; align-items:center; border-top:1px solid #e2e8f0; margin-top:18px; padding-top:16px; }
+    .igv-footer-logo { height:60px; width:auto; object-fit:contain; }
+    .igv-footer-txt { font-size:15px; color:#94a3b8; font-weight:700; }
 		
 		@media (max-width: 640px) {
             body { padding: 10px; }
@@ -1084,6 +1123,10 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                     <button class="btn-download btn-secondary" onclick="generarPrevisualizacionGaleria()">📸 Procesar Captura de Imagen</button>
                     <button class="btn-download btn-primary" onclick="exportarPlacaAImagen()">📥 Descargar Imagen (PNG)</button>
                 </div>
+                <div class="actions-grid-buttons" id="filaPlacaInstagram" style="margin-top:8px;">
+                    <button class="btn-download btn-secondary" onclick="previsualizarPlacaInstagram()">📱 Vista previa Instagram</button>
+                    <button class="btn-download btn-primary" onclick="exportarPlacaInstagram()">📥 Descargar Instagram (PNG)</button>
+                </div>
             </div>
 
             <div class="social-box">
@@ -1119,6 +1162,29 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
 
 <div class="marca-agua-difusion"></div>
 </div>
+
+	<div id="placaInstagramEntity">
+    <div class="igv-header">
+        <div class="igv-volanta" id="igv-volanta">Diputados — Votación (00/00/0000)</div>
+        <div class="igv-badge">Sólo para difusión</div>
+    </div>
+    <div class="igv-resultado" id="igv-resultado"></div>
+    <div class="igv-bullet-container">
+        <div class="igv-bullet-fill" id="igv-seg-af"></div>
+        <div class="igv-bullet-fill" id="igv-seg-neg"></div>
+        <div class="igv-bullet-fill" id="igv-seg-abs"></div>
+        <div class="igv-bullet-fill" id="igv-seg-sv"></div>
+    </div>
+    <div class="igv-legend" id="igv-legend"></div>
+    <div class="igv-blocks" id="igv-blocks"></div>
+    <div class="igv-footer">
+        <img class="igv-footer-logo" src="logo.png" alt="Logo">
+        <div class="igv-footer-txt">Generado por @ArgElecciones</div>
+    </div>
+    <div class="marca-agua-difusion"></div>
+</div>
+
+<div id="placaRecintoEntity">
 
 <div id="placaRecintoEntity">
     <div class="placa-nominal-header">
@@ -1797,6 +1863,115 @@ function renderizarVistaDetallada(camara) {
                 leyenda.appendChild(box);
             });
         }
+    }
+
+	    function armarContenidoPlacaInstagram(camara, votos, mayoria) {
+        const { t_af, t_neg, t_abs, t_aus, t_sv } = votos;
+        const hoy = new Date();
+        const fechaTxt = `${String(hoy.getDate()).padStart(2,'0')}/${String(hoy.getMonth()+1).padStart(2,'0')}/${hoy.getFullYear()}`;
+        const camaraNombre = camaraActiva.charAt(0).toUpperCase() + camaraActiva.slice(1);
+
+        document.getElementById('igv-volanta').innerText = `${camaraNombre} — Votación (${fechaTxt})`;
+
+        const resEl = document.getElementById('igv-resultado');
+        const { hayQuorum, alcanzada, empateDesempatable, resultadoTexto } = mayoria;
+        let claseRes = 'esperando';
+        if (hayQuorum) {
+            if (empateDesempatable && !desempateManual) claseRes = 'esperando';
+            else if (empateDesempatable && desempateManual === 'favor') claseRes = 'aprobado';
+            else if (empateDesempatable && desempateManual === 'contra') claseRes = 'rechazado';
+            else claseRes = alcanzada ? 'aprobado' : 'rechazado';
+        }
+        resEl.className = 'igv-resultado ' + claseRes;
+        resEl.innerText = resultadoTexto.replace(/[✅❌⏳⚖️]/g, '').trim();
+
+        const total = camara.total;
+        document.getElementById('igv-seg-af').style.width = `${(t_af/total)*100}%`;
+        document.getElementById('igv-seg-neg').style.width = `${(t_neg/total)*100}%`;
+        document.getElementById('igv-seg-abs').style.width = `${(t_abs/total)*100}%`;
+        document.getElementById('igv-seg-sv').style.width = `${Math.max((t_sv||0)/total*100, t_sv ? 1.5 : 0)}%`;
+
+        const legend = document.getElementById('igv-legend');
+        legend.innerHTML = '';
+        const items = [
+            ['af','Afirmativos', t_af], ['neg','Negativos', t_neg], ['abs','Abstenciones', t_abs]
+        ];
+        if (t_sv) items.push(['sv','Sin Votar', t_sv]);
+        items.push(['aus','Ausentes', t_aus]);
+        items.forEach(([cls,label,val]) => {
+            const div = document.createElement('div');
+            div.className = `igv-legend-item ${cls}`;
+            div.innerHTML = `<span class="igv-l-label">${label}</span><span class="igv-l-val">${val}</span>`;
+            legend.appendChild(div);
+        });
+
+        const idxPresidente = presidenciaSinVotar ? obtenerIndicePresidente(camaraActiva) : -1;
+        const blocksEl = document.getElementById('igv-blocks');
+        blocksEl.innerHTML = '';
+        camara.blocks.forEach((bloque, idx) => {
+            const valAf = document.getElementById(`v-af-${idx}`) ? (parseInt(document.getElementById(`v-af-${idx}`).value) || 0) : 0;
+            const valNeg = document.getElementById(`v-neg-${idx}`) ? (parseInt(document.getElementById(`v-neg-${idx}`).value) || 0) : 0;
+            const valAbs = document.getElementById(`v-abs-${idx}`) ? (parseInt(document.getElementById(`v-abs-${idx}`).value) || 0) : 0;
+            let valAus = bloque.max - (valAf + valNeg + valAbs);
+            let valSv = 0;
+            if (idx === idxPresidente && valAus > 0) { valSv = 1; valAus -= 1; }
+
+            const row = document.createElement('div');
+            row.className = 'igv-block-row';
+            row.style.borderLeftColor = bloque.color || '#64748b';
+            row.innerHTML = `
+                <span class="igv-block-nombre">${bloque.name}${valSv > 0 ? ' <span style="color:#1e40af;font-size:11px;">S/V1</span>' : ''}</span>
+                <div class="igv-block-votos">
+                    <span style="background:rgba(16,185,129,.15); color:#059669;">${valAf}</span>
+                    <span style="background:rgba(239,68,68,.15); color:#dc2626;">${valNeg}</span>
+                    <span style="background:rgba(234,179,8,.15); color:#a16207;">${valAbs}</span>
+                    <span style="background:rgba(226,232,240,.9); color:#94a3b8;">${valAus}</span>
+                </div>`;
+            blocksEl.appendChild(row);
+        });
+    }
+
+    function capturarPlacaInstagram(onListo) {
+        const camara = dataCongreso[camaraActiva];
+        const votos = recolectarVotos(camara);
+        const mayoria = calcularMayoria(camara, votos);
+        armarContenidoPlacaInstagram(camara, votos, mayoria);
+
+        const placa = document.getElementById('placaInstagramEntity');
+        placa.style.left = '0';
+        placa.style.zIndex = '-1';
+
+        setTimeout(async () => {
+            try {
+                const canvas = await html2canvas(placa, {
+                    scale: 1, backgroundColor: '#f8fafc', width: 1080, height: 1350, useCORS: true, allowTaint: true
+                });
+                onListo(canvas);
+            } catch (err) {
+                alert('Error al generar la placa Instagram: ' + err.message);
+            } finally {
+                placa.style.left = '-9999px';
+                placa.style.zIndex = '';
+            }
+        }, 150);
+    }
+
+    function previsualizarPlacaInstagram() {
+        capturarPlacaInstagram(canvas => {
+            document.getElementById('galleryStaticImage').src = canvas.toDataURL('image/png');
+            document.getElementById('galleryModalEntity').style.display = 'flex';
+        });
+    }
+
+    function exportarPlacaInstagram() {
+        capturarPlacaInstagram(canvas => {
+            const hoy = new Date();
+            const fecha = `${hoy.getFullYear()}${String(hoy.getMonth()+1).padStart(2,'0')}${String(hoy.getDate()).padStart(2,'0')}`;
+            const link = document.createElement('a');
+            link.download = `votacion-ig-${camaraActiva}-${fecha}-argelecciones.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
     }
 
         function capturarPlacaRecinto(onListo) {
