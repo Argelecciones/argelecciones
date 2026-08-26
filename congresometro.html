@@ -1128,8 +1128,8 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         </div>
         <div class="placa-nominal-badge">Sólo para difusión</div>
     </div>
-    <div class="placa-nominal-resumen" id="pr-resumen"></div>
-    <div style="display:flex; flex:1; align-items:center; gap:40px; overflow:hidden;">
+        <div class="placa-nominal-resumen" id="pr-resumen" style="width:100%; box-sizing:border-box;"></div>
+    <div style="display:flex; flex:1; align-items:center; gap:40px; overflow:hidden; width:100%;">
         <div id="pr-svg-container" style="display:flex; justify-content:center; align-items:center; width:76%; height:100%;"></div>
         <div id="pr-leyenda" style="display:flex; flex-direction:column; gap:8px; width:22%;"></div>
     </div>
@@ -1773,11 +1773,14 @@ function renderizarVistaDetallada(camara) {
             svgContainer.innerHTML = '';
             const svgOriginal = document.querySelector('#recintoContainer svg');
             if (svgOriginal) {
-                const wrapper = document.createElement('div');
-                wrapper.style.cssText = 'width:100%; max-width:1300px; background:#0f172a; border-radius:16px; padding:18px 60px; box-sizing:border-box;';
+                                const wrapper = document.createElement('div');
+                wrapper.style.cssText = 'position:relative; width:100%; max-width:1300px; background:#0f172a; border-radius:16px; padding:18px 60px; box-sizing:border-box; overflow:hidden;';
                 const clon = svgOriginal.cloneNode(true);
-                clon.setAttribute('style', 'width:100%; height:auto; display:block;');
+                clon.setAttribute('style', 'width:100%; height:auto; display:block; position:relative; z-index:1;');
+                const marcaAguaInterna = document.createElement('div');
+                marcaAguaInterna.style.cssText = 'position:absolute; inset:0; pointer-events:none; z-index:2; background-image:url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'900\' height=\'500\' viewBox=\'0 0 900 500\'><text x=\'450\' y=\'250\' text-anchor=\'middle\' font-family=\'Inter, sans-serif\' font-size=\'26\' font-weight=\'800\' fill=\'rgba(255,255,255,0.06)\' transform=\'rotate(-28 450 250)\'>Sólo para difusión</text></svg>"); background-repeat:repeat;';
                 wrapper.appendChild(clon);
+                wrapper.appendChild(marcaAguaInterna);
                 svgContainer.appendChild(wrapper);
             }
         }
