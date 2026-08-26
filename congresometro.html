@@ -1768,17 +1768,19 @@ function renderizarVistaDetallada(camara) {
             }
         }
 
-                const svgContainer = document.getElementById('pr-svg-container');
+        const svgContainer = document.getElementById('pr-svg-container');
         if (svgContainer) {
             svgContainer.innerHTML = '';
             const svgOriginal = document.querySelector('#recintoContainer svg');
             if (svgOriginal) {
+                const wrapper = document.createElement('div');
+                wrapper.style.cssText = 'width:100%; max-width:820px; background:#0f172a; border-radius:16px; padding:30px 40px; box-sizing:border-box;';
                 const clon = svgOriginal.cloneNode(true);
-                clon.setAttribute('style', 'width:100%; max-width:820px; height:auto; background:#0f172a; border-radius:16px; padding:30px 40px; box-sizing:border-box;');
-                svgContainer.appendChild(clon);
+                clon.setAttribute('style', 'width:100%; height:auto; display:block;');
+                wrapper.appendChild(clon);
+                svgContainer.appendChild(wrapper);
             }
         }
-
         const leyenda = document.getElementById('pr-leyenda');
         if (leyenda) {
             leyenda.innerHTML = '';
