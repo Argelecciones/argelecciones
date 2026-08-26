@@ -809,8 +809,8 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
 	.tag-sv { background:#dbeafe; color:#1e40af; }
     .placa-nominal-footer { display:flex; justify-content:space-between; align-items:center; border-top:1px solid #e2e8f0; margin-top:25px; padding-top:15px; }
     .placa-nominal-footer-logo { height:90px; width:auto; object-fit:contain; }
-.placa-nominal-footer-txt { font-size:16px; color:#94a3b8; font-weight:700; }
-    #placaRecintoEntity { position: fixed; left: -9999px; top: 0; width: 1920px; background: #f8fafc; color: #0f172a; font-family: 'Inter', sans-serif; box-sizing: border-box; padding: 60px 70px; }
+	.placa-nominal-footer-txt { font-size:16px; color:#94a3b8; font-weight:700; }
+    #placaRecintoEntity { position: fixed; left: -9999px; top: 0; width: 1920px; height: 1080px; background: #f8fafc; color: #0f172a; font-family: 'Inter', sans-serif; box-sizing: border-box; padding: 60px 70px; display: flex; flex-direction: column; }
 		
 		@media (max-width: 640px) {
             body { padding: 10px; }
@@ -1129,8 +1129,8 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         <div class="placa-nominal-badge">Sólo para difusión</div>
     </div>
     <div class="placa-nominal-resumen" id="pr-resumen"></div>
-    <div id="pr-svg-container" style="display:flex; justify-content:center; margin:20px 0;"></div>
-    <div id="pr-leyenda" style="display:flex; gap:16px; justify-content:center; margin-bottom:20px;"></div>
+    <div id="pr-svg-container" style="display:flex; justify-content:center; align-items:center; flex:1; overflow:hidden;"></div>
+    <div id="pr-leyenda" style="display:flex; gap:16px; justify-content:center; margin-bottom:10px;"></div>
     <div class="placa-nominal-footer">
     <img class="placa-nominal-footer-logo" src="logo.png" alt="Logo">
     <div class="placa-nominal-footer-txt">Generado por @ArgElecciones</div>
@@ -1766,13 +1766,13 @@ function renderizarVistaDetallada(camara) {
             }
         }
 
-        const svgContainer = document.getElementById('pr-svg-container');
+                const svgContainer = document.getElementById('pr-svg-container');
         if (svgContainer) {
             svgContainer.innerHTML = '';
             const svgOriginal = document.querySelector('#recintoContainer svg');
             if (svgOriginal) {
                 const clon = svgOriginal.cloneNode(true);
-                clon.setAttribute('style', 'width:1650px; height:auto; background:transparent;');
+                clon.setAttribute('style', 'width:900px; height:auto; background:#0f172a; border-radius:16px; padding:20px; box-sizing:border-box;');
                 svgContainer.appendChild(clon);
             }
         }
@@ -1792,7 +1792,7 @@ function renderizarVistaDetallada(camara) {
         }
     }
 
-    function capturarPlacaRecinto(onListo) {
+        function capturarPlacaRecinto(onListo) {
         const camara = dataCongreso[camaraActiva];
         armarContenidoPlacaRecinto(camara);
 
@@ -1800,11 +1800,10 @@ function renderizarVistaDetallada(camara) {
         placa.style.left = '0';
         placa.style.zIndex = '-1';
 
-                setTimeout(async () => {
-            const alturaReal = placa.scrollHeight;
+        setTimeout(async () => {
             try {
                 const canvas = await html2canvas(placa, {
-                    scale: 1, backgroundColor: '#f8fafc', width: 1920, height: alturaReal, useCORS: true, allowTaint: true
+                    scale: 1, backgroundColor: '#f8fafc', width: 1920, height: 1080, useCORS: true, allowTaint: true
                 });
                 onListo(canvas);
             } catch (err) {
