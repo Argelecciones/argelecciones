@@ -1130,8 +1130,8 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     </div>
     <div class="placa-nominal-resumen" id="pr-resumen"></div>
     <div style="display:flex; flex:1; align-items:center; gap:40px; overflow:hidden;">
-        <div id="pr-svg-container" style="display:flex; justify-content:center; align-items:center; width:68%;"></div>
-        <div id="pr-leyenda" style="display:flex; flex-direction:column; gap:8px; width:29%;"></div>
+        <div id="pr-svg-container" style="display:flex; justify-content:center; align-items:center; width:76%; height:100%;"></div>
+        <div id="pr-leyenda" style="display:flex; flex-direction:column; gap:8px; width:22%;"></div>
     </div>
     <div class="placa-nominal-footer">
     <img class="placa-nominal-footer-logo" src="logo.png" alt="Logo">
@@ -1774,7 +1774,7 @@ function renderizarVistaDetallada(camara) {
             const svgOriginal = document.querySelector('#recintoContainer svg');
             if (svgOriginal) {
                 const wrapper = document.createElement('div');
-                wrapper.style.cssText = 'width:100%; max-width:820px; background:#0f172a; border-radius:16px; padding:30px 40px; box-sizing:border-box;';
+                wrapper.style.cssText = 'width:100%; max-width:1300px; background:#0f172a; border-radius:16px; padding:18px 60px; box-sizing:border-box;';
                 const clon = svgOriginal.cloneNode(true);
                 clon.setAttribute('style', 'width:100%; height:auto; display:block;');
                 wrapper.appendChild(clon);
