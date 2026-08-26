@@ -1797,6 +1797,7 @@ function renderizarVistaDetallada(camara) {
         capturarPlacaNominal(canvas => {
             document.getElementById('galleryStaticImage').src = canvas.toDataURL('image/png');
             document.getElementById('galleryModalEntity').style.display = 'flex';
+			document.body.classList.add('modal-abierto');
         });
     }
 
@@ -2003,10 +2004,11 @@ function renderizarVistaDetallada(camara) {
         }, 150);
     }
 
-    function previsualizarPlacaRecinto() {
+        function previsualizarPlacaRecinto() {
         capturarPlacaRecinto(canvas => {
             document.getElementById('galleryStaticImage').src = canvas.toDataURL('image/png');
             document.getElementById('galleryModalEntity').style.display = 'flex';
+            document.body.classList.add('modal-abierto');
         });
     }
 
@@ -2504,6 +2506,7 @@ function renderizarVistaDetallada(camara) {
             target.style.transform = originalTransform;
             const imgModalElement = document.getElementById('galleryStaticImage');
             imgModalElement.src = canvas.toDataURL('image/png');
+			document.body.classList.add('modal-abierto');
             document.getElementById('galleryModalEntity').style.display = 'flex';
         }).catch(err => {
             target.style.transform = originalTransform;
@@ -3021,7 +3024,8 @@ function renderizarVistaDetallada(camara) {
             
             const imgModalElement = document.getElementById('galleryStaticImage');
             imgModalElement.src = canvas.toDataURL('image/png');
-            
+
+			document.body.classList.add('modal-abierto');            
             document.getElementById('galleryModalEntity').style.display = 'flex';
         }).catch(err => {
             target.style.transform = originalTransform;
@@ -3029,10 +3033,10 @@ function renderizarVistaDetallada(camara) {
         });
     }
 
-    function cerrarModalGaleria() {
+            function cerrarModalGaleria() {
         document.getElementById('galleryModalEntity').style.display = 'none';
+        document.body.classList.remove('modal-abierto');
     }
-
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') cerrarModalGaleria();
     });
