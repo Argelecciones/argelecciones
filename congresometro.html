@@ -1865,10 +1865,10 @@ function renderizarVistaDetallada(camara) {
         glowsConfig.forEach(([id, color]) => {
             const filtro = document.createElementNS(svgns, 'filter');
             filtro.setAttribute('id', id);
-            filtro.setAttribute('x', '-100%');
-            filtro.setAttribute('y', '-100%');
-            filtro.setAttribute('width', '300%');
-            filtro.setAttribute('height', '300%');
+            filtro.setAttribute('x', '-150%');
+            filtro.setAttribute('y', '-150%');
+            filtro.setAttribute('width', '400%');
+            filtro.setAttribute('height', '400%');
             const feFlood = document.createElementNS(svgns, 'feFlood');
             feFlood.setAttribute('flood-color', color);
             feFlood.setAttribute('result', 'floodColor');
@@ -1879,7 +1879,7 @@ function renderizarVistaDetallada(camara) {
             feComposite.setAttribute('result', 'coloredAlpha');
             const feGaussianBlur = document.createElementNS(svgns, 'feGaussianBlur');
             feGaussianBlur.setAttribute('in', 'coloredAlpha');
-            feGaussianBlur.setAttribute('stdDeviation', '0.6');
+            feGaussianBlur.setAttribute('stdDeviation', '1.1');
             feGaussianBlur.setAttribute('result', 'blur');
             const feMerge = document.createElementNS(svgns, 'feMerge');
             const feMergeNode1 = document.createElementNS(svgns, 'feMergeNode');
