@@ -825,6 +825,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     }
     .igv-header { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #e2e8f0; padding-bottom:18px; margin-bottom:18px; }
     .igv-volanta { font-size:26px; font-weight:900; color:#0f172a; line-height:1.2; max-width:750px; }
+	.igv-titulo-custom { font-size:22px; font-weight:800; color:#334155; margin-top:6px; }
     .igv-badge { background:#fee2e2; color:#991b1b; font-size:14px; font-weight:800; padding:6px 14px; border-radius:6px; text-transform:uppercase; letter-spacing:.03em; white-space:nowrap; }
     .igv-resultado { font-size:24px; font-weight:800; padding:14px 18px; border-radius:10px; margin-bottom:20px; }
     .igv-resultado.aprobado { background:#dcfce7; color:#166534; }
@@ -1174,8 +1175,11 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
 </div>
 
 	<div id="placaInstagramEntity">
-    <div class="igv-header">
-        <div class="igv-volanta" id="igv-volanta">Diputados — Votación (00/00/0000)</div>
+        <div class="igv-header">
+        <div>
+            <div class="igv-volanta" id="igv-volanta">Diputados — Votación (00/00/0000)</div>
+            <div class="igv-titulo-custom" id="igv-titulo-custom" style="display:none;"></div>
+        </div>
         <div class="igv-badge">Sólo para difusión</div>
     </div>
     <div class="igv-resultado" id="igv-resultado"></div>
@@ -1882,9 +1886,14 @@ function renderizarVistaDetallada(camara) {
         const fechaTxt = `${String(hoy.getDate()).padStart(2,'0')}/${String(hoy.getMonth()+1).padStart(2,'0')}/${hoy.getFullYear()}`;
         const camaraNombre = camaraActiva.charAt(0).toUpperCase() + camaraActiva.slice(1);
 
-                const inputTitulo = document.getElementById('inputTituloVotacion');
+                        document.getElementById('igv-volanta').innerText = `${camaraNombre} — Votación (${fechaTxt})`;
+        const inputTitulo = document.getElementById('inputTituloVotacion');
         const tituloVotacion = inputTitulo ? inputTitulo.value.trim() : '';
-        document.getElementById('igv-volanta').innerText = tituloVotacion || `${camaraNombre} — Votación (${fechaTxt})`;
+        const tituloCustomEl = document.getElementById('igv-titulo-custom');
+        if (tituloCustomEl) {
+            tituloCustomEl.style.display = tituloVotacion ? 'block' : 'none';
+            tituloCustomEl.innerText = tituloVotacion;
+        }
 
         const resEl = document.getElementById('igv-resultado');
         const { hayQuorum, alcanzada, empateDesempatable, resultadoTexto } = mayoria;
