@@ -951,8 +951,8 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                     <label class="majority-option checked"><input type="radio" name="tipoMayoria" value="simple" checked onchange="onCambioMayoria()"><span>Mayoría simple</span></label>
                     <label class="majority-option"><input type="radio" name="tipoMayoria" value="absoluta" onchange="onCambioMayoria()"><span>Mayoría absoluta</span></label>
                     <label class="majority-option"><input type="radio" name="tipoMayoria" value="23presentes" onchange="onCambioMayoria()"><span>2/3 presentes</span></label>
-                    <label class="majority-option"><input type="radio" name="tipoMayoria" value="23emitidos" onchange="onCambioMayoria()"><span>2/3 votos emitidos</span></label>
                     <label class="majority-option"><input type="radio" name="tipoMayoria" value="23total" onchange="onCambioMayoria()"><span>2/3 total</span></label>
+                    <label class="majority-option" id="opcion34presentes" style="display:none;"><input type="radio" name="tipoMayoria" value="34presentes" onchange="onCambioMayoria()"><span>3/4 presentes</span></label>
                 </div>
                <div class="meta-readout" id="metaReadout">
                     <span class="meta-label">Meta actual</span>
@@ -1481,13 +1481,26 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             }
         }
     }
-           function cambiarCamara(camara) {
+               function cambiarCamara(camara) {
         camaraActiva = camara;
         desempateManual = null;
         presidenciaSinVotar = false;
         filtroEstadoDetallada = 'todos';
         document.getElementById('cam-diputados').classList.toggle('active', camara === 'diputados');
         document.getElementById('cam-senadores').classList.toggle('active', camara === 'senadores');
+
+        const opcion34 = document.getElementById('opcion34presentes');
+        if (opcion34) {
+            opcion34.style.display = (camara === 'diputados') ? 'flex' : 'none';
+            if (camara === 'senadores') {
+                const radioSel = document.querySelector('input[name="tipoMayoria"]:checked');
+                if (radioSel && radioSel.value === '34presentes') {
+                    document.querySelector('input[name="tipoMayoria"][value="simple"]').checked = true;
+                    onCambioMayoria();
+                }
+            }
+        }
+
         inicializarEstructura();
     }
 
@@ -1519,7 +1532,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             op.classList.toggle('checked', radio && radio.checked);
         });
         const radioSel = document.querySelector('input[name="tipoMayoria"]:checked');
-        const etiquetas = { simple: 'Mayoría simple', absoluta: 'Mayoría absoluta', '23presentes': '2/3 presentes', '23emitidos': '2/3 votos emitidos', '23total': '2/3 total' };
+                const etiquetas = { simple: 'Mayoría simple', absoluta: 'Mayoría absoluta', '23presentes': '2/3 presentes', '23emitidos': '2/3 votos emitidos', '23total': '2/3 total', '34presentes': '3/4 presentes' };
         const resumenEl = document.getElementById('majorityPanelResumen');
         if (resumenEl && radioSel) resumenEl.textContent = etiquetas[radioSel.value] || 'Mayoría simple';
         actualizarLineaReferencia();
@@ -2405,7 +2418,7 @@ function renderizarVistaDetallada(camara) {
         const radioSel = document.querySelector('input[name="tipoMayoria"]:checked');
         const tipo = radioSel ? radioSel.value : 'simple';
 
-        if (tipo === 'simple' || tipo === '23presentes' || tipo === '23emitidos') {
+        if (tipo === 'simple' || tipo === '23presentes' || tipo === '23emitidos' || tipo === '34presentes') {
             bLine.style.display = 'none';
             bLabel.style.display = 'none';
             return;
@@ -2678,9 +2691,13 @@ function renderizarVistaDetallada(camara) {
                 metaVotos = Math.ceil((emitidos * 2) / 3);
                 etiquetaMayoria = '2/3 de votos emitidos';
                 break;
-            case '23total':
+        	case '23total':
                 metaVotos = Math.ceil((totalCamara * 2) / 3);
                 etiquetaMayoria = '2/3 del total';
+                break;
+            case '34presentes':
+                metaVotos = Math.ceil((presentes * 3) / 4);
+                etiquetaMayoria = '3/4 de presentes';
                 break;
             default:
                 metaVotos = t_neg + 1;
@@ -3160,12 +3177,12 @@ function renderizarVistaDetallada(camara) {
             }
         }
     });
-    const contenedorBloques = document.getElementById('blocksContainer');
+        const contenedorBloques = document.getElementById('blocksContainer');
     if (contenedorBloques) {
         observadorModo.observe(contenedorBloques, { childList: true });
     }
+    document.getElementById('opcion34presentes').style.display = (camaraActiva === 'diputados') ? 'flex' : 'none';
     cargarLegisladores();
-
 </script>
 
 </body>
