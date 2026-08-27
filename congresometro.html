@@ -845,8 +845,8 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     .igv-legend-item.abs { background:rgba(234,179,8,.15); }
     .igv-legend-item.sv { background:rgba(37,99,235,.15); }
     .igv-legend-item.aus { background:rgba(148,163,184,.15); }
-    .igv-blocks { flex:1; display:grid; grid-template-columns:1fr 1fr; gap:8px 16px; align-content:start; overflow:hidden; }
-    .igv-block-row { display:flex; justify-content:space-between; align-items:center; background:#f1f5f9; border-radius:8px; padding:9px 14px; border-left:5px solid #64748b; }
+        .igv-blocks { flex:1; display:grid; grid-template-columns:1fr 1fr; gap:14px 20px; align-content:center; overflow:hidden; }
+    .igv-block-row { display:flex; justify-content:space-between; align-items:center; background:#f1f5f9; border-radius:10px; padding:16px 18px; border-left:6px solid #64748b; }
     .igv-block-nombre { font-size:15px; font-weight:700; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px; }
     .igv-block-votos { display:flex; gap:4px; flex-shrink:0; }
     .igv-block-votos span { font-size:13px; font-weight:800; padding:3px 6px; border-radius:5px; min-width:24px; text-align:center; }
@@ -1132,6 +1132,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                     <button class="btn-download btn-secondary" onclick="generarPrevisualizacionGaleria()">📸 Procesar Captura de Imagen</button>
                     <button class="btn-download btn-primary" onclick="exportarPlacaAImagen()">📥 Descargar Imagen (PNG)</button>
                 </div>
+				<input type="text" id="inputTituloVotacion" class="input-nombre-votacion" placeholder="Título de la votación (opcional)..." style="width:100%; margin-bottom:8px; box-sizing:border-box;" oninput="sincronizarTituloVotacion()">
                 <div class="actions-grid-buttons" id="filaPlacaInstagram" style="margin-top:8px;">
                     <button class="btn-download btn-secondary" onclick="previsualizarPlacaInstagram()">📱 Vista previa Instagram</button>
                     <button class="btn-download btn-primary" onclick="exportarPlacaInstagram()">📥 Descargar Instagram (PNG)</button>
@@ -1881,7 +1882,9 @@ function renderizarVistaDetallada(camara) {
         const fechaTxt = `${String(hoy.getDate()).padStart(2,'0')}/${String(hoy.getMonth()+1).padStart(2,'0')}/${hoy.getFullYear()}`;
         const camaraNombre = camaraActiva.charAt(0).toUpperCase() + camaraActiva.slice(1);
 
-        document.getElementById('igv-volanta').innerText = `${camaraNombre} — Votación (${fechaTxt})`;
+                const inputTitulo = document.getElementById('inputTituloVotacion');
+        const tituloVotacion = inputTitulo ? inputTitulo.value.trim() : '';
+        document.getElementById('igv-volanta').innerText = tituloVotacion || `${camaraNombre} — Votación (${fechaTxt})`;
 
         const resEl = document.getElementById('igv-resultado');
         const { hayQuorum, alcanzada, empateDesempatable, resultadoTexto } = mayoria;
@@ -1939,6 +1942,14 @@ function renderizarVistaDetallada(camara) {
                 </div>`;
             blocksEl.appendChild(row);
         });
+    }
+
+	    function sincronizarTituloVotacion() {
+        const input = document.getElementById('inputTituloVotacion');
+        const tituloPlacaGrande = document.getElementById('placa-titulo-principal');
+        if (input && tituloPlacaGrande && input.value.trim()) {
+            tituloPlacaGrande.innerText = input.value.trim();
+        }
     }
 
     function capturarPlacaInstagram(onListo) {
