@@ -1072,8 +1072,9 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             </div>
 
             <div class="placa-wrapper" id="placaWrapperBlock" style="display: none;">
-                <h3 style="font-size:14px; color:#475569; margin-bottom:10px;">Previsualización de Placa (Interactiva)</h3>
-                
+                                <h3 style="font-size:14px; color:#475569; margin-bottom:10px;">Previsualización de Placa (Interactiva)</h3>
+                <input type="text" id="inputTituloVotacion" class="input-nombre-votacion" placeholder="Título de la votación (opcional, se usa en ambas placas)..." style="width:100%; margin-bottom:10px; box-sizing:border-box;" oninput="sincronizarTituloVotacion()">
+
                 <div class="placa-preview-container">
                     <div id="placaHtmlEntity">
 					<div class="placa-col-left">
@@ -1132,7 +1133,6 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                     <button class="btn-download btn-secondary" onclick="generarPrevisualizacionGaleria()">📸 Procesar Captura de Imagen</button>
                     <button class="btn-download btn-primary" onclick="exportarPlacaAImagen()">📥 Descargar Imagen (PNG)</button>
                 </div>
-				<input type="text" id="inputTituloVotacion" class="input-nombre-votacion" placeholder="Título de la votación (opcional)..." style="width:100%; margin-bottom:8px; box-sizing:border-box;" oninput="sincronizarTituloVotacion()">
                 <div class="actions-grid-buttons" id="filaPlacaInstagram" style="margin-top:8px;">
                     <button class="btn-download btn-secondary" onclick="previsualizarPlacaInstagram()">📱 Vista previa Instagram</button>
                     <button class="btn-download btn-primary" onclick="exportarPlacaInstagram()">📥 Descargar Instagram (PNG)</button>
