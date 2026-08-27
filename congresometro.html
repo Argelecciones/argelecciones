@@ -981,11 +981,12 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                 <button class="btn-shortcut" onclick="previsualizarPlacaRecinto()">📸 Vista previa</button>
                 <button class="btn-shortcut" onclick="exportarPlacaRecinto()">📥 Descargar PNG</button>
             </div>
-           <div class="global-shortcuts-bar">
+                     <div class="global-shortcuts-bar">
                 <span class="shortcuts-title">Acciones rápidas:</span>
                 <button class="btn-shortcut" onclick="atajoLimpiarTodo()">❌ Limpiar Todo</button>
                 <button id="btn-marcar-todos" class="btn-shortcut" onclick="atajoMarcarTodos()">✅ Marcar Todos</button>
                 <button id="btn-presidencia-sv" class="btn-shortcut" onclick="togglePresidenciaSinVotar()" style="display:none;">🔵 Presidencia: Sin Votar</button>
+                <button id="btn-ocultar-fecha" class="btn-shortcut" onclick="toggleOcultarFecha()" style="display:none;">🗓️ Ocultar fecha</button>
             </div>
                         <div id="recintoContainer" style="display:none; margin-bottom:15px;"></div>
             <div id="recintoPopover" style="display:none;position:fixed;z-index:9999;background:#1e293b;border:1px solid #334155;border-radius:8px;padding:10px;box-shadow:0 8px 20px rgba(0,0,0,.4);"></div>
@@ -1030,7 +1031,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                     <div id="placaQuorumEntity">
                         <div class="placa-quorum-header">
                             <div>
-                                <div class="placa-quorum-subtitulo" id="pq-volanta">Cámara de Diputados — Sesión del 00/00/0000</div>
+                                <div class="placa-quorum-subtitulo" id="pq-volanta" contenteditable="true" oninput="this.dataset.editado='true'">Cámara de Diputados — Sesión del 00/00/0000</div>
                                 <div style="font-size:32px; color:#94a3b8; margin-top:6px;"> Escenario de quórum - vía @ArgElecciones</div>
                             </div>
                             <div style="display:flex; flex-direction:column; align-items:flex-end; gap:10px;">
@@ -1288,6 +1289,13 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     let votosIndividuales = {};
     let presidenciaSinVotar = false;
     let filtroEstadoDetallada = 'todos';
+    let fechaOcultaPlacas = false;
+
+    function toggleOcultarFecha() {
+        fechaOcultaPlacas = !fechaOcultaPlacas;
+        const btn = document.getElementById('btn-ocultar-fecha');
+        if (btn) btn.classList.toggle('active', fechaOcultaPlacas);
+    }
 
     function setFiltroEstadoDetallada(valor) {
         filtroEstadoDetallada = valor;
@@ -1497,6 +1505,8 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                 if (radioSel && radioSel.value === '34presentes') {
                     document.querySelector('input[name="tipoMayoria"][value="simple"]').checked = true;
                     onCambioMayoria();
+				const pqVolantaReset = document.getElementById('pq-volanta');
+        if (pqVolantaReset) delete pqVolantaReset.dataset.editado;
                 }
             }
         }
@@ -1707,8 +1717,8 @@ function renderizarVistaDetallada(camara) {
         const hoy = new Date();
         const fechaTxt = `${String(hoy.getDate()).padStart(2, '0')}/${String(hoy.getMonth() + 1).padStart(2, '0')}/${hoy.getFullYear()}`;
 
-       const volanta = document.getElementById('pn-volanta');
-        if (volanta) volanta.innerText = `${camara.label} — ${modoActivo === 'quorum' ? 'Asistencia' : 'Votación'} nominal (${fechaTxt})`;
+        const volanta = document.getElementById('pn-volanta');
+        if (volanta) volanta.innerText = `${camara.label} — ${modoActivo === 'quorum' ? 'Asistencia' : 'Votación'} nominal${fechaOcultaPlacas ? '' : ` (${fechaTxt})`}`;
 
         const nombreInput = document.getElementById('inputNombreVotacionNominal');
         const nombreVotacion = nombreInput ? nombreInput.value.trim() : '';
@@ -1838,7 +1848,7 @@ function renderizarVistaDetallada(camara) {
         const fechaTxt = `${String(hoy.getDate()).padStart(2, '0')}/${String(hoy.getMonth() + 1).padStart(2, '0')}/${hoy.getFullYear()}`;
 
         const volanta = document.getElementById('pr-volanta');
-        if (volanta) volanta.innerText = `${camara.label} — ${modoActivo === 'quorum' ? 'Asistencia' : 'Votación'} (${fechaTxt})`;
+        if (volanta) volanta.innerText = `${camara.label} — ${modoActivo === 'quorum' ? 'Asistencia' : 'Votación'}${fechaOcultaPlacas ? '' : ` (${fechaTxt})`}`;
 
         const nombreInput = document.getElementById('inputNombreVotacionNominal');
         const nombreVotacion = nombreInput ? nombreInput.value.trim() : '';
@@ -2294,6 +2304,9 @@ function renderizarVistaDetallada(camara) {
             if (vistaActiva === 'detallada') pintarBotonesFiltroEstado();
         }
 
+		        const btnOcultarFecha = document.getElementById('btn-ocultar-fecha');
+        if (btnOcultarFecha) btnOcultarFecha.style.display = (vistaActiva === 'detallada') ? 'inline-block' : 'none';
+
                 const idxPresBtn = obtenerIndicePresidente(camaraActiva);
         const btnPresidenciaSV = document.getElementById('btn-presidencia-sv');
         if (btnPresidenciaSV) btnPresidenciaSV.style.display = (vistaActiva === 'bloques' && modoActivo === 'vote' && idxPresBtn >= 0) ? 'inline-block' : 'none';
@@ -2464,9 +2477,11 @@ function renderizarVistaDetallada(camara) {
         const fechaTxt = `${String(hoy.getDate()).padStart(2,'0')}/${String(hoy.getMonth()+1).padStart(2,'0')}/${hoy.getFullYear()}`;
         const hayQuorum = totalPresentes >= camara.quorum;
 
-        // Volanta
+                // Volanta
         const pqVolanta = document.getElementById('pq-volanta');
-        if (pqVolanta) pqVolanta.innerText = `Cámara de ${camara.label} — Sesión del ${fechaTxt}`;
+        if (pqVolanta && pqVolanta.dataset.editado !== 'true') {
+            pqVolanta.innerText = `Cámara de ${camara.label} — Sesión del ${fechaTxt}`;
+        }
 
         // Badge
         const pqBadge = document.getElementById('pq-badge');
