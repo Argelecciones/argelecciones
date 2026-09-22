@@ -148,17 +148,6 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
 .cal-punto.destacado{background:var(--destacado)}
 .cal-mas{font-size:8px;color:var(--muted);font-weight:700;margin-top:2px}
 
-/* PANEL DETALLE CALENDARIO */
-.cal-detalle{max-width:780px;margin:0 auto 20px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;display:none;}
-.cal-detalle.visible{display:block}
-.cal-detalle-titulo{font-size:12px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;}
-.cal-detalle-evento{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);position:relative;}
-.cal-detalle-evento:last-child{border-bottom:none}
-.cal-det-barra{width:3px;height:36px;border-radius:2px;flex-shrink:0}
-.cal-det-cat{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px}
-.cal-det-desc{font-size:13px;font-weight:600;color:var(--text);padding-right:90px;}
-.cal-det-prov{font-size:10px;color:var(--muted);margin-top:2px}
-
 /* BOTÓN DESCARGA PLACA UNIFICADA */
 .cal-descarga-row{max-width:780px;margin:0 auto 20px;display:flex;justify-content:flex-end;gap:8px;}
 .btn-descarga{background:var(--destacado);color:#fff;border:none;padding:8px 18px;border-radius:6px;font-size:12px;font-weight:800;cursor:pointer;transition:opacity .15s;}
@@ -470,6 +459,19 @@ display: none;
 .gallery-close-btn:hover{color:#f43f5e}
 .gallery-caption{color:#94a3b8;font-size:13px;font-weight:600;margin-top:15px;text-transform:uppercase;letter-spacing:.05em;}
 
+  /* MODAL DETALLE DE EVENTO */
+.evento-modal{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(2,4,10,.85);display:none;justify-content:center;align-items:center;z-index:10000;padding:20px;}
+.evento-modal.visible{display:flex}
+.evento-modal-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;box-sizing:border-box;width:100%;max-width:420px;position:relative;}
+.evento-modal-close{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1;padding:0;}
+.evento-modal-fecha{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px;padding-right:24px;}
+.evento-modal-item{margin-bottom:16px;}
+.evento-modal-item:last-child{margin-bottom:0}
+.evento-modal-desc{font-size:20px;font-weight:800;color:var(--text);line-height:1.3;margin:6px 0}
+.evento-modal-prov{font-size:13px;color:var(--muted);margin-bottom:16px;}
+.evento-modal-acciones{display:flex;gap:8px;}
+.evento-modal-acciones .btn-accion-ev{flex:1;width:auto;}
+
 /* VACÍO */
 .vacio{text-align:center;padding:60px 20px;color:var(--muted)}
 .vacio-icon{font-size:36px;margin-bottom:10px}
@@ -509,16 +511,11 @@ display: none;
   .btn-accion-ev::after { content: " Copiar"; font-weight: 700; font-size: 11px; }
   .btn-accion-ev.dl-btn::after { content: " Placa" !important; }
 
-  .cal-detalle-evento { padding-bottom: 44px; }
-  .cal-det-desc { padding-right: 0; }
-
   .cal-celda { min-height: 65px; padding: 4px; }
   .cal-num { font-size: 12px; margin-bottom: 2px; }
   .cal-punto { font-size: 8px; padding: 1px 3px; -webkit-line-clamp: 1; }
   .cal-mas { font-size: 7px; padding: 1px 3px; }
-  
-  .cal-descarga-row { padding: 0 16px; flex-direction: column; }
-  .btn-descarga { width: 100%; text-align: center; }
+
   /* Reducción de tamaños en el encabezado de la placa para ganar espacio vertical */
 #placaCalendario {
   padding: 40px 70px 30px; /* Reducimos padding superior e inferior (antes 60px) */
@@ -621,7 +618,6 @@ display: none;
 
 <!-- VISTA CALENDARIO -->
 <div id="vistaCalendario" style="padding:0 20px">
-<div class="cal-detalle" id="calDetalle"></div>
   <div class="cal-nav">
     <button class="btn-cal-nav" onclick="cambiarMesCal(-1)">‹</button>
     <div class="cal-mes-titulo" id="calTitulo">—</div>
@@ -783,7 +779,13 @@ display: none;
   <button onclick="elegirFormato('cuadrada')" style="background:#0f172a;border:1px solid #334155;color:#f0f4ff;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;text-align:left;white-space:nowrap;">⬛ Cuadrada (1200×1200)</button>
   <button onclick="elegirFormato('instagram')" style="background:#0f172a;border:1px solid #334155;color:#f0f4ff;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;text-align:left;white-space:nowrap;">📷 Instagram (1080×1350)</button>
 </div>
-<div id="galleryModalEntity" class="gallery-modal" onclick="cerrarModalGaleria()">
+<div id="eventoModal" class="evento-modal" onclick="cerrarModalEvento(event)">
+  <div class="evento-modal-card" onclick="event.stopPropagation()">
+    <button class="evento-modal-close" onclick="cerrarModalEvento()">×</button>
+    <div id="eventoModalBody"></div>
+  </div>
+</div>
+  <div id="galleryModalEntity" class="gallery-modal" onclick="cerrarModalGaleria()">
   <div class="gallery-content-wrapper" onclick="event.stopPropagation()">
     <button class="gallery-close-btn" onclick="cerrarModalGaleria()">&times;</button>
     <img id="galleryStaticImage" class="gallery-image" src="" alt="Vista previa placa">
@@ -1112,7 +1114,12 @@ document.addEventListener('click', (e) => {
 function cerrarModalGaleria(){
   document.getElementById('galleryModalEntity').style.display='none';
 }
-window.addEventListener('keydown',(e)=>{if(e.key==='Escape') cerrarModalGaleria();});
+window.addEventListener('keydown',(e)=>{
+  if(e.key==='Escape'){
+    cerrarModalGaleria();
+    cerrarModalEvento();
+  }
+});
 
 function togglePasados(){
   mostrarPasados=!mostrarPasados;
@@ -1290,7 +1297,6 @@ function cambiarMesCal(d){ calMes+=d; if(calMes>11){calMes=0;calAño++;}else if(
 
 function renderizarCalendario(){
   document.getElementById('calTitulo').textContent=`${MESES[calMes]} ${calAño}`;
-  document.getElementById('calDetalle').classList.remove('visible');
   const primer=new Date(calAño,calMes,1);
   const ultimo=new Date(calAño,calMes+1,0);
   const inicioSem=primer.getDay();
@@ -1329,32 +1335,39 @@ function renderizarCalendario(){
 function mostrarDetalleDia(d){
   const fecha=new Date(calAño,calMes,d); fecha.setHours(0,0,0,0);
   let evsDia=eventos.map((ev, idx) => ({ev, idx})).filter(item=>item.ev.fecha.getTime()===fecha.getTime());
-  
+
   if(filtro==='destacado') evsDia=evsDia.filter(item=>item.ev.destacado);
   else if(filtro!=='todos') evsDia=evsDia.filter(item=>catKey(item.ev.categoria)===filtro);
   if(!evsDia.length) return;
-  const detalle=document.getElementById('calDetalle');
+
   const diaNom=DIAS[fecha.getDay()];
-  let html=`<div class="cal-detalle-titulo">${diaNom} ${d} de ${MESES[calMes]} de ${calAño}</div>`;
+  let html=`<div class="evento-modal-fecha">${diaNom} ${d} de ${MESES[calMes]} de ${calAño}</div>`;
   evsDia.forEach(item=>{
     const ev = item.ev;
     const idx = item.idx;
     const ck=ev.destacado?'destacado':catKey(ev.categoria);
     const color=ck==='nacional'?'var(--nacional)':ck==='provincial'?'var(--provincial)':ck==='municipal'?'var(--municipal)':ck==='partidos'?'var(--partidos)':'var(--destacado)';
-    html+=`<div class="cal-detalle-evento">
-      <div class="cal-det-barra" style="background:${color}"></div>
-      <div><div class="cal-det-cat" style="color:${color}">${ev.categoria}</div>
-      <div class="cal-det-desc">${ev.descripcion}</div>
-      ${ev.provincia?`<div class="cal-det-prov">📍 ${ev.provincia}</div>`:''}</div>
-      
-      <!-- BOTONES EN DETALLE DE CALENDARIO -->
-      <div class="evento-acciones">
-        <button class="btn-accion-ev" onclick="copiarEvento(${idx}, this)">📋</button>
-        <button class="btn-accion-ev dl-btn" style="border-color:#a855f7; color:#a855f7" onclick="abrirMenuFormato(event, 'evento', ${idx})">📥</button>
+    html+=`<div class="evento-modal-item">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:9px;font-weight:900;color:${color};text-transform:uppercase;letter-spacing:.08em;">${ev.categoria}</span>
+        ${ev.destacado?'<span style="background:var(--destacado);color:#fff;font-size:8px;font-weight:900;padding:2px 6px;border-radius:2px;text-transform:uppercase;letter-spacing:.05em;">⭐ Clave</span>':''}
+      </div>
+      <div class="evento-modal-desc">${ev.descripcion}</div>
+      ${ev.provincia?`<div class="evento-modal-prov">📍 ${ev.provincia}</div>`:''}
+      <div class="evento-modal-acciones">
+        <button class="btn-accion-ev" onclick="copiarEvento(${idx}, this)">📋 Copiar</button>
+        <button class="btn-accion-ev dl-btn" style="border-color:#a855f7; color:#a855f7" onclick="abrirMenuFormato(event, 'evento', ${idx})">📥 Placa</button>
       </div>
     </div>`;
   });
-  detalle.innerHTML=html; detalle.classList.add('visible');
+
+  document.getElementById('eventoModalBody').innerHTML = html;
+  document.getElementById('eventoModal').classList.add('visible');
+}
+
+function cerrarModalEvento(evt){
+  if(evt) evt.stopPropagation();
+  document.getElementById('eventoModal').classList.remove('visible');
 }
 
 function construirPlacaCal(){
