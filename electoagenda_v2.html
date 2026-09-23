@@ -785,7 +785,7 @@ display: none;
 </div>
 
 </div>
-  <div id="formatoPopover" style="display:none;position:fixed;z-index:9999;background:#1e293b;border:1px solid #334155;border-radius:8px;padding:6px;box-shadow:0 8px 20px rgba(0,0,0,.4);flex-direction:column;gap:4px;">
+  <div id="formatoPopover" style="display:none;position:fixed;z-index:10001;background:#1e293b;border:1px solid #334155;border-radius:8px;padding:6px;box-shadow:0 8px 20px rgba(0,0,0,.4);flex-direction:column;gap:4px;">
   <button onclick="elegirFormato('cuadrada')" style="background:#0f172a;border:1px solid #334155;color:#f0f4ff;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;text-align:left;white-space:nowrap;">⬛ Cuadrada (1200×1200)</button>
   <button onclick="elegirFormato('instagram')" style="background:#0f172a;border:1px solid #334155;color:#f0f4ff;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;text-align:left;white-space:nowrap;">📷 Instagram (1080×1350)</button>
 </div>
@@ -1226,8 +1226,9 @@ function renderizarLista(){
           ${ev.provincia?`<div class="evento-prov">📍 ${ev.provincia}</div>`:''}
           <div class="evento-lista-editorial">${ev.descripcion}${ev.provincia?` (${ev.provincia})`:''}: ${fechaLarga}</div>
         </div>
-        <div class="evento-lista-acciones">
+          <div class="evento-lista-acciones">
           <button class="btn-accion-ev" data-label="Ver detalle" onclick="abrirDetalleEvento(${idx})">👁</button>
+          <button class="btn-accion-ev" data-label="Copiar" onclick="copiarEvento(${idx}, this)">📋</button>
           <button class="btn-accion-ev dl-btn" style="border-color:#a855f7; color:#a855f7" data-label="Descargar placa" onclick="abrirMenuFormato(event, 'evento', ${idx})">📥</button>
         </div>
       </div>`;
