@@ -117,6 +117,13 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
 
 /* BOTONES DE ACCIÓN EN CADA EVENTO */
 .evento-acciones{position:absolute;right:0;top:50%;transform:translateY(-50%);display:flex;gap:4px;}
+  /* TARJETA LISTA REDISEÑADA (3 columnas: fecha | contenido | acciones) */
+.evento-lista{grid-template-columns:52px 3px 1fr auto;align-items:stretch;gap:0 14px;}
+.evento-lista .evento-body{padding-right:0;flex:1;min-width:0;}
+.evento-lista-editorial{font-size:12px;color:var(--muted);line-height:1.5;margin-top:6px;}
+.evento-lista-acciones{display:flex;flex-direction:column;gap:6px;justify-content:center;padding-left:14px;border-left:1px solid var(--border);min-width:150px;}
+.evento-lista-acciones .btn-accion-ev{width:auto;height:auto;padding:7px 12px;border-radius:6px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;}
+.evento-lista-acciones .btn-accion-ev::after{content:attr(data-label);}
 .evento-efemeride .evento-body{padding-right:0;padding-bottom:44px}
 .evento-efemeride .evento-acciones{left:auto;right:0;top:auto;bottom:0;transform:none;display:flex;gap:4px}
 .btn-accion-ev{background:#1e293b;border:1px solid #334155;color:#94a3b8;width:34px;height:34px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all 0.15s;}
@@ -503,6 +510,9 @@ display: none;
   .btn-header#btnPasados { margin-left: 0; width: 100%; }
 
   .evento { grid-template-columns: 46px 3px 1fr; gap: 0 10px; padding: 16px 0; }
+  .evento-lista { grid-template-columns: 46px 3px 1fr; }
+  .evento-lista-acciones { flex-direction: row; border-left: none; border-top: 1px solid var(--border); padding-left: 0; padding-top: 10px; margin-top: 10px; grid-column: 1 / -1; }
+  .evento-lista-acciones .btn-accion-ev { flex: 1; }
   .evento-dia { font-size: 22px; }
   .evento-body { padding-right: 0; padding-bottom: 44px; }
   .evento-acciones { left: 0; right: auto; top: auto; bottom: 0; transform: none; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
@@ -1205,20 +1215,22 @@ function renderizarLista(){
       let diasRestTxt='';
       if(!pasado&&dias<=30){const cls=dias<=7?'cerca':'';diasRestTxt=`<span class="evento-dias-restantes ${cls}">${dias===0?'¡Hoy!':`Faltan ${dias}d`}</span>`;}
       
-      html+=`<div class="evento${pasado?' pasado':''}${ev.destacado?' destacado-ev':''}">
+            const fechaLarga = `${DIAS_LARGOS[ev.fecha.getDay()]} ${ev.fecha.getDate()} de ${MESES[ev.fecha.getMonth()]} de ${ev.fecha.getFullYear()}`;
+
+      html+=`<div class="evento evento-lista${pasado?' pasado':''}${ev.destacado?' destacado-ev':''}">
         <div class="evento-num"><div class="evento-dia">${ev.fecha.getDate()}</div><div class="evento-diaNom">${diaNom}</div></div>
         <div class="evento-barra ${barraClass}"></div>
         <div class="evento-body">
           <div class="evento-top"><span class="evento-cat ${catClass}">${ev.categoria}</span>${badges}${diasRestTxt}</div>
           <div class="evento-desc">${ev.descripcion}</div>
           ${ev.provincia?`<div class="evento-prov">📍 ${ev.provincia}</div>`:''}
-          
-          <!-- BOTONES RÁPIDOS POR EVENTO -->
-          <div class="evento-acciones">
-            <button class="btn-accion-ev" onclick="copiarEvento(${idx}, this)">📋</button>
-            <button class="btn-accion-ev dl-btn" style="border-color:#a855f7; color:#a855f7" onclick="abrirMenuFormato(event, 'evento', ${idx})">📥</button>
-          </div>
-        </div></div>`;
+          <div class="evento-lista-editorial">${ev.descripcion}${ev.provincia?` (${ev.provincia})`:''}: ${fechaLarga}</div>
+        </div>
+        <div class="evento-lista-acciones">
+          <button class="btn-accion-ev" data-label="Ver detalle" onclick="abrirDetalleEvento(${idx})">👁</button>
+          <button class="btn-accion-ev dl-btn" style="border-color:#a855f7; color:#a855f7" data-label="Descargar placa" onclick="abrirMenuFormato(event, 'evento', ${idx})">📥</button>
+        </div>
+      </div>`;
     });
     html+=`</div>`;
   });
@@ -1332,22 +1344,10 @@ function renderizarCalendario(){
   document.getElementById('calCeldas').innerHTML=celdas;
 }
 
-function mostrarDetalleDia(d){
-  const fecha=new Date(calAño,calMes,d); fecha.setHours(0,0,0,0);
-  let evsDia=eventos.map((ev, idx) => ({ev, idx})).filter(item=>item.ev.fecha.getTime()===fecha.getTime());
-
-  if(filtro==='destacado') evsDia=evsDia.filter(item=>item.ev.destacado);
-  else if(filtro!=='todos') evsDia=evsDia.filter(item=>catKey(item.ev.categoria)===filtro);
-  if(!evsDia.length) return;
-
-  const diaNom=DIAS[fecha.getDay()];
-  let html=`<div class="evento-modal-fecha">${diaNom} ${d} de ${MESES[calMes]} de ${calAño}</div>`;
-  evsDia.forEach(item=>{
-    const ev = item.ev;
-    const idx = item.idx;
-    const ck=ev.destacado?'destacado':catKey(ev.categoria);
-    const color=ck==='nacional'?'var(--nacional)':ck==='provincial'?'var(--provincial)':ck==='municipal'?'var(--municipal)':ck==='partidos'?'var(--partidos)':'var(--destacado)';
-    html+=`<div class="evento-modal-item">
+function renderEventoModalItem(ev, idx){
+  const ck=ev.destacado?'destacado':catKey(ev.categoria);
+  const color=ck==='nacional'?'var(--nacional)':ck==='provincial'?'var(--provincial)':ck==='municipal'?'var(--municipal)':ck==='partidos'?'var(--partidos)':'var(--destacado)';
+  return `<div class="evento-modal-item">
       <div style="display:flex;align-items:center;gap:8px;">
         <span style="font-size:9px;font-weight:900;color:${color};text-transform:uppercase;letter-spacing:.08em;">${ev.categoria}</span>
         ${ev.destacado?'<span style="background:var(--destacado);color:#fff;font-size:8px;font-weight:900;padding:2px 6px;border-radius:2px;text-transform:uppercase;letter-spacing:.05em;">⭐ Clave</span>':''}
@@ -1359,9 +1359,31 @@ function mostrarDetalleDia(d){
         <button class="btn-accion-ev dl-btn" style="border-color:#a855f7; color:#a855f7" onclick="abrirMenuFormato(event, 'evento', ${idx})">📥 Placa</button>
       </div>
     </div>`;
-  });
+}
+
+function mostrarDetalleDia(d){
+  const fecha=new Date(calAño,calMes,d); fecha.setHours(0,0,0,0);
+  let evsDia=eventos.map((ev, idx) => ({ev, idx})).filter(item=>item.ev.fecha.getTime()===fecha.getTime());
+
+  if(filtro==='destacado') evsDia=evsDia.filter(item=>item.ev.destacado);
+  else if(filtro!=='todos') evsDia=evsDia.filter(item=>catKey(item.ev.categoria)===filtro);
+  if(!evsDia.length) return;
+
+  const diaNom=DIAS[fecha.getDay()];
+  let html=`<div class="evento-modal-fecha">${diaNom} ${d} de ${MESES[calMes]} de ${calAño}</div>`;
+  evsDia.forEach(item=>{ html+=renderEventoModalItem(item.ev, item.idx); });
 
   document.getElementById('eventoModalBody').innerHTML = html;
+  document.getElementById('eventoModal').classList.add('visible');
+}
+
+  function abrirDetalleEvento(idx){
+  const ev = eventos[idx];
+  if(!ev) return;
+  const fechaStr = `${DIAS_LARGOS[ev.fecha.getDay()]} ${ev.fecha.getDate()} de ${MESES[ev.fecha.getMonth()]} de ${ev.fecha.getFullYear()}`;
+
+  document.getElementById('eventoModalBody').innerHTML =
+    `<div class="evento-modal-fecha">${fechaStr}</div>` + renderEventoModalItem(ev, idx);
   document.getElementById('eventoModal').classList.add('visible');
 }
 
