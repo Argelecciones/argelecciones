@@ -795,6 +795,10 @@ display: none;
   <button onclick="elegirFormato('cuadrada')" style="background:#0f172a;border:1px solid #334155;color:#f0f4ff;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;text-align:left;white-space:nowrap;">⬛ Cuadrada (1200×1200)</button>
   <button onclick="elegirFormato('instagram')" style="background:#0f172a;border:1px solid #334155;color:#f0f4ff;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;text-align:left;white-space:nowrap;">📷 Instagram (1080×1350)</button>
 </div>
+  <div id="calendarioPopover" style="display:none;position:fixed;z-index:10001;background:#1e293b;border:1px solid #334155;border-radius:8px;padding:6px;box-shadow:0 8px 20px rgba(0,0,0,.4);flex-direction:column;gap:4px;">
+  <button onclick="elegirAccionCalendario('google')" style="background:#0f172a;border:1px solid #334155;color:#f0f4ff;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;text-align:left;white-space:nowrap;">📅 Google Calendar</button>
+  <button onclick="elegirAccionCalendario('ics')" style="background:#0f172a;border:1px solid #334155;color:#f0f4ff;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;text-align:left;white-space:nowrap;">⬇️ Descargar .ics</button>
+</div>
 <div id="eventoModal" class="evento-modal" onclick="cerrarModalEvento(event)">
   <div class="evento-modal-card" onclick="event.stopPropagation()">
     <button class="evento-modal-close" onclick="cerrarModalEvento()">×</button>
@@ -1364,6 +1368,7 @@ function renderEventoModalItem(ev, idx){
       <div class="evento-modal-acciones">
         <button class="btn-accion-ev" onclick="copiarEvento(${idx}, this)">📋 Copiar</button>
         <button class="btn-accion-ev dl-btn" style="border-color:#a855f7; color:#a855f7" onclick="abrirMenuFormato(event, 'evento', ${idx})">📥 Placa</button>
+        <button class="btn-accion-ev" style="border-color:#10b981; color:#10b981" onclick="abrirMenuCalendario(event, ${idx})">➕ Calendario</button>
       </div>
     </div>`;
 }
@@ -1393,6 +1398,99 @@ function mostrarDetalleDia(d){
     `<div class="evento-modal-fecha">${fechaStr}</div>` + renderEventoModalItem(ev, idx);
   document.getElementById('eventoModal').classList.add('visible');
 }
+
+  function generarICS(ev) {
+  const pad = n => String(n).padStart(2, '0');
+  const f = ev.fecha;
+  const fechaICS = `${f.getFullYear()}${pad(f.getMonth()+1)}${pad(f.getDate())}`;
+
+  const escapar = s => (s||'').replace(/([,;])/g, '\\$1');
+
+  const lineas = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//ElectoAgenda//ArgElecciones//ES',
+    'BEGIN:VEVENT',
+    `UID:${fechaICS}-${Math.random().toString(36).slice(2,9)}@argelecciones`,
+    `DTSTAMP:${fechaICS}T000000Z`,
+    `DTSTART;VALUE=DATE:${fechaICS}`,
+    `SUMMARY:${escapar(ev.descripcion)}`,
+    ev.provincia ? `LOCATION:${escapar(ev.provincia)}` : '',
+    `DESCRIPTION:${escapar(ev.categoria)} - ElectoAgenda @ArgElecciones`,
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ].filter(Boolean);
+
+  const contenido = lineas.join('\r\n');
+  const blob = new Blob([contenido], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `${fechaICS}-${ev.descripcion.slice(0,30).replace(/[^a-z0-9]+/gi,'-')}.ics`;
+  link.click();
+
+  URL.revokeObjectURL(url);
+}
+
+  function linkGoogleCalendar(ev) {
+  const pad = n => String(n).padStart(2, '0');
+  const f = ev.fecha;
+  const fechaInicio = `${f.getFullYear()}${pad(f.getMonth()+1)}${pad(f.getDate())}`;
+
+  const fin = new Date(f);
+  fin.setDate(fin.getDate() + 1);
+  const fechaFin = `${fin.getFullYear()}${pad(fin.getMonth()+1)}${pad(fin.getDate())}`;
+
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: ev.descripcion,
+    dates: `${fechaInicio}/${fechaFin}`,
+    details: `${ev.categoria} - ElectoAgenda @ArgElecciones`
+  });
+
+  if (ev.provincia) params.set('location', ev.provincia);
+
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
+  let idxCalendarioActual = null;
+
+function abrirMenuCalendario(evt, idx) {
+  evt.stopPropagation();
+  idxCalendarioActual = idx;
+  const pop = document.getElementById('calendarioPopover');
+
+  pop.style.display = 'flex';
+  const rect = evt.currentTarget.getBoundingClientRect();
+  const popWidth = 180;
+  const popHeight = 90;
+  let left = rect.left;
+  if (left + popWidth > window.innerWidth) left = window.innerWidth - popWidth - 10;
+  let top = rect.bottom + 6;
+  if (rect.bottom + popHeight > window.innerHeight) top = rect.top - popHeight - 6;
+  pop.style.left = left + 'px';
+  pop.style.top = top + 'px';
+}
+
+function elegirAccionCalendario(accion) {
+  document.getElementById('calendarioPopover').style.display = 'none';
+  const ev = eventos[idxCalendarioActual];
+  if (!ev) return;
+
+  if (accion === 'google') {
+    window.open(linkGoogleCalendar(ev), '_blank');
+  } else if (accion === 'ics') {
+    generarICS(ev);
+  }
+}
+
+document.addEventListener('click', (e) => {
+  const pop = document.getElementById('calendarioPopover');
+  if (pop && pop.style.display !== 'none' && !pop.contains(e.target)) {
+    pop.style.display = 'none';
+  }
+});
 
 function cerrarModalEvento(evt){
   if(evt) evt.stopPropagation();
