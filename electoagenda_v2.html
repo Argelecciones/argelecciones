@@ -1102,6 +1102,7 @@ let idxPopoverActual = null;
 
 function abrirMenuFormato(evt, tipo, idx) {
   evt.stopPropagation();
+  document.getElementById('calendarioPopover').style.display = 'none';
   const pop = document.getElementById('formatoPopover');
   tipoPopoverActual = tipo;
   idxPopoverActual = idx;
@@ -1458,6 +1459,7 @@ function mostrarDetalleDia(d){
 
 function abrirMenuCalendario(evt, idx) {
   evt.stopPropagation();
+  document.getElementById('formatoPopover').style.display = 'none';
   idxCalendarioActual = idx;
   const pop = document.getElementById('calendarioPopover');
 
@@ -1495,6 +1497,8 @@ document.addEventListener('click', (e) => {
 function cerrarModalEvento(evt){
   if(evt) evt.stopPropagation();
   document.getElementById('eventoModal').classList.remove('visible');
+  document.getElementById('formatoPopover').style.display = 'none';
+  document.getElementById('calendarioPopover').style.display = 'none';
 }
 
 function construirPlacaCal(){
