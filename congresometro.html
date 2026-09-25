@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Congresómetro — @argelecciones</title>
+        <title>Congresómetro — @ArgElecciones</title>
     <meta name="description" content="Simulá quórum y votaciones en Diputados y Senadores de la Nación en tiempo real, con exportación de placas para redes.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://argelecciones.netlify.app/congresometro.html">
@@ -932,6 +932,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             <h1 style="margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3px;text-transform:uppercase">Congresómetro</h1>
             <p style="margin:2px 0 0;font-size:11px;color:#93c5fd;font-weight:700;text-transform:uppercase;letter-spacing:.1em">@ArgElecciones Toolbox</p>
         </div>
+        <a href="index.html" style="margin-left:auto;color:#fff;font-size:12px;font-weight:800;text-decoration:none;background:rgba(255,255,255,.15);padding:6px 12px;border-radius:6px;white-space:nowrap;">← Toolbox</a>
     </header>
 
     <div class="selectors-grid">
@@ -1136,7 +1137,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
 </div> <!-- Cierre de placa-col-left -->
                                                 <div class="placa-col-right">
                             <div id="placaBlocksDetail"></div>
-                            <div class="placa-footer">Generado por @argelecciones</div>
+                            <div class="placa-footer">Generado por @ArgElecciones</div>
 							<div class="placa-footer">Sólo para difusión</div>
                         </div>
                     <div class="marca-agua-difusion"></div>
@@ -2999,11 +3000,11 @@ function renderizarVistaDetallada(camara) {
         if (txArea) {
             const camLabel = camara.label;
             if (modoActivo === 'quorum') {
-                txArea.value = `🏛 CONGRESO | Sesión en ${camLabel}:\n\n${statusTextReport}\nPresentes en sus bancas: ${totalPresentes}/${camara.total}\n\nDetalle de asistencia:\n${reporteBloques.join('\n') || 'Ninguno en el recinto'}\n\n#Congresómetro vía @argelecciones`;
+                txArea.value = `🏛 CONGRESO | Sesión en ${camLabel}:\n\n${statusTextReport}\nPresentes en sus bancas: ${totalPresentes}/${camara.total}\n\nDetalle de asistencia:\n${reporteBloques.join('\n') || 'Ninguno en el recinto'}\n\n#Congresómetro vía @ArgElecciones`;
             } else {
                                 const lineaResultado = resultadoTexto ? `${resultadoTexto}\n\n` : '';
                 const lineaSV = t_sv ? `🔵 Sin Votar: ${t_sv}\n` : '';
-                txArea.value = `🏛 ${camLabel} - Votación:\n\n${lineaResultado}🟢 A Favor: ${t_af}\n🔴 En Contra: ${t_neg}\n⚪ Abstenciones: ${t_abs}\n${lineaSV}⚫ Ausentes: ${t_aus}\n\nDetalle estructural por bloques:\n${reporteBloques.join('\n') || 'Sin votos registrados'}\n\n#Congresómetro vía @argelecciones`;
+                txArea.value = `🏛 ${camLabel} - Votación:\n\n${lineaResultado}🟢 A Favor: ${t_af}\n🔴 En Contra: ${t_neg}\n⚪ Abstenciones: ${t_abs}\n${lineaSV}⚫ Ausentes: ${t_aus}\n\nDetalle estructural por bloques:\n${reporteBloques.join('\n') || 'Sin votos registrados'}\n\n#Congresómetro vía @ArgElecciones`;
             }
         }
     }
