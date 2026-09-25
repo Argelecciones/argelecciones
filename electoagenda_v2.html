@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ElectoAgenda — @argelecciones</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -353,11 +355,12 @@ display: none;
   height: 1200px;
   background: #ffffff;
   font-family: 'Inter', system-ui, sans-serif;
-  display: flex;
+ display: none;
   flex-direction: column;
   color: #000000;
   border-top: 10px solid #19aae5;
 }
+
 
 .placa-efem-header {
   display: flex;
@@ -575,7 +578,7 @@ display: none;
 
 <div class="header">
   <div class="header-left">
-    <img src="logo.png" alt="Logo ArgElecciones" style="height:44px;width:auto;">
+<img src="/.netlify/images?url=/logo.png&w=90&fm=webp" alt="Logo ArgElecciones" style="height:44px;width:44px;">
     <div>
       <div class="header-title">Electo<span>Agenda</span></div>
       <div class="header-tag">Agenda electoral · @argelecciones</div>
