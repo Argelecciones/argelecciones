@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ElectoAgenda — @argelecciones</title>
+<title>ElectoAgenda — @ArgElecciones</title>
 <meta name="description" content="Cronograma y calendario electoral nacional y provincial de Argentina, actualizado automáticamente.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://argelecciones.netlify.app/electoagenda_v2.html">
-<meta property="og:title" content="ElectoAgenda — @argelecciones">
+<meta property="og:title" content="ElectoAgenda — @ArgElecciones">
 <meta property="og:description" content="Calendario electoral nacional y provincial de Argentina.">
 <meta property="og:image" content="https://argelecciones.netlify.app/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="ElectoAgenda — @argelecciones">
+<meta name="twitter:title" content="ElectoAgenda — @ArgElecciones">
 <meta name="twitter:description" content="Calendario electoral nacional y provincial de Argentina.">
 <meta name="twitter:image" content="https://argelecciones.netlify.app/og-image.png">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
@@ -591,10 +591,11 @@ display: none;
 <img src="/.netlify/images?url=/logo.png&w=90&fm=webp" alt="Logo ArgElecciones" style="height:44px;width:44px;">
     <div>
       <div class="header-title">Electo<span>Agenda</span></div>
-      <div class="header-tag">Agenda electoral · @argelecciones</div>
+      <div class="header-tag">Agenda electoral · @ArgElecciones</div>
     </div>
   </div>
 <div class="header-right">
+    <a href="index.html" class="btn-header" style="text-decoration:none;">← Toolbox</a>
     <button class="btn-header" id="btnLista" onclick="setVista('lista')">☰ Lista</button>
     <button class="btn-header" id="btnCal" onclick="setVista('calendario')">📅 Calendario</button>
     <button class="btn-header" id="btnEfem" onclick="setVista('efemerides')">🏛 Efemérides</button>
@@ -675,7 +676,7 @@ display: none;
   <div class="placa-header-cal">
     <div>
       <div class="placa-titulo-cal">Electo<span>Agenda</span></div>
-      <div class="placa-subtitulo-cal">Agenda electoral · @argelecciones</div>
+      <div class="placa-subtitulo-cal">Agenda electoral · @ArgElecciones</div>
     </div>
     <div>
       <div class="placa-mes-cal" id="placaMesTitulo">—</div>
@@ -825,7 +826,7 @@ display: none;
     <div class="gallery-caption">Previsualización — ESC o clic afuera para cerrar</div>
   </div>
 </div>
-<div class="footer">#ElectoAgenda · Solo para difusión · @argelecciones</div>
+<div class="footer">#ElectoAgenda · Solo para difusión · @ArgElecciones</div>
 
 <script>
 const CSV_URL = 'https://script.google.com/macros/s/AKfycbzNeoVgpRk3Luck2mPhe86zJqkRssY7zQGAeQ-AmawGn3HJGlKeprxC3dNcp52dSCbZ/exec';
@@ -950,8 +951,8 @@ function copiarEvento(idx, btn) {
   if(!ev) return;
   const fechaStr = `${DIAS_LARGOS[ev.fecha.getDay()]} ${ev.fecha.getDate()} de ${MESES[ev.fecha.getMonth()]} de ${ev.fecha.getFullYear()}`;
   const texto = ev.provincia
-    ? `📅 ElectoAgenda @Argelecciones\n\n🗳 ${ev.descripcion} (${ev.provincia}): ${fechaStr}`
-    : `📅 ElectoAgenda @Argelecciones\n\n🗳 ${ev.descripcion}: ${fechaStr}`;
+    ? `📅 ElectoAgenda @ArgElecciones\n\n🗳 ${ev.descripcion} (${ev.provincia}): ${fechaStr}`
+    : `📅 ElectoAgenda @ArgElecciones\n\n🗳 ${ev.descripcion}: ${fechaStr}`;
     
   navigator.clipboard.writeText(texto).then(() => {
     const origText = btn.textContent;
@@ -965,7 +966,7 @@ function copiarEvento(idx, btn) {
   if(!ev) return;
   const años = hoy.getFullYear() - ev.fecha.getFullYear();
   const fechaStr = `${ev.fecha.getDate()} de ${MESES[ev.fecha.getMonth()]} de ${ev.fecha.getFullYear()}`;
-  const texto = `📅ElectoAgenda @Argelecciones |\n\n🏛Se cumplen ${años} años: ${ev.descripcion} (${fechaStr})${ev.detalle?`\n\n${ev.detalle}`:''}`;
+  const texto = `📅ElectoAgenda @ArgElecciones |\n\n🏛Se cumplen ${años} años: ${ev.descripcion} (${fechaStr})${ev.detalle?`\n\n${ev.detalle}`:''}`;
 
   navigator.clipboard.writeText(texto).then(() => {
     const origText = btn.textContent;
