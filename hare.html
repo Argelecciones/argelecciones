@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Calculadora Hare — Provincia de Buenos Aires · @argelecciones</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -27,7 +27,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 
 /* HEADER */
 .header{background:var(--pba);padding:18px 28px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 8px rgba(0,0,0,.2);}
-.header-logo{height:44px;width:auto}
+.header-logo{height:44px;width:44px;object-fit:contain}
 .header-titles{}
 .header-title{font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3px}
 .header-title span{color:var(--acento)}
@@ -129,7 +129,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 <body>
 
 <div class="header">
-  <img src="logo.png" alt="Logo" class="header-logo">
+  <img src="/.netlify/images?url=/logo.png&w=90&fm=webp" alt="Logo" class="header-logo">
   <div class="header-titles">
     <div class="header-title">Calculadora <span>Hare</span></div>
     <div class="header-sub">Provincia de Buenos Aires · @argelecciones</div>
