@@ -91,6 +91,11 @@
 
     #statusBar { font-size: 13px; color: var(--text-muted); margin-bottom: 15px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
     #statusBar strong { color: var(--text-main); }
+	.dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; display: inline-block; }
+.dot.loading { background: var(--color-encuesta); animation: blink 1s infinite; }
+.dot.ok { background: #22c55e; }
+.dot.error { background: var(--destacado); }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
 
     .lista-noticias { display: flex; flex-direction: column; gap: 10px; }
 
@@ -244,12 +249,15 @@
     </div>
 
     <div id="statusBar">
-        <span id="loadingStatus">⏳ Cargando noticias...</span>
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <span id="conteoResultados"></span>
-            <button id="btnRestablecer" class="btn-restablecer" style="display: none;" onclick="restablecerOcultos()">Mostrar ocultas</button>
-        </div>
+    <div style="display: flex; align-items: center; gap: 7px;">
+        <span class="dot loading" id="statusDot"></span>
+        <span id="loadingStatus">Cargando noticias...</span>
     </div>
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <span id="conteoResultados"></span>
+        <button id="btnRestablecer" class="btn-restablecer" style="display: none;" onclick="restablecerOcultos()">Mostrar ocultas</button>
+    </div>
+</div>
 
     <div class="lista-noticias" id="listaNoticias"></div>
 
@@ -300,22 +308,33 @@
     }
 
     async function cargarNoticias() {
-        try {
-            const response = await fetch(APPS_SCRIPT_URL);
-            const data = await response.json();
-            BD_NOTICIAS = data.noticias || [];
-            document.getElementById('loadingStatus').innerText =
-                BD_NOTICIAS.length > 0
-                    ? `Última actualización: ${new Date(BD_NOTICIAS[0].Fecha).toLocaleString('es-AR')}`
-                    : "Sin noticias cargadas todavía.";
-            poblarFiltroMedios();
-            renderizarLista();
-        } catch (error) {
-            console.error("Error en conexión:", error);
-            document.getElementById('loadingStatus').innerText = "❌ Error al cargar los datos.";
-        }
-    }
+    const dot = document.getElementById('statusDot');
+    try {
+        const response = await fetch(APPS_SCRIPT_URL);
+        const data = await response.json();
+        BD_NOTICIAS = data.noticias || [];
 
+        if (BD_NOTICIAS.length > 0) {
+            const fechasCarga = BD_NOTICIAS
+                .map(n => new Date(n.FechaCarga))
+                .filter(f => !isNaN(f));
+            const ultimaCarga = fechasCarga.length > 0 ? new Date(Math.max(...fechasCarga)) : null;
+            document.getElementById('loadingStatus').innerText = ultimaCarga
+                ? `Última actualización: ${ultimaCarga.toLocaleString('es-AR')}`
+                : "Sin datos de actualización.";
+        } else {
+            document.getElementById('loadingStatus').innerText = "Sin noticias cargadas todavía.";
+        }
+
+        dot.className = 'dot ok';
+        poblarFiltroMedios();
+        renderizarLista();
+    } catch (error) {
+        console.error("Error en conexión:", error);
+        document.getElementById('loadingStatus').innerText = "❌ Error al cargar los datos.";
+        dot.className = 'dot error';
+    }
+}
     function poblarFiltroMedios() {
         const selMedio = document.getElementById('filterMedio');
         // Limpiamos opciones anteriores para no duplicarlas si se vuelve a cargar
