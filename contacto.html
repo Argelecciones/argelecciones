@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contacto — @ArgElecciones</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#f1f5f9;color:#0f172a;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
+.card{background:#fff;border:1px solid #cbd5e1;border-radius:12px;padding:32px;max-width:480px;width:100%;box-shadow:0 4px 6px -1px rgba(0,0,0,.05)}
+h1{font-size:22px;margin-bottom:6px}
+.sub{font-size:13px;color:#475569;margin-bottom:20px}
+label{display:block;font-size:12px;font-weight:700;color:#475569;margin:14px 0 6px}
+input,select,textarea{width:100%;border:1px solid #cbd5e1;border-radius:6px;padding:10px;font-family:inherit;font-size:14px}
+textarea{min-height:120px;resize:vertical}
+button{margin-top:18px;background:#2563eb;color:#fff;border:none;padding:12px;border-radius:6px;font-weight:800;width:100%;cursor:pointer}
+button:hover{background:#1e40af}
+.volver{display:inline-block;margin-bottom:16px;font-size:13px;color:#2563eb;text-decoration:none;font-weight:700}
+.ok{display:none;text-align:center;padding:20px 0}
+</style>
+</head>
+<body>
+<div class="card">
+  <a href="index.html" class="volver">← Toolbox</a>
+  <h1>Reportar error o sugerencia</h1>
+  <p class="sub">Contanos qué encontraste. Leemos todos los envíos.</p>
+
+  <form name="feedback" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="feedbackForm">
+    <input type="hidden" name="form-name" value="feedback" />
+    <p style="display:none"><label>No completar: <input name="bot-field" /></label></p>
+
+    <label>Herramienta</label>
+    <select name="herramienta">
+      <option>General / Toolbox</option>
+      <option>Congresómetro</option>
+      <option>D'Hondt</option>
+      <option>Hare</option>
+      <option>ElectoAgenda</option>
+      <option>Radar Electoral</option>
+      <option>Generador de Hemiciclos</option>
+    </select>
+
+    <label>Tu mensaje</label>
+    <textarea name="mensaje" required placeholder="Describí el error o tu sugerencia"></textarea>
+
+    <label>Nombre o usuario de X (opcional)</label>
+    <input type="text" name="nombre" placeholder="Opcional">
+
+    <button type="submit">Enviar</button>
+  </form>
+
+  <div class="ok" id="okMsg">
+    <p style="font-size:16px;font-weight:800;color:#16a34a">✓ ¡Gracias! Ya lo recibimos.</p>
+  </div>
+</div>
+
+<script>
+document.getElementById('feedbackForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const form = e.target;
+  const data = new FormData(form);
+  fetch('/', { method: 'POST', body: new URLSearchParams(data) })
+    .then(() => {
+      form.style.display = 'none';
+      document.getElementById('okMsg').style.display = 'block';
+    })
+    .catch(() => alert('Hubo un error al enviar. Probá de nuevo.'));
+});
+</script>
+</body>
+</html>
