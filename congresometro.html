@@ -2508,11 +2508,11 @@ function renderizarVistaDetallada(camara) {
         // Falta texto
         const pqFaltaTxt = document.getElementById('pq-falta-txt');
         if (pqFaltaTxt) {
-            if (hayQuorum) {
-                pqFaltaTxt.innerText = `Superó en ${totalPresentes - camara.quorum} el mínimo`;
-            } else {
+                        if (hayQuorum) {
+                pqFaltaTxt.innerText = `${totalPresentes - camara.quorum} por encima del quórum`;
+                       } else {
                 const falt = camara.quorum - totalPresentes;
-                pqFaltaTxt.innerText = `Faltan ${falt} legislador${falt===1?'':'es'}`;
+                pqFaltaTxt.innerText = `Faltan ${falt} para el quórum`;
             }
         }
 
@@ -2556,9 +2556,13 @@ function renderizarVistaDetallada(camara) {
                 .filter(b => b.val > 0)
                 .sort((a, b) => b.val - a.val);
 
-            let tamanoNombre = 24, tamanoNum = 30, paddingFila = '8px 12px';
-            if (bloquesConValor.length > 16) { tamanoNombre = 16; tamanoNum = 20; paddingFila = '5px 10px'; }
-            else if (bloquesConValor.length > 10) { tamanoNombre = 19; tamanoNum = 24; paddingFila = '6px 11px'; }
+                        const n = bloquesConValor.length;
+            let tamanoNombre, tamanoNum, paddingFila;
+            if (n <= 8) { tamanoNombre = 28; tamanoNum = 36; paddingFila = '14px 16px'; }
+            else if (n <= 12) { tamanoNombre = 25; tamanoNum = 32; paddingFila = '11px 14px'; }
+            else if (n <= 16) { tamanoNombre = 22; tamanoNum = 28; paddingFila = '9px 13px'; }
+            else if (n <= 20) { tamanoNombre = 19; tamanoNum = 24; paddingFila = '7px 12px'; }
+            else { tamanoNombre = 17; tamanoNum = 21; paddingFila = '6px 10px'; }
 
             bloquesConValor.forEach(({ bloque, val }) => {
                 const fila = document.createElement('div');
