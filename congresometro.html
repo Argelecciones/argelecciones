@@ -383,7 +383,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     inset: 0;
     pointer-events: none;
     z-index: 20;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='900' height='500' viewBox='0 0 900 500'><text x='450' y='250' text-anchor='middle' font-family='Inter, sans-serif' font-size='30' font-weight='800' fill='rgba(15,23,42,0.055)' transform='rotate(-28 450 250)'>Sólo para difusión</text></svg>");
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1100' height='650' viewBox='0 0 1100 650'><text x='550' y='325' text-anchor='middle' font-family='Inter, sans-serif' font-size='28' font-weight='800' fill='rgba(15,23,42,0.035)' transform='rotate(-28 550 325)'>Sólo para difusión</text></svg>");
     background-repeat: repeat;
 }
         
@@ -625,10 +625,10 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     }
     .placa-quorum-titulo { font-size: 80px; font-weight: 900; color: #0f172a; line-height: 1.1; }
     .placa-quorum-subtitulo { font-size: 30px; color: #64748b; font-weight: 700; margin-top: 8px; }
-    .placa-quorum-badge-grande {
-        padding: 14px 28px;
-        border-radius: 16px;
-        font-size: 40px;
+        .placa-quorum-badge-grande {
+        padding: 10px 20px;
+        border-radius: 12px;
+        font-size: 28px;
         font-weight: 900;
         text-transform: uppercase;
         letter-spacing: 0.05em;
@@ -716,10 +716,10 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         overflow: hidden;
         text-overflow: ellipsis;
     }
-    .placa-quorum-bloque-num {
+        .placa-quorum-bloque-num {
         font-size: 30px;
         font-weight: 900;
-        color: #10b981;
+        color: #1e3a8a;
         min-width: 30px;
         text-align: right;
     }
@@ -1062,11 +1062,13 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                                     <div class="placa-quorum-barra-fill sin" id="pq-fill" style="width:0%"></div>
                                 </div>
                             </div>
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                                       <div style="display:flex; flex-direction:column; gap:4px;">
                                 <div>
                                     <span class="placa-quorum-num" id="pq-total">0</span>
-                                    <span style="font-size:24px; color:#64748b; font-weight:700;" id="pq-de-total"> / 257 presentes</span>
+                                    <span style="font-size:48px; color:#64748b; font-weight:700;"> / </span>
+                                    <span class="placa-quorum-num" id="pq-necesario" style="color:#1e3a8a;">0</span>
                                 </div>
+                                <div style="font-size:20px; color:#94a3b8; font-weight:700;" id="pq-de-total">/ 257 bancas totales</div>
                             </div>
                         </div>
 
@@ -2535,27 +2537,39 @@ function renderizarVistaDetallada(camara) {
 
         // Totales
         const pqTotal = document.getElementById('pq-total');
+        const pqNecesario = document.getElementById('pq-necesario');
         const pqDeTotal = document.getElementById('pq-de-total');
         if (pqTotal) pqTotal.innerText = totalPresentes;
-        if (pqDeTotal) pqDeTotal.innerText = ` / ${camara.total} bancas`;
+        if (pqNecesario) pqNecesario.innerText = camara.quorum;
+        if (pqDeTotal) pqDeTotal.innerText = `${camara.total} bancas totales`;
 
-        // Bloques
+                // Bloques
         const pqBloques = document.getElementById('pq-bloques');
         if (pqBloques) {
             pqBloques.innerHTML = '';
-            camara.blocks.forEach((bloque, idx) => {
-                const slider = document.getElementById(`q-slide-${idx}`);
-                const val = slider ? (parseInt(slider.value) || 0) : 0;
-                if (val > 0) {
-                    const fila = document.createElement('div');
-                    fila.className = 'placa-quorum-bloque-fila';
-                    fila.style.borderLeftColor = bloque.color;
-                    fila.innerHTML = `
-                        <span class="placa-quorum-bloque-nombre">${bloque.name}</span>
-                        <span class="placa-quorum-bloque-num">${val}</span>
-                    `;
-                    pqBloques.appendChild(fila);
-                }
+            const bloquesConValor = camara.blocks
+                .map((bloque, idx) => {
+                    const slider = document.getElementById(`q-slide-${idx}`);
+                    const val = slider ? (parseInt(slider.value) || 0) : 0;
+                    return { bloque, val };
+                })
+                .filter(b => b.val > 0)
+                .sort((a, b) => b.val - a.val);
+
+            let tamanoNombre = 24, tamanoNum = 30, paddingFila = '8px 12px';
+            if (bloquesConValor.length > 16) { tamanoNombre = 16; tamanoNum = 20; paddingFila = '5px 10px'; }
+            else if (bloquesConValor.length > 10) { tamanoNombre = 19; tamanoNum = 24; paddingFila = '6px 11px'; }
+
+            bloquesConValor.forEach(({ bloque, val }) => {
+                const fila = document.createElement('div');
+                fila.className = 'placa-quorum-bloque-fila';
+                fila.style.borderLeftColor = bloque.color;
+                fila.style.padding = paddingFila;
+                fila.innerHTML = `
+                    <span class="placa-quorum-bloque-nombre" style="font-size:${tamanoNombre}px;">${bloque.name}</span>
+                    <span class="placa-quorum-bloque-num" style="font-size:${tamanoNum}px;">${val}</span>
+                `;
+                pqBloques.appendChild(fila);
             });
         }
     }
