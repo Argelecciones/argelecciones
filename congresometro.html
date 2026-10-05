@@ -233,6 +233,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         .vote-summary-line .vs-abs { background: rgba(234, 179, 8, 0.15); color: #854d0e; }
         .vote-summary-line .vs-aus { background: rgba(148, 163, 184, 0.15); color: #475569; }
         .vote-summary-line .vs-sv { background: rgba(37, 99, 235, 0.15); color: #1e40af; }
+        .vote-summary-line .vs-duda { background: rgba(100, 116, 139, 0.15); color: #334155; }
 
         /* CAJA DE REDES */
         .social-box { background: #eff6ff; border: 1px solid #bfdbfe; padding: 15px; border-radius: 12px; }
@@ -782,6 +783,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     .btn-estado-persona.btn-aus.active { background:#334155; border-color:#64748b; color:#e2e8f0; }
     .btn-estado-persona.btn-presente.active { background:#064e3b; border-color:#10b981; color:#6ee7b7; }
     .btn-estado-persona.btn-sv.active { background:#1e3a5f; border-color:#3b82f6; color:#93c5fd; }
+	.btn-estado-persona.btn-duda.active { background:#334155; border-color:#94a3b8; color:#e2e8f0; }
 
 		#placaNominalEntity {
         position: fixed;
@@ -822,6 +824,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     .tag-abs { background:#fef9c3; color:#854d0e; }
     .tag-aus { background:#e2e8f0; color:#64748b; }
 	.tag-sv { background:#dbeafe; color:#1e40af; }
+    .tag-duda { background:#e2e8f0; color:#475569; }
     .placa-nominal-footer { display:flex; justify-content:space-between; align-items:center; border-top:1px solid #e2e8f0; margin-top:25px; padding-top:15px; }
     .placa-nominal-footer-logo { height:90px; width:auto; object-fit:contain; }
 	.placa-nominal-footer-txt { font-size:16px; color:#94a3b8; font-weight:700; }
@@ -999,6 +1002,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                 <button class="btn-shortcut" onclick="atajoLimpiarTodo()">❌ Limpiar Todo</button>
                 <button id="btn-marcar-todos" class="btn-shortcut" onclick="atajoMarcarTodos()">✅ Marcar Todos</button>
                 <button id="btn-presidencia-sv" class="btn-shortcut" onclick="togglePresidenciaSinVotar()" style="display:none;">🔵 Presidencia: Sin Votar</button>
+						                 <button id="btn-duda-bloques" class="btn-shortcut" onclick="abrirModalDuda()" style="display:none;">🔘 En duda</button>
                 <button id="btn-ocultar-fecha" class="btn-shortcut" onclick="toggleOcultarFecha()" style="display:none;">🗓️ Ocultar fecha</button>
             </div>
                         <div id="recintoContainer" style="display:none; margin-bottom:15px;"></div>
@@ -1050,6 +1054,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                             <div style="display:flex; flex-direction:column; align-items:flex-end; gap:10px;">
                                 <div class="placa-quorum-badge-grande sin" id="pq-badge">Sin Quórum</div>
                                 <div style="font-size:24px; color:#94a3b8; font-weight:700;" id="pq-falta-txt"></div>
+                                <div style="font-size:20px; color:#64748b; font-weight:700;" id="pq-duda-txt"></div>
                             </div>
                         </div>
 
@@ -1237,6 +1242,15 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
 </div>
 
 <!-- LIGHTBOX MODAL DE PREVISUALIZACIÓN EMERGENTE -->
+	<div id="modalDudaEntity" class="gallery-modal" onclick="cerrarModalDuda(event)">
+    <div class="gallery-content-wrapper" onclick="event.stopPropagation()" style="background:#1e293b; border-radius:12px; padding:24px; max-width:420px; width:100%;">
+        <button class="gallery-close-btn" onclick="cerrarModalDuda()" style="top:-10px; right:-10px;">&times;</button>
+        <h3 style="color:#f8fafc; font-size:16px; margin-bottom:4px;">Marcar "En duda" por bloque</h3>
+        <p style="color:#94a3b8; font-size:12px; margin-bottom:16px;">No suma al quórum. Se descuenta primero de los ausentes; si no alcanza, de los presentes marcados.</p>
+        <div id="listaDudaBloques" style="display:flex; flex-direction:column; gap:10px; max-height:400px; overflow-y:auto;"></div>
+        <button class="btn-shortcut" style="width:100%; margin-top:16px; background:#1e3a8a;" onclick="cerrarModalDuda()">Listo</button>
+    </div>
+</div>
 <div id="galleryModalEntity" class="gallery-modal" onclick="cerrarModalGaleria()">
     <div class="gallery-content-wrapper" onclick="event.stopPropagation()">
         <button class="gallery-close-btn" onclick="cerrarModalGaleria()">&times;</button>
@@ -1305,6 +1319,15 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     let presidenciaSinVotar = false;
     let filtroEstadoDetallada = 'todos';
     let fechaOcultaPlacas = false;
+    let dudaPorBloque = {};
+
+    function claveDuda(camaraKey, idx) {
+        return `${camaraKey}::${idx}`;
+    }
+
+    function getDudaBloque(camaraKey, idx) {
+        return dudaPorBloque[claveDuda(camaraKey, idx)] || 0;
+    }
 
     function toggleOcultarFecha() {
         fechaOcultaPlacas = !fechaOcultaPlacas;
@@ -1345,6 +1368,38 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             mostrarToastSV(`Recordá cargar 1 voto menos en ${nombreBloque} — el sistema ya descuenta esa banca de "Ausentes" automáticamente.`);
         }
         ejecutarCalculos();
+    }
+
+	    function abrirModalDuda() {
+        const camara = dataCongreso[camaraActiva];
+        const lista = document.getElementById('listaDudaBloques');
+        lista.innerHTML = '';
+        camara.blocks.forEach((bloque, idx) => {
+            const val = getDudaBloque(camaraActiva, idx);
+            const fila = document.createElement('div');
+            fila.style.cssText = 'display:flex; align-items:center; justify-content:space-between; gap:10px;';
+            fila.innerHTML = `
+                <span style="color:#f8fafc; font-size:13px; font-weight:700;">${bloque.name}</span>
+                <input type="number" min="0" max="${bloque.max}" value="${val}" style="width:60px; padding:5px; border-radius:4px; border:1px solid #334155; background:#0f172a; color:#f8fafc; text-align:center;" onchange="setDudaBloque(${idx}, this.value, ${bloque.max})">
+            `;
+            lista.appendChild(fila);
+        });
+        document.getElementById('modalDudaEntity').style.display = 'flex';
+        document.body.classList.add('modal-abierto');
+    }
+
+    function setDudaBloque(idx, valor, max) {
+        let v = parseInt(valor) || 0;
+        if (v < 0) v = 0;
+        if (v > max) v = max;
+        dudaPorBloque[claveDuda(camaraActiva, idx)] = v;
+        ejecutarCalculos();
+    }
+
+    function cerrarModalDuda(evt) {
+        if (evt) evt.stopPropagation();
+        document.getElementById('modalDudaEntity').style.display = 'none';
+        document.body.classList.remove('modal-abierto');
     }
 
     function mostrarToastSV(texto) {
@@ -1509,6 +1564,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         desempateManual = null;
         presidenciaSinVotar = false;
         filtroEstadoDetallada = 'todos';
+		        dudaPorBloque = {};
         document.getElementById('cam-diputados').classList.toggle('active', camara === 'diputados');
         document.getElementById('cam-senadores').classList.toggle('active', camara === 'senadores');
 
@@ -1687,10 +1743,11 @@ function renderizarVistaDetallada(camara) {
                 fila.className = 'legislador-fila';
 
                                 let botonesHtml = '';
-                if (modoActivo === 'quorum') {
+                                if (modoActivo === 'quorum') {
                     botonesHtml = `
                         <button class="btn-estado-persona btn-presente ${estado === 'presente' ? 'active' : ''}" onclick="marcarPersonaEstado('${p.nombre.replace(/'/g, "\\'")}', 'presente')">PRES</button>
-                        <button class="btn-estado-persona btn-aus ${estado !== 'presente' ? 'active' : ''}" onclick="marcarPersonaEstado('${p.nombre.replace(/'/g, "\\'")}', 'ausente')">AUS</button>`;
+                        <button class="btn-estado-persona btn-duda ${estado === 'duda' ? 'active' : ''}" onclick="marcarPersonaEstado('${p.nombre.replace(/'/g, "\\'")}', 'duda')">EN DUDA</button>
+                        <button class="btn-estado-persona btn-aus ${estado === 'ausente' ? 'active' : ''}" onclick="marcarPersonaEstado('${p.nombre.replace(/'/g, "\\'")}', 'ausente')">AUS</button>`;
                 } else {
                     botonesHtml = `
                         <button class="btn-estado-persona btn-af ${estado === 'af' ? 'active' : ''}" onclick="marcarPersonaEstado('${p.nombre.replace(/'/g, "\\'")}', 'af')">AF</button>
@@ -1797,8 +1854,8 @@ function renderizarVistaDetallada(camara) {
                 let tagClass = 'tag-aus', tagTxt = 'AUS';
 
                 if (modoActivo === 'quorum') {
-                    tagClass = estado === 'presente' ? 'tag-af' : 'tag-aus';
-                    tagTxt = estado === 'presente' ? 'PRES' : 'AUS';
+                    tagClass = estado === 'presente' ? 'tag-af' : estado === 'duda' ? 'tag-duda' : 'tag-aus';
+                    tagTxt = estado === 'presente' ? 'PRES' : estado === 'duda' ? 'EN DUDA' : 'AUS';
                 } else {
                     if (estado === 'af') { tagClass = 'tag-af'; tagTxt = 'AF'; }
                     else if (estado === 'neg') { tagClass = 'tag-neg'; tagTxt = 'NEG'; }
@@ -1906,8 +1963,8 @@ function renderizarVistaDetallada(camara) {
         const leyenda = document.getElementById('pr-leyenda');
         if (leyenda) {
             leyenda.innerHTML = '';
-                                           const items = modoActivo === 'quorum'
-                ? [['PRESENTE', votos.totalPresentes, 'rgba(16, 185, 129, 0.15)', '#166534', 'rgba(16, 185, 129, 0.3)'], ['AUSENTE', votos.t_aus, 'rgba(148, 163, 184, 0.15)', '#334155', 'rgba(148, 163, 184, 0.3)']]
+const items = modoActivo === 'quorum'
+                ? [['PRESENTE', votos.totalPresentes, 'rgba(16, 185, 129, 0.15)', '#166534', 'rgba(16, 185, 129, 0.3)'], ['EN DUDA', votos.t_duda || 0, 'rgba(100, 116, 139, 0.2)', '#334155', 'rgba(100, 116, 139, 0.4)'], ['AUSENTE', votos.t_aus, 'rgba(148, 163, 184, 0.15)', '#334155', 'rgba(148, 163, 184, 0.3)']]
                 : [['AFIRMATIVOS', votos.t_af, 'rgba(16, 185, 129, 0.15)', '#166534', 'rgba(16, 185, 129, 0.3)'], ['NEGATIVOS', votos.t_neg, 'rgba(239, 68, 68, 0.15)', '#991b1b', 'rgba(239, 68, 68, 0.3)'], ['ABSTENCIÓN', votos.t_abs, 'rgba(234, 179, 8, 0.15)', '#854d0e', 'rgba(234, 179, 8, 0.3)'], ['SIN VOTAR', votos.t_sv || 0, 'rgba(37, 99, 235, 0.15)', '#1e40af', 'rgba(37, 99, 235, 0.3)'], ['AUSENTE', votos.t_aus, 'rgba(148, 163, 184, 0.15)', '#334155', 'rgba(148, 163, 184, 0.3)']];
                         items.forEach(([label, val, bg, color, borderColor]) => {
                 const box = document.createElement('div');
@@ -2103,11 +2160,12 @@ function renderizarVistaDetallada(camara) {
         svg.setAttribute('style', 'width:100%; max-width:640px; height:auto; background:#0f172a; border-radius:8px; display:block; margin:0 auto;');
 
         const defs = document.createElementNS(svgns, 'defs');
-        const glowsConfig = [
+                const glowsConfig = [
             ['glow-verde', '#16a34a'],
             ['glow-rojo', '#b91c1c'],
             ['glow-amarillo', '#ca8a04'],
-            ['glow-azul', '#2563eb']
+            ['glow-azul', '#2563eb'],
+            ['glow-gris', '#94a3b8']
         ];
         glowsConfig.forEach(([id, color]) => {
             const filtro = document.createElementNS(svgns, 'filter');
@@ -2143,12 +2201,13 @@ function renderizarVistaDetallada(camara) {
         });
         svg.appendChild(defs);
 
-                        const coloresEstado = {
+        const coloresEstado = {
             presente: '#16a34a',
             af: '#16a34a',
             neg: '#b91c1c',
             abs: '#ca8a04',
             sinvotar: '#2563eb',
+            duda: '#94a3b8',
             ausente: null
         };
 
@@ -2156,9 +2215,9 @@ function renderizarVistaDetallada(camara) {
             '#16a34a': 'glow-verde',
             '#b91c1c': 'glow-rojo',
             '#ca8a04': 'glow-amarillo',
-            '#2563eb': 'glow-azul'
+            '#2563eb': 'glow-azul',
+            '#94a3b8': 'glow-gris'
         };
-
         datos.forEach(persona => {
             const estado = estadoIndividual(camaraActiva, persona.nombre);
             const colorGlow = coloresEstado[estado];
@@ -2248,11 +2307,11 @@ function renderizarVistaDetallada(camara) {
         }
     }
 
-		function abrirPopoverRecinto(nombre, bloque, evt, esPresidente) {
+			function abrirPopoverRecinto(nombre, bloque, evt, esPresidente) {
         cancelarCierrePopover();
         const pop = document.getElementById('recintoPopover');
         const estados = modoActivo === 'quorum'
-            ? [['presente', 'PRES'], ['ausente', 'AUS']]
+            ? [['presente', 'PRES'], ['duda', 'EN DUDA'], ['ausente', 'AUS']]
             : [['af', 'AF'], ['neg', 'NEG'], ['abs', 'ABS'], ['ausente', 'AUS']];
         if (esPresidente && modoActivo === 'vote') estados.push(['sinvotar', 'S/V']);
         let html = `<div style="font-size:12px;font-weight:800;color:#f8fafc;margin-bottom:2px;">${nombre}</div><div style="font-size:10px;color:#94a3b8;margin-bottom:8px;">${bloque}</div><div style="display:flex;gap:4px;flex-wrap:wrap;">`;
@@ -2325,6 +2384,8 @@ function renderizarVistaDetallada(camara) {
                 const idxPresBtn = obtenerIndicePresidente(camaraActiva);
         const btnPresidenciaSV = document.getElementById('btn-presidencia-sv');
         if (btnPresidenciaSV) btnPresidenciaSV.style.display = (vistaActiva === 'bloques' && modoActivo === 'vote' && idxPresBtn >= 0) ? 'inline-block' : 'none';
+		        const btnDudaBloques = document.getElementById('btn-duda-bloques');
+        if (btnDudaBloques) btnDudaBloques.style.display = (vistaActiva === 'bloques' && modoActivo === 'quorum') ? 'inline-block' : 'none';
 
         const dashboardLayout = document.getElementById('dashboardLayout');
         const monitorPanel = document.getElementById('monitorPanel');
@@ -2486,7 +2547,7 @@ function renderizarVistaDetallada(camara) {
     window.addEventListener('resize', ajustarEscalaPlacaQuorum);
 
     // Renderiza la placa de quórum con los datos actuales
-    function renderizarPlacaQuorum(totalPresentes, reporteDetalle) {
+    function renderizarPlacaQuorum(totalPresentes, tDuda, reporteDetalle) {
         const camara = dataCongreso[camaraActiva];
         const hoy = new Date();
         const fechaTxt = `${String(hoy.getDate()).padStart(2,'0')}/${String(hoy.getMonth()+1).padStart(2,'0')}/${hoy.getFullYear()}`;
@@ -2515,6 +2576,8 @@ function renderizarVistaDetallada(camara) {
                 pqFaltaTxt.innerText = `Faltan ${falt} para el quórum`;
             }
         }
+		        const pqDudaTxt = document.getElementById('pq-duda-txt');
+        if (pqDudaTxt) pqDudaTxt.innerText = tDuda > 0 ? `${tDuda} en duda` : '';
 
         // Marker de quórum
         const pqMarker = document.getElementById('pq-marker');
@@ -2550,10 +2613,15 @@ function renderizarVistaDetallada(camara) {
             const bloquesConValor = camara.blocks
                 .map((bloque, idx) => {
                     const slider = document.getElementById(`q-slide-${idx}`);
-                    const val = slider ? (parseInt(slider.value) || 0) : 0;
-                    return { bloque, val };
+                    const srcVal = slider ? (parseInt(slider.value) || 0) : 0;
+                    const dudaBloque = getDudaBloque(camaraActiva, idx);
+                    const ausentesDisponibles = bloque.max - srcVal;
+                    const dudaDeAusentes = Math.min(dudaBloque, ausentesDisponibles);
+                    const dudaDePresentes = dudaBloque - dudaDeAusentes;
+                    const val = srcVal - dudaDePresentes;
+                    return { bloque, val, dudaBloque };
                 })
-                .filter(b => b.val > 0)
+                .filter(b => b.val > 0 || b.dudaBloque > 0)
                 .sort((a, b) => b.val - a.val);
 
                         const n = bloquesConValor.length;
@@ -2564,13 +2632,13 @@ function renderizarVistaDetallada(camara) {
             else if (n <= 20) { tamanoNombre = 19; tamanoNum = 24; paddingFila = '7px 12px'; }
             else { tamanoNombre = 17; tamanoNum = 21; paddingFila = '6px 10px'; }
 
-            bloquesConValor.forEach(({ bloque, val }) => {
+            bloquesConValor.forEach(({ bloque, val, dudaBloque }) => {
                 const fila = document.createElement('div');
                 fila.className = 'placa-quorum-bloque-fila';
                 fila.style.borderLeftColor = bloque.color;
                 fila.style.padding = paddingFila;
                 fila.innerHTML = `
-                    <span class="placa-quorum-bloque-nombre" style="font-size:${tamanoNombre}px;">${bloque.name}</span>
+                    <span class="placa-quorum-bloque-nombre" style="font-size:${tamanoNombre}px;">${bloque.name}${dudaBloque > 0 ? ` <span style="color:#94a3b8;font-size:${Math.round(tamanoNombre*0.55)}px;">(+${dudaBloque} duda)</span>` : ''}</span>
                     <span class="placa-quorum-bloque-num" style="font-size:${tamanoNum}px;">${val}</span>
                 `;
                 pqBloques.appendChild(fila);
@@ -2616,22 +2684,23 @@ function renderizarVistaDetallada(camara) {
         });
     }
 
-        function recolectarVotos(camara) {
+    function recolectarVotos(camara) {
         let totalPresentes = 0;
-        let t_af = 0, t_neg = 0, t_abs = 0, t_aus = 0, t_sv = 0;
+        let t_af = 0, t_neg = 0, t_abs = 0, t_aus = 0, t_sv = 0, t_duda = 0;
         let reporteBloques = [];
 
                 if (vistaActiva === 'detallada') {
             const personasCamara = legisladores.filter(p => p.camara === camaraActiva);
 
-            camara.blocks.forEach(bloque => {
+                        camara.blocks.forEach(bloque => {
                 const personas = personasCamara.filter(p => p.bloque === bloque.name);
-                let af = 0, neg = 0, abs = 0, aus = 0, sv = 0, presentes = 0;
+                let af = 0, neg = 0, abs = 0, aus = 0, sv = 0, duda = 0, presentes = 0;
 
                 personas.forEach(p => {
                     const estado = estadoIndividual(camaraActiva, p.nombre);
                     if (modoActivo === 'quorum') {
                         if (estado === 'presente') presentes++;
+                        else if (estado === 'duda') duda++;
                     } else {
                         if (estado === 'af') af++;
                         else if (estado === 'neg') neg++;
@@ -2641,8 +2710,9 @@ function renderizarVistaDetallada(camara) {
                     }
                 });
 
-                                if (modoActivo === 'quorum') {
+                if (modoActivo === 'quorum') {
                     totalPresentes += presentes;
+                    t_duda += duda;
                     if (presentes > 0) reporteBloques.push(`${bloque.name}: ${presentes}`);
                 } else {
                     t_af += af; t_neg += neg; t_abs += abs; t_aus += aus; t_sv += sv;
@@ -2654,10 +2724,10 @@ function renderizarVistaDetallada(camara) {
             });
 
             if (modoActivo === 'quorum') {
-                t_aus = camara.total - totalPresentes;
+                t_aus = camara.total - totalPresentes - t_duda;
             }
 
-            return { totalPresentes, t_af, t_neg, t_abs, t_aus, t_sv, reporteBloques };
+            return { totalPresentes, t_af, t_neg, t_abs, t_aus, t_sv, t_duda, reporteBloques };
         }
 
         const idxPresidente = (modoActivo === 'vote' && presidenciaSinVotar) ? obtenerIndicePresidente(camaraActiva) : -1;
@@ -2670,8 +2740,15 @@ function renderizarVistaDetallada(camara) {
                 const numInput = document.getElementById(`q-num-${idx}`);
                 if (numInput && parseInt(numInput.value) !== srcVal) numInput.value = srcVal;
 
-                totalPresentes += srcVal;
-                if (srcVal > 0) reporteBloques.push(`${bloque.name}: ${srcVal}`);
+                const dudaBloque = getDudaBloque(camaraActiva, idx);
+                const ausentesDisponibles = bloque.max - srcVal;
+                const dudaDeAusentes = Math.min(dudaBloque, ausentesDisponibles);
+                const dudaDePresentes = dudaBloque - dudaDeAusentes;
+                const presentesEfectivos = srcVal - dudaDePresentes;
+
+                totalPresentes += presentesEfectivos;
+                t_duda += dudaBloque;
+                if (presentesEfectivos > 0) reporteBloques.push(`${bloque.name}: ${presentesEfectivos}${dudaBloque > 0 ? ` (+${dudaBloque} en duda)` : ''}`);
             } else {
                 const inputAf = document.getElementById(`v-af-${idx}`);
                 const inputNeg = document.getElementById(`v-neg-${idx}`);
@@ -2705,11 +2782,11 @@ function renderizarVistaDetallada(camara) {
             }
         });
 
-                if (modoActivo === 'quorum') {
-            t_aus = camara.total - totalPresentes;
+        if (modoActivo === 'quorum') {
+            t_aus = camara.total - totalPresentes - t_duda;
         }
 
-        return { totalPresentes, t_af, t_neg, t_abs, t_aus, t_sv, reporteBloques };
+        return { totalPresentes, t_af, t_neg, t_abs, t_aus, t_sv, t_duda, reporteBloques };
     }
 	
     function calcularMayoria(camara, votos) {
@@ -2781,8 +2858,8 @@ function renderizarVistaDetallada(camara) {
         return { tipoMayoria, metaVotos, etiquetaMayoria, hayQuorum, alcanzada, faltan, plural, esEmpate, empateTxt, empateDesempatable, etiquetaPresidencia, resultadoTexto };
     }
 
-        function renderizarPanelIzquierdo(camara, votos, mayoria) {
-        const { t_af, t_neg, t_abs, t_aus, t_sv, totalPresentes } = votos;
+    function renderizarPanelIzquierdo(camara, votos, mayoria) {
+        const { t_af, t_neg, t_abs, t_aus, t_sv, t_duda, totalPresentes } = votos;
         const { tipoMayoria, metaVotos, etiquetaMayoria, hayQuorum, alcanzada, faltan, plural, empateTxt, empateDesempatable, etiquetaPresidencia, resultadoTexto } = mayoria;
 
         const banner = document.getElementById('appResultadoBanner');
@@ -2850,7 +2927,7 @@ function renderizarVistaDetallada(camara) {
             }
         }
 
-                        const voteSummary = document.getElementById('voteSummaryLine');
+        const voteSummary = document.getElementById('voteSummaryLine');
         if (voteSummary) {
             if (modoActivo === 'vote') {
                 voteSummary.style.display = 'flex';
@@ -2860,6 +2937,9 @@ function renderizarVistaDetallada(camara) {
                     `<span class="vs-item vs-abs">Abst.: ${t_abs}</span>` +
                     (votos.t_sv ? `<span class="vs-item vs-sv">S/V: ${votos.t_sv}</span>` : '') +
                     `<span class="vs-item vs-aus">Aus.: ${t_aus}</span>`;
+            } else if (modoActivo === 'quorum' && t_duda > 0) {
+                voteSummary.style.display = 'flex';
+                voteSummary.innerHTML = `<span class="vs-item vs-duda">En duda: ${t_duda}</span>`;
             } else {
                 voteSummary.style.display = 'none';
             }
@@ -2907,7 +2987,7 @@ function renderizarVistaDetallada(camara) {
         const { hayQuorum, alcanzada, empateDesempatable, resultadoTexto } = mayoria;
 
         if (modoActivo === 'quorum') {
-            renderizarPlacaQuorum(totalPresentes, reporteBloques);
+            renderizarPlacaQuorum(totalPresentes, votos.t_duda, reporteBloques);
             return;
         }
 
