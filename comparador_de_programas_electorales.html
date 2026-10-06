@@ -14,7 +14,7 @@
   <header class="bg-blue-900 text-white shadow-md py-6 px-4">
     <div class="max-w-7xl mx-auto text-center">
       <h1 class="text-3xl font-bold tracking-tight">Comparador de Programas Electorales</h1>
-      <p class="text-blue-200 mt-2">ArgElecciones ToolBox — Presidenciales Argentina</p>
+      <p class="text-blue-200 mt-2">ArgElecciones ToolBox</p>
     </div>
   </header>
 
@@ -46,12 +46,14 @@
   </main>
 
   <script>
-    // Tu ID público de publicación web
-    const PUB_KEY = '2PACX-1vTt72Fk5fNUuyzrVBqupcs1cS7R30icE8Vkky94RtC8WkdyoaaFwYfXPRWWE9zY4KKVTwbMEMFVNx7j';
-
-    // URLs de consulta con gviz (compatibles con CORS y lectura de pestañas por nombre)
-    const CANDIDATES_URL = `https://docs.google.com/spreadsheets/d/e/${PUB_KEY}/gviz/tq?tqx=out:csv&sheet=Candidatos`;
-    const PROPOSALS_URL = `https://docs.google.com/spreadsheets/d/e/${PUB_KEY}/gviz/tq?tqx=out:csv&sheet=Propuestas`;
+    // ---------------------------------------------------------------------
+    // REEMPLAZA ESTA CADENA POR EL ID NATIVO DE TU GOOGLE SHEET:
+    // (Ejemplo de ID: 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms)
+    // ---------------------------------------------------------------------
+const SHEET_ID = '1r2iDJ25AAwpsp6rWnBvjzq_Yh4hYGb-_aoBrINlj6gQ';
+    // URLs con soporte nativo de CORS y lectura de pestañas por nombre
+    const CANDIDATES_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Candidatos`;
+    const PROPOSALS_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Propuestas`;
 
     let candidates = [];
     let proposals = [];
@@ -59,19 +61,14 @@
     let searchQuery = '';
 
     async function loadData() {
-      // Advertencia si se ejecuta de forma local (file://)
-      if (window.location.protocol === 'file:') {
-        console.warn("Atención: Estás abriendo el archivo localmente (file://). Para evitar bloqueos CORS en algunos navegadores, te recomendamos probarlo subiéndolo a GitHub Pages o usando un servidor local (VS Code Live Server).");
-      }
-
       try {
         const [candidatesRes, proposalsRes] = await Promise.all([
           fetch(CANDIDATES_URL).then(r => {
-            if (!r.ok) throw new Error('Error al obtener pestaña Candidatos');
+            if (!r.ok) throw new Error(`HTTP ${r.status}: No se pudo leer pestaña 'Candidatos'`);
             return r.text();
           }),
           fetch(PROPOSALS_URL).then(r => {
-            if (!r.ok) throw new Error('Error al obtener pestaña Propuestas');
+            if (!r.ok) throw new Error(`HTTP ${r.status}: No se pudo leer pestaña 'Propuestas'`);
             return r.text();
           })
         ]);
@@ -89,10 +86,11 @@
         document.getElementById('loading').innerHTML = `
           <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl max-w-xl mx-auto text-left">
             <h3 class="font-bold text-lg mb-2">Error al cargar los datos</h3>
-            <p class="text-sm mb-3">No se pudieron descargar los datos desde Google Sheets. Causa común:</p>
+            <p class="text-sm mb-3">Detalle: <code>${err.message}</code></p>
             <ul class="list-disc list-inside text-xs space-y-1">
-              <li>Estás abriendo el archivo localmente (<code>file:///...</code>) y el navegador bloqueó la conexión por seguridad CORS. Subilo a GitHub Pages o abrilo mediante un servidor local.</li>
-              <li>Asegurate de que las dos pestañas de tu Google Sheet se llamen exactamente <strong>Candidatos</strong> y <strong>Propuestas</strong>.</li>
+              <li>Verifica haber copiado el <strong>SHEET_ID</strong> nativo (el que aparece en la URL del editor entre <code>/d/</code> y <code>/edit</code>).</li>
+              <li>Asegúrate de que la planilla tenga acceso general configurado como <strong>"Cualquier persona con el enlace puede ver"</strong>.</li>
+              <li>Asegúrate de que las pestañas dentro del documento se llamen exactamente <strong>Candidatos</strong> y <strong>Propuestas</strong>.</li>
             </ul>
           </div>
         `;
@@ -174,7 +172,7 @@
       });
     }
 
-    // Cargar datos
+    // Iniciar carga
     loadData();
   </script>
 </body>
