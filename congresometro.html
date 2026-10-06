@@ -650,6 +650,30 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         border-radius: 10px;
         overflow: hidden;
         position: relative;
+        display: flex;
+    }
+    .placa-quorum-barra-fill-confirmados {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #1e3a8a, #3b82f6);
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding-right: 16px;
+        color: #fff;
+        font-weight: 900;
+        font-size: 18px;
+        text-transform: uppercase;
+        letter-spacing: .03em;
+        white-space: nowrap;
+        overflow: hidden;
+        transition: width 0.3s;
+    }
+    .placa-quorum-barra-fill-duda {
+        height: 100%;
+        width: 0%;
+        background-image: repeating-linear-gradient(45deg, #94a3b8, #94a3b8 6px, #cbd5e1 6px, #cbd5e1 12px);
+        transition: width 0.3s;
     }
     .placa-quorum-barra-fill {
         height: 100%;
@@ -690,6 +714,10 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         color: #64748b;
     }
     .placa-quorum-num { font-size: 80px; font-weight: 900; color: #0f172a; }
+		    .placa-quorum-stats-row { display:flex; justify-content:space-between; margin-top:20px; }
+    .pq-stat { text-align:center; }
+    .pq-stat-num { font-size:56px; font-weight:900; line-height:1; }
+    .pq-stat-label { font-size:16px; color:#64748b; font-weight:700; text-transform:uppercase; letter-spacing:.04em; margin-top:4px; }
 
         .placa-quorum-bloques {
         display: grid;
@@ -699,6 +727,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         align-content: start;
         overflow: hidden;
     }
+		    .placa-quorum-bloques-titulo { font-size:26px; font-weight:900; color:#0f172a; margin:10px 0 14px; text-transform:uppercase; letter-spacing:.02em; }
     .placa-quorum-bloque-fila {
         display: flex;
         align-items: center;
@@ -723,6 +752,15 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         color: #1e3a8a;
         min-width: 30px;
         text-align: right;
+    }
+		    .pq-duda-pill {
+        background: #64748b;
+        color: #ffffff;
+        font-size: 15px;
+        font-weight: 900;
+        padding: 3px 9px;
+        border-radius: 999px;
+        white-space: nowrap;
     }
     .placa-quorum-footer {
         display: flex;
@@ -1053,8 +1091,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                             </div>
                             <div style="display:flex; flex-direction:column; align-items:flex-end; gap:10px;">
                                 <div class="placa-quorum-badge-grande sin" id="pq-badge">Sin Quórum</div>
-                                <div style="font-size:24px; color:#94a3b8; font-weight:700;" id="pq-falta-txt"></div>
-                                <div style="font-size:20px; color:#64748b; font-weight:700;" id="pq-duda-txt"></div>
+                                <div style="font-size:22px; color:#94a3b8; font-weight:800; text-transform:uppercase; letter-spacing:.02em;" id="pq-falta-txt"></div>
                             </div>
                         </div>
 
@@ -1063,22 +1100,33 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                                 <div class="placa-quorum-marker" id="pq-marker">
                                     <div class="placa-quorum-marker-label" id="pq-marker-label">Quórum (129)</div>
                                 </div>
-                                <div class="placa-quorum-barra-bg">
-                                    <div class="placa-quorum-barra-fill sin" id="pq-fill" style="width:0%"></div>
+                                <div class="placa-quorum-barra-bg" id="pq-barra-bg">
+                                    <div class="placa-quorum-barra-fill-confirmados" id="pq-fill-confirmados"></div>
+                                    <div class="placa-quorum-barra-fill-duda" id="pq-fill-duda"></div>
                                 </div>
                             </div>
-                                                       <div style="display:flex; flex-direction:column; gap:4px;">
-                                <div>
-                                    <span class="placa-quorum-num" id="pq-total">0</span>
-                                    <span style="font-size:48px; color:#64748b; font-weight:700;"> / </span>
-                                    <span class="placa-quorum-num" id="pq-necesario" style="color:#1e3a8a;">0</span>
-                                </div>
-                                <div style="font-size:20px; color:#94a3b8; font-weight:700;" id="pq-de-total">/ 257 bancas totales</div>
+                        <div class="placa-quorum-stats-row">
+                            <div class="pq-stat">
+                                <div class="pq-stat-num" id="pq-stat-confirmados" style="color:#1e3a8a;">0</div>
+                                <div class="pq-stat-label">Presentes confirmados</div>
+                            </div>
+                            <div class="pq-stat">
+                                <div class="pq-stat-num" id="pq-stat-duda" style="color:#64748b;">0</div>
+                                <div class="pq-stat-label">En duda</div>
+                            </div>
+                            <div class="pq-stat">
+                                <div class="pq-stat-num" id="pq-stat-quorum" style="color:#0f172a;">0</div>
+                                <div class="pq-stat-label">Quórum necesario</div>
+                            </div>
+                            <div class="pq-stat">
+                                <div class="pq-stat-num" id="pq-stat-total" style="color:#94a3b8;">0</div>
+                                <div class="pq-stat-label">Bancas totales</div>
                             </div>
                         </div>
+                        </div>
 
+                        <div class="placa-quorum-bloques-titulo">¿Cómo se distribuyen los presentes?</div>
                         <div class="placa-quorum-bloques" id="pq-bloques"></div>
-
                         <div class="placa-quorum-footer">
     <img class="placa-quorum-footer-logo" src="logo.png" alt="Logo">
     <div class="placa-quorum-footer-txt">Sólo para difusión</div>
@@ -2563,21 +2611,21 @@ const items = modoActivo === 'quorum'
         const pqBadge = document.getElementById('pq-badge');
         if (pqBadge) {
             pqBadge.className = 'placa-quorum-badge-grande ' + (hayQuorum ? 'con' : 'sin');
-            pqBadge.innerText = hayQuorum ? '✅ Con Quórum' : '❌ Sin Quórum';
+            pqBadge.innerText = hayQuorum ? '✅ Hay Quórum' : '⏳ Aún no hay quórum';
         }
 
         // Falta texto
         const pqFaltaTxt = document.getElementById('pq-falta-txt');
         if (pqFaltaTxt) {
-                        if (hayQuorum) {
-                pqFaltaTxt.innerText = `${totalPresentes - camara.quorum} por encima del quórum`;
-                       } else {
+            if (hayQuorum) {
+                pqFaltaTxt.innerText = `${(totalPresentes - camara.quorum)} POR ENCIMA DEL QUÓRUM`;
+            } else {
                 const falt = camara.quorum - totalPresentes;
-                pqFaltaTxt.innerText = `Faltan ${falt} para el quórum`;
+                let texto = `FALTAN ${falt} PARA EL QUÓRUM`;
+                if (tDuda > 0) texto += ` · HAY ${tDuda} EN DUDA`;
+                pqFaltaTxt.innerText = texto;
             }
         }
-		        const pqDudaTxt = document.getElementById('pq-duda-txt');
-        if (pqDudaTxt) pqDudaTxt.innerText = tDuda > 0 ? `${tDuda} en duda` : '';
 
         // Marker de quórum
         const pqMarker = document.getElementById('pq-marker');
@@ -2589,22 +2637,26 @@ const items = modoActivo === 'quorum'
             pqMarkerLabel.innerText = `Quórum (${camara.quorum})`;
         }
 
-        // Barra de fill
-        const pqFill = document.getElementById('pq-fill');
-        const fillPct = Math.min((totalPresentes / camara.total) * 100, 100);
-        if (pqFill) {
-            pqFill.style.width = `${fillPct}%`;
-            pqFill.className = 'placa-quorum-barra-fill ' + (hayQuorum ? 'con' : 'sin');
-            pqFill.innerText = totalPresentes > 0 ? totalPresentes : '';
+        // Barra segmentada
+        const pqFillConfirmados = document.getElementById('pq-fill-confirmados');
+        const pqFillDuda = document.getElementById('pq-fill-duda');
+        const pctConfirmados = Math.min((totalPresentes / camara.total) * 100, 100);
+        const pctDuda = Math.min((tDuda / camara.total) * 100, 100 - pctConfirmados);
+        if (pqFillConfirmados) {
+            pqFillConfirmados.style.width = `${pctConfirmados}%`;
+            pqFillConfirmados.innerText = pctConfirmados > 18 ? 'Presentes confirmados' : '';
         }
+        if (pqFillDuda) pqFillDuda.style.width = `${pctDuda}%`;
 
         // Totales
-        const pqTotal = document.getElementById('pq-total');
-        const pqNecesario = document.getElementById('pq-necesario');
-        const pqDeTotal = document.getElementById('pq-de-total');
-        if (pqTotal) pqTotal.innerText = totalPresentes;
-        if (pqNecesario) pqNecesario.innerText = camara.quorum;
-        if (pqDeTotal) pqDeTotal.innerText = `${camara.total} bancas totales`;
+        const statConfirmados = document.getElementById('pq-stat-confirmados');
+        const statDuda = document.getElementById('pq-stat-duda');
+        const statQuorum = document.getElementById('pq-stat-quorum');
+        const statTotal = document.getElementById('pq-stat-total');
+        if (statConfirmados) statConfirmados.innerText = totalPresentes;
+        if (statDuda) statDuda.innerText = tDuda;
+        if (statQuorum) statQuorum.innerText = camara.quorum;
+        if (statTotal) statTotal.innerText = camara.total;
 
                 // Bloques
         const pqBloques = document.getElementById('pq-bloques');
@@ -2638,8 +2690,11 @@ const items = modoActivo === 'quorum'
                 fila.style.borderLeftColor = bloque.color;
                 fila.style.padding = paddingFila;
                 fila.innerHTML = `
-                    <span class="placa-quorum-bloque-nombre" style="font-size:${tamanoNombre}px;">${bloque.name}${dudaBloque > 0 ? ` <span style="color:#94a3b8;font-size:${Math.round(tamanoNombre*0.55)}px;">(+${dudaBloque} duda)</span>` : ''}</span>
-                    <span class="placa-quorum-bloque-num" style="font-size:${tamanoNum}px;">${val}</span>
+                    <span class="placa-quorum-bloque-nombre" style="font-size:${tamanoNombre}px;">${bloque.name}</span>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        ${dudaBloque > 0 ? `<span class="pq-duda-pill">❔${dudaBloque}</span>` : ''}
+                        <span class="placa-quorum-bloque-num" style="font-size:${tamanoNum}px;">${val}</span>
+                    </div>
                 `;
                 pqBloques.appendChild(fila);
             });
