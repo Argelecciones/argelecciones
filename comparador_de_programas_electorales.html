@@ -4,59 +4,101 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Comparador de Propuestas Electorales - ArgElecciones</title>
+  
+  <!-- Fuente Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- PapaParse para procesar los CSV de Google Sheets -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <!-- FontAwesome para los íconos -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
 
-  <header class="bg-blue-900 text-white shadow-md py-6 px-4">
-    <div class="max-w-7xl mx-auto text-center">
-      <h1 class="text-3xl font-bold tracking-tight">Comparador de Programas Electorales</h1>
-      <p class="text-blue-200 mt-2">ArgElecciones ToolBox</p>
+  <header class="bg-white border-b border-slate-200 py-6 px-4">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div>
+        <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">Comparador de Programas Electorales</h1>
+        <p class="text-sm font-medium text-slate-500 mt-1">ArgElecciones ToolBox — Presidenciales Argentina</p>
+      </div>
+      <div class="w-full md:w-72">
+        <div class="relative">
+          <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+          <input type="text" id="searchInput" placeholder="Buscar propuesta..." class="w-full pl-9 pr-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-xs font-medium focus:ring-2 focus:ring-slate-900 focus:bg-white outline-none transition-all">
+        </div>
+      </div>
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto p-4 md:p-6">
-    <!-- Estado de carga -->
-    <div id="loading" class="text-center py-12">
-      <i class="fas fa-spinner fa-spin text-4xl text-blue-600"></i>
-      <p class="mt-4 text-slate-600">Cargando propuestas desde Google Sheets...</p>
-    </div>
+  <main class="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
 
-    <!-- Contenido principal -->
-    <div id="content" class="hidden space-y-6">
-      <!-- Buscador y Filtros -->
-      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row gap-4 justify-between items-center">
-        <div class="w-full md:w-1/3">
-          <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Buscar propuesta</label>
-          <input type="text" id="searchInput" placeholder="Ej: retenciones, dolarización, salud..." class="w-full border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+    <!-- Panel de Filtros -->
+    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-5">
+      
+      <!-- CANDIDATOS / FUERZAS POLÍTICAS -->
+      <div>
+        <h2 class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3">Candidatos / Fuerzas Políticas</h2>
+        <div class="flex flex-wrap gap-2.5" id="candidateFilters">
+          <!-- Chips de candidatos generados dinámicamente -->
         </div>
-        <div class="w-full md:w-2/3 flex flex-wrap gap-2" id="topicButtons">
+      </div>
+
+      <!-- EJES TEMÁTICOS -->
+      <div>
+        <h2 class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3">Ejes Temáticos</h2>
+        <div class="flex flex-wrap gap-2.5" id="topicButtons">
           <!-- Botones de ejes temáticos dinámicos -->
         </div>
       </div>
 
-      <!-- Cuadrícula de Comparación -->
-      <div id="comparisonGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Tarjetas por candidato -->
-      </div>
     </div>
+
+    <!-- Estado de carga -->
+    <div id="loading" class="text-center py-12">
+      <i class="fas fa-circle-notch fa-spin text-3xl text-slate-800"></i>
+      <p class="mt-3 text-sm font-medium text-slate-500">Cargando datos desde Google Sheets...</p>
+    </div>
+
+    <!-- Cuadrícula de Comparación -->
+    <div id="comparisonGrid" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Tarjetas por candidato -->
+    </div>
+
   </main>
 
   <script>
-    // ---------------------------------------------------------------------
-    // REEMPLAZA ESTA CADENA POR EL ID NATIVO DE TU GOOGLE SHEET:
-    // (Ejemplo de ID: 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms)
-    // ---------------------------------------------------------------------
-const SHEET_ID = '1r2iDJ25AAwpsp6rWnBvjzq_Yh4hYGb-_aoBrINlj6gQ';
-    // URLs con soporte nativo de CORS y lectura de pestañas por nombre
+    // Tu ID público de Google Sheet
+    const SHEET_ID = '1r2iDJ25AAwpsp6rWnBvjzq_Yh4hYGb-_aoBrINlj6gQ';
+
     const CANDIDATES_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Candidatos`;
     const PROPOSALS_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Propuestas`;
 
+    // Mapa de íconos según tema o id del tema
+    const TOPIC_ICONS = {
+      'economia': 'fa-chart-line',
+      'trabajo': 'fa-briefcase',
+      'empleo': 'fa-briefcase',
+      'seguridad': 'fa-shield-halved',
+      'educacion': 'fa-graduation-cap',
+      'salud': 'fa-heart-pulse',
+      'estado': 'fa-building-columns',
+      'reforma': 'fa-building-columns',
+      'desarrollo': 'fa-seedling',
+      'ambiente': 'fa-leaf'
+    };
+
     let candidates = [];
     let proposals = [];
+    let selectedCandidates = new Set();
     let activeTopic = 'todos';
     let searchQuery = '';
 
@@ -64,11 +106,11 @@ const SHEET_ID = '1r2iDJ25AAwpsp6rWnBvjzq_Yh4hYGb-_aoBrINlj6gQ';
       try {
         const [candidatesRes, proposalsRes] = await Promise.all([
           fetch(CANDIDATES_URL).then(r => {
-            if (!r.ok) throw new Error(`HTTP ${r.status}: No se pudo leer pestaña 'Candidatos'`);
+            if (!r.ok) throw new Error(`HTTP ${r.status}`);
             return r.text();
           }),
           fetch(PROPOSALS_URL).then(r => {
-            if (!r.ok) throw new Error(`HTTP ${r.status}: No se pudo leer pestaña 'Propuestas'`);
+            if (!r.ok) throw new Error(`HTTP ${r.status}`);
             return r.text();
           })
         ]);
@@ -76,25 +118,73 @@ const SHEET_ID = '1r2iDJ25AAwpsp6rWnBvjzq_Yh4hYGb-_aoBrINlj6gQ';
         candidates = Papa.parse(candidatesRes, { header: true, skipEmptyLines: true }).data;
         proposals = Papa.parse(proposalsRes, { header: true, skipEmptyLines: true }).data;
 
-        document.getElementById('loading').classList.add('hidden');
-        document.getElementById('content').classList.remove('hidden');
+        // Por defecto todos los candidatos están seleccionados
+        candidates.forEach(c => {
+          if (c.id) selectedCandidates.add(c.id);
+        });
 
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('comparisonGrid').classList.remove('hidden');
+
+        renderCandidateFilters();
         renderTopicButtons();
         renderComparison();
       } catch (err) {
-        console.error('Error al cargar datos de Google Sheets:', err);
+        console.error('Error al cargar datos:', err);
         document.getElementById('loading').innerHTML = `
-          <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl max-w-xl mx-auto text-left">
-            <h3 class="font-bold text-lg mb-2">Error al cargar los datos</h3>
-            <p class="text-sm mb-3">Detalle: <code>${err.message}</code></p>
-            <ul class="list-disc list-inside text-xs space-y-1">
-              <li>Verifica haber copiado el <strong>SHEET_ID</strong> nativo (el que aparece en la URL del editor entre <code>/d/</code> y <code>/edit</code>).</li>
-              <li>Asegúrate de que la planilla tenga acceso general configurado como <strong>"Cualquier persona con el enlace puede ver"</strong>.</li>
-              <li>Asegúrate de que las pestañas dentro del documento se llamen exactamente <strong>Candidatos</strong> y <strong>Propuestas</strong>.</li>
-            </ul>
+          <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl max-w-xl mx-auto text-left text-xs font-medium">
+            <p class="font-bold text-sm mb-1">Error al cargar los datos</p>
+            <p>Verifica que la planilla de Google Sheets tenga permisos "Cualquier persona con el enlace puede ver" y que las pestañas se llamen Candidatos y Propuestas.</p>
           </div>
         `;
       }
+    }
+
+    function renderCandidateFilters() {
+      const container = document.getElementById('candidateFilters');
+      container.innerHTML = '';
+
+      candidates.forEach(cand => {
+        if (!cand.id) return;
+
+        const isSelected = selectedCandidates.has(cand.id);
+        const color = cand.color || '#3B82F6';
+
+        const btn = document.createElement('button');
+        btn.onclick = () => toggleCandidate(cand.id);
+        btn.className = `flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-xs font-medium transition-all ${
+          isSelected 
+            ? 'bg-white text-slate-800 shadow-sm border-slate-200 hover:bg-slate-50' 
+            : 'bg-slate-100 text-slate-400 border-transparent hover:bg-slate-200'
+        }`;
+
+        btn.innerHTML = `
+          <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${isSelected ? color : '#94A3B8'}"></span>
+          <span>${cand.name} (${cand.party})</span>
+        `;
+
+        container.appendChild(btn);
+      });
+    }
+
+    function toggleCandidate(candId) {
+      if (selectedCandidates.has(candId)) {
+        if (selectedCandidates.size > 1) { // Mantener al menos 1 candidato activo
+          selectedCandidates.delete(candId);
+        }
+      } else {
+        selectedCandidates.add(candId);
+      }
+      renderCandidateFilters();
+      renderComparison();
+    }
+
+    function getTopicIcon(topicId, topicName) {
+      const key = (topicId || topicName || '').toLowerCase();
+      for (const [iconKey, iconClass] of Object.entries(TOPIC_ICONS)) {
+        if (key.includes(iconKey)) return iconClass;
+      }
+      return 'fa-layer-group';
     }
 
     function renderTopicButtons() {
@@ -107,10 +197,31 @@ const SHEET_ID = '1r2iDJ25AAwpsp6rWnBvjzq_Yh4hYGb-_aoBrINlj6gQ';
         }
       });
 
-      let html = `<button onclick="filterTopic('todos')" class="topic-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white shadow-sm" data-topic="todos">Todos los Ejes</button>`;
+      let html = `
+        <button onclick="filterTopic('todos')" class="topic-btn flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all ${
+          activeTopic === 'todos' 
+            ? 'bg-slate-900 text-white shadow' 
+            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+        }" data-topic="todos">
+          <i class="fas fa-border-all text-xs"></i>
+          <span>Todos los Ejes</span>
+        </button>
+      `;
 
       topicsMap.forEach((name, id) => {
-        html += `<button onclick="filterTopic('${id}')" class="topic-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200" data-topic="${id}">${name}</button>`;
+        const iconClass = getTopicIcon(id, name);
+        const isActive = activeTopic === id;
+
+        html += `
+          <button onclick="filterTopic('${id}')" class="topic-btn flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all ${
+            isActive 
+              ? 'bg-slate-900 text-white shadow' 
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+          }" data-topic="${id}">
+            <i class="fas ${iconClass} text-xs"></i>
+            <span>${name}</span>
+          </button>
+        `;
       });
 
       container.innerHTML = html;
@@ -118,13 +229,7 @@ const SHEET_ID = '1r2iDJ25AAwpsp6rWnBvjzq_Yh4hYGb-_aoBrINlj6gQ';
 
     function filterTopic(topicId) {
       activeTopic = topicId;
-      document.querySelectorAll('.topic-btn').forEach(btn => {
-        if (btn.dataset.topic === topicId) {
-          btn.className = 'topic-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white shadow-sm';
-        } else {
-          btn.className = 'topic-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200';
-        }
-      });
+      renderTopicButtons();
       renderComparison();
     }
 
@@ -137,34 +242,45 @@ const SHEET_ID = '1r2iDJ25AAwpsp6rWnBvjzq_Yh4hYGb-_aoBrINlj6gQ';
       const container = document.getElementById('comparisonGrid');
       container.innerHTML = '';
 
-      candidates.forEach(cand => {
+      const visibleCandidates = candidates.filter(c => selectedCandidates.has(c.id));
+
+      visibleCandidates.forEach(cand => {
         const candidateProposals = proposals.filter(p => {
           const matchCand = p.candidateId === cand.id;
           const matchTopic = activeTopic === 'todos' || p.topicId === activeTopic;
-          const matchSearch = !searchQuery || (p.text && p.text.toLowerCase().includes(searchQuery));
+          const matchSearch = !searchQuery || (
+            (p.text && p.text.toLowerCase().includes(searchQuery)) ||
+            (p.topicName && p.topicName.toLowerCase().includes(searchQuery))
+          );
           return matchCand && matchTopic && matchSearch;
         });
 
         const card = document.createElement('div');
-        card.className = "bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col";
+        card.className = "bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden flex flex-col";
         
         card.innerHTML = `
           <div class="p-4 border-b border-slate-100 flex items-center gap-3" style="border-top: 4px solid ${cand.color || '#3B82F6'}">
-            <img src="${cand.avatar || 'https://via.placeholder.com/50'}" alt="${cand.name}" class="w-12 h-12 rounded-full object-cover border">
+            <img src="${cand.avatar || 'https://via.placeholder.com/60'}" alt="${cand.name}" class="w-12 h-12 rounded-full object-cover border border-slate-200">
             <div>
-              <h3 class="font-bold text-slate-800">${cand.name}</h3>
-              <p class="text-xs text-slate-500">${cand.party}</p>
+              <h3 class="font-bold text-slate-900 text-sm tracking-tight">${cand.name}</h3>
+              <p class="text-xs font-medium text-slate-500">${cand.party}</p>
             </div>
           </div>
-          <div class="p-4 flex-1 space-y-4 overflow-y-auto max-h-[600px]">
+          <div class="p-4 flex-1 space-y-3.5 overflow-y-auto max-h-[600px]">
             ${candidateProposals.length === 0 
-              ? '<p class="text-sm text-slate-400 italic">No hay propuestas registradas para este filtro.</p>' 
-              : candidateProposals.map(p => `
-                  <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
-                    <span class="inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-200 text-slate-700 mb-1.5">${p.topicName || p.topicId}</span>
-                    <p class="text-sm text-slate-700 leading-relaxed">${p.text}</p>
-                  </div>
-                `).join('')
+              ? '<p class="text-xs text-slate-400 italic py-4 text-center">No hay propuestas registradas para este filtro.</p>' 
+              : candidateProposals.map(p => {
+                  const iconClass = getTopicIcon(p.topicId, p.topicName);
+                  return `
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100/80 space-y-2">
+                      <div class="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                        <i class="fas ${iconClass} text-slate-400 text-[10px]"></i>
+                        <span>${p.topicName || p.topicId}</span>
+                      </div>
+                      <p class="text-xs text-slate-700 leading-relaxed font-normal">${p.text}</p>
+                    </div>
+                  `;
+                }).join('')
             }
           </div>
         `;
@@ -172,7 +288,7 @@ const SHEET_ID = '1r2iDJ25AAwpsp6rWnBvjzq_Yh4hYGb-_aoBrINlj6gQ';
       });
     }
 
-    // Iniciar carga
+    // Cargar datos
     loadData();
   </script>
 </body>
