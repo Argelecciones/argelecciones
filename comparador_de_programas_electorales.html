@@ -40,6 +40,18 @@
   </header>
 
   <main class="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
+    <!-- Selector de Elecciones (Tabs) -->
+<div class="flex border-b border-slate-200 mb-6">
+  <button id="tab2023" onclick="switchElection('2023')" class="py-2 px-4 font-bold text-sm border-b-2 border-slate-900 text-slate-900 focus:outline-none transition-all">
+    Elecciones 2023
+  </button>
+  <button id="tab2027" onclick="switchElection('2027')" class="py-2 px-4 font-medium text-sm text-slate-400 hover:text-slate-600 border-b-2 border-transparent focus:outline-none transition-all">
+    Elecciones 2027
+  </button>
+</div>
+
+<!-- Vista 2023 (Contenido Actual) -->
+<div id="view2023" class="space-y-6">
 
     <!-- Panel de Filtros -->
     <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-5">
@@ -72,12 +84,45 @@
     <div id="comparisonGrid" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <!-- Tarjetas por candidato -->
     </div>
+  </div> <!-- Cierre de view2023 -->
+
+<!-- Vista 2027 (Vacía / Próximamente) -->
+<div id="view2027" class="hidden text-center py-16 bg-white rounded-2xl border border-slate-200/80 shadow-sm p-8">
+  <i class="fas fa-hourglass-half text-4xl text-slate-300 mb-4"></i>
+  <h3 class="text-lg font-bold text-slate-800">Plataformas Electorales 2027</h3>
+  <p class="text-xs text-slate-500 max-w-md mx-auto mt-2 leading-relaxed">
+    Esta sección se actualizará para el próximo ciclo electoral.
+  </p>
+</div>
 
   </main>
 
   <script>
     // Tu ID público de Google Sheet
     const SHEET_ID = '1r2iDJ25AAwpsp6rWnBvjzq_Yh4hYGb-_aoBrINlj6gQ';
+
+    function switchElection(year) {
+  const tab2023 = document.getElementById('tab2023');
+  const tab2027 = document.getElementById('tab2027');
+  const view2023 = document.getElementById('view2023');
+  const view2027 = document.getElementById('view2027');
+
+  if (year === '2023') {
+    // Activar pestaña 2023
+    tab2023.className = "py-2 px-4 font-bold text-sm border-b-2 border-slate-900 text-slate-900 focus:outline-none transition-all";
+    tab2027.className = "py-2 px-4 font-medium text-sm text-slate-400 hover:text-slate-600 border-b-2 border-transparent focus:outline-none transition-all";
+    
+    view2023.classList.remove('hidden');
+    view2027.classList.add('hidden');
+  } else {
+    // Activar pestaña 2027
+    tab2027.className = "py-2 px-4 font-bold text-sm border-b-2 border-slate-900 text-slate-900 focus:outline-none transition-all";
+    tab2023.className = "py-2 px-4 font-medium text-sm text-slate-400 hover:text-slate-600 border-b-2 border-transparent focus:outline-none transition-all";
+    
+    view2027.classList.remove('hidden');
+    view2023.classList.add('hidden');
+  }
+}
 
     const CANDIDATES_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Candidatos`;
     const PROPOSALS_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Propuestas`;
