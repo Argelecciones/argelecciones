@@ -1934,7 +1934,7 @@ function renderizarVistaDetallada(camara) {
             const alturaReal = placa.scrollHeight;
             try {
                 const canvas = await html2canvas(placa, {
-                    scale: 1, backgroundColor: '#f8fafc', width: 1920, height: alturaReal, useCORS: true, allowTaint: true, scrollX: -window.scrollX, scrollY: -window.scrollY
+                    scale: 1, backgroundColor: '#f8fafc', width: 1920, height: alturaReal, useCORS: true, allowTaint: true, windowWidth: 1920, windowHeight: alturaReal, scrollX: 0, scrollY: 0
                 });
                 onListo(canvas);
             } catch (err) {
@@ -2121,7 +2121,7 @@ const items = modoActivo === 'quorum'
         setTimeout(async () => {
             try {
                 const canvas = await html2canvas(placa, {
-                    scale: 1, backgroundColor: '#f8fafc', width: 1080, height: 1350, useCORS: true, allowTaint: true, scrollX: -window.scrollX, scrollY: -window.scrollY
+                    scale: 1, backgroundColor: '#f8fafc', width: 1080, height: 1350, useCORS: true, allowTaint: true, windowWidth: 1080, windowHeight: 1350, scrollX: 0, scrollY: 0
                 });
                 onListo(canvas);
             } catch (err) {
@@ -2164,7 +2164,7 @@ const items = modoActivo === 'quorum'
         setTimeout(async () => {
             try {
                 const canvas = await html2canvas(placa, {
-                    scale: 1, backgroundColor: '#f8fafc', width: 1920, height: 1080, useCORS: true, allowTaint: true, scrollX: -window.scrollX, scrollY: -window.scrollY
+                    scale: 1, backgroundColor: '#f8fafc', width: 1920, height: 1080, useCORS: true, allowTaint: true, windowWidth: 1920, windowHeight: 1080, scrollX: 0, scrollY: 0
                 });
                 onListo(canvas);
             } catch (err) {
@@ -2731,7 +2731,7 @@ const items = modoActivo === 'quorum'
         const originalTransform = target.style.transform;
         target.style.transform = 'none';
         html2canvas(target, {
-            scale: 2, backgroundColor: '#f8fafc', width: 1920, height: 1080, scrollX: -window.scrollX, scrollY: -window.scrollY
+            scale: 2, backgroundColor: '#f8fafc', width: 1920, height: 1080, windowWidth: 1920, windowHeight: 1080, scrollX: 0, scrollY: 0
         }).then(canvas => {
             target.style.transform = originalTransform;
             const hoy = new Date();
@@ -3247,8 +3247,10 @@ const items = modoActivo === 'quorum'
             backgroundColor: '#f8fafc',
             width: 1920,
             height: 1080,
-            scrollX: -window.scrollX,
-            scrollY: -window.scrollY
+            windowWidth: 1920,
+            windowHeight: 1080,
+            scrollX: 0,
+            scrollY: 0
         }).then(canvas => {
             target.style.transform = originalTransform;
             
@@ -3281,8 +3283,10 @@ const items = modoActivo === 'quorum'
             backgroundColor: '#f8fafc',
             width: 1920,
             height: 1080,
-            scrollX: -window.scrollX,
-            scrollY: -window.scrollY
+            windowWidth: 1920,
+            windowHeight: 1080,
+            scrollX: 0,
+            scrollY: 0
         }).then(canvas => {
             target.style.transform = originalTransform;
 
