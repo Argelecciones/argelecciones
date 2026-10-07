@@ -83,19 +83,21 @@
     const PROPOSALS_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Propuestas`;
 
     // Mapa de íconos según tema o id del tema
-    const TOPIC_ICONS = {
-      'economia': 'fa-chart-line',
-      'trabajo': 'fa-briefcase',
-      'empleo': 'fa-briefcase',
-      'seguridad': 'fa-shield-halved',
-      'educacion': 'fa-graduation-cap',
-      'salud': 'fa-heart-pulse',
-      'estado': 'fa-building-columns',
-      'reforma': 'fa-building-columns',
-      'desarrollo': 'fa-seedling',
-      'ambiente': 'fa-leaf'
-    };
-
+const TOPIC_ICONS = {
+  'economia': 'fa-chart-line',
+  'trabajo': 'fa-briefcase',
+  'empleo': 'fa-briefcase',
+  'seguridad': 'fa-shield-halved',
+  'educacion': 'fa-graduation-cap',
+  'salud': 'fa-heart-pulse',
+  'estado': 'fa-building-columns',
+  'reforma': 'fa-building-columns',
+  'vivienda_servicios': 'fa-house',
+  'servicios': 'fa-bolt',
+  'ambiente': 'fa-leaf',
+  'genero': 'fa-venus-mars',
+  'internacional': 'fa-globe'
+};
     let candidates = [];
     let proposals = [];
     let selectedCandidates = new Set();
