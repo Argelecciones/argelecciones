@@ -1118,6 +1118,10 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         <input type="checkbox" id="checkOcultarFecha" onchange="onCambioOcultarFecha()"> Ocultar fecha
     </label>
 </div>
+			<div class="global-shortcuts-bar" id="filaTituloQuorum">
+    <span class="shortcuts-title">Título de la placa:</span>
+    <input type="text" id="inputTituloQuorum" class="input-nombre-votacion" placeholder="Título..." oninput="this.dataset.editado='true'; ejecutarCalculos();">
+</div>
                         <div id="recintoContainer" style="display:none; margin-bottom:15px;"></div>
             <div id="recintoPopover" style="display:none;position:fixed;z-index:9999;background:#1e293b;border:1px solid #334155;border-radius:8px;padding:10px;box-shadow:0 8px 20px rgba(0,0,0,.4);"></div>
             <div class="global-shortcuts-bar" id="filtroEstadoBar" style="display:none;">
@@ -1161,7 +1165,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                     <div id="placaQuorumEntity">
                         <div class="placa-quorum-header">
                             <div>
-                                <div class="placa-quorum-subtitulo" id="pq-volanta" contenteditable="true" oninput="this.dataset.editado='true'">Cámara de Diputados — Sesión del 00/00/0000</div>
+                                <div class="placa-quorum-subtitulo" id="pq-volanta">Cámara de Diputados — Sesión del 00/00/0000</div>
                                 <div style="font-size:32px; color:#94a3b8; margin-top:6px;"> Escenario de quórum - vía @ArgElecciones</div>
                             </div>
                             <div style="display:flex; flex-direction:column; align-items:flex-end; gap:10px;">
@@ -1224,8 +1228,8 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                     <div id="placaHtmlEntity">
 					<div class="placa-col-left">
     <div class="placa-header">
-        <div class="placa-volanta" id="placaVolantaText" contenteditable="true">Resultado votación - Diputados (00/00/0000)</div>
-        <h1 id="placa-titulo-principal" contenteditable="true">Hacé clic acá para cambiar el título</h1>
+        <div class="placa-volanta" id="placaVolantaText">Resultado votación - Diputados (00/00/0000)</div>
+        <h1 id="placa-titulo-principal">Título de la votación</h1>
     </div>
 	
         <div class="bullet-graph-container">
@@ -1695,6 +1699,7 @@ function todosPresentes(idx, max) {
         }
     }
                function cambiarCamara(camara) {
+				   const iq = document.getElementById('inputTituloQuorum'); if (iq) delete iq.dataset.editado;
         camaraActiva = camara;
         desempateManual = null;
         presidenciaSinVotar = false;
@@ -1922,7 +1927,7 @@ function renderizarVistaDetallada(camara) {
 	function armarContenidoPlacaNominal(camara) {
         const personasCamara = legisladores.filter(p => p.camara === camaraActiva);
         const hoy = new Date();
-        const fechaTxt = `${String(hoy.getDate()).padStart(2, '0')}/${String(hoy.getMonth() + 1).padStart(2, '0')}/${hoy.getFullYear()}`;
+        const fechaTxt = fechaPlacaTexto();
 
         const volanta = document.getElementById('pn-volanta');
         if (volanta) volanta.innerText = `${camara.label} — ${modoActivo === 'quorum' ? 'Asistencia' : 'Votación'} nominal${fechaOcultaPlacas ? '' : ` (${fechaTxt})`}`;
@@ -2054,7 +2059,7 @@ function renderizarVistaDetallada(camara) {
 
 			function armarContenidoPlacaRecinto(camara) {
         const hoy = new Date();
-        const fechaTxt = `${String(hoy.getDate()).padStart(2, '0')}/${String(hoy.getMonth() + 1).padStart(2, '0')}/${hoy.getFullYear()}`;
+        const fechaTxt = fechaPlacaTexto();
 
         const volanta = document.getElementById('pr-volanta');
         if (volanta) volanta.innerText = `${camara.label} — ${modoActivo === 'quorum' ? 'Asistencia' : 'Votación'}${fechaOcultaPlacas ? '' : ` (${fechaTxt})`}`;
@@ -2115,10 +2120,10 @@ const items = modoActivo === 'quorum'
 	    function armarContenidoPlacaInstagram(camara, votos, mayoria) {
         const { t_af, t_neg, t_abs, t_aus, t_sv } = votos;
         const hoy = new Date();
-        const fechaTxt = `${String(hoy.getDate()).padStart(2,'0')}/${String(hoy.getMonth()+1).padStart(2,'0')}/${hoy.getFullYear()}`;
+        const fechaTxt = fechaPlacaTexto();
         const camaraNombre = camaraActiva.charAt(0).toUpperCase() + camaraActiva.slice(1);
 
-                        document.getElementById('igv-volanta').innerText = `${camaraNombre} — Votación (${fechaTxt})`;
+                        document.getElementById('igv-volanta').innerText = `${camaraNombre} — Votación${fechaOcultaPlacas ? '' : ` (${fechaTxt})`}`;
         const inputTitulo = document.getElementById('inputTituloVotacion');
         const tituloVotacion = inputTitulo ? inputTitulo.value.trim() : '';
         const tituloCustomEl = document.getElementById('igv-titulo-custom');
@@ -2185,12 +2190,11 @@ const items = modoActivo === 'quorum'
         });
     }
 
-	    function sincronizarTituloVotacion() {
-        const input = document.getElementById('inputTituloVotacion');
-        const tituloPlacaGrande = document.getElementById('placa-titulo-principal');
-        if (input && tituloPlacaGrande && input.value.trim()) {
-            tituloPlacaGrande.innerText = input.value.trim();
-        }
+function sincronizarTituloVotacion() {
+    const input = document.getElementById('inputTituloVotacion');
+    const t = document.getElementById('placa-titulo-principal');
+    if (input && t) t.innerText = input.value.trim() || 'Título de la votación';
+}
     }
 
     function capturarPlacaInstagram(onListo) {
@@ -2537,6 +2541,9 @@ const items = modoActivo === 'quorum'
             dashboardLayout.appendChild(monitorPanel);
         }
 
+		const filaTituloQ = document.getElementById('filaTituloQuorum');
+if (filaTituloQ) filaTituloQ.style.display = (vistaActiva === 'bloques' && modoActivo === 'quorum') ? 'flex' : 'none';
+
         const placaWrapper = document.getElementById('placaWrapperBlock');
         const placaQuorumWrapper = document.getElementById('placaQuorumWrapperBlock');
         if (vistaActiva === 'detallada') {
@@ -2698,14 +2705,16 @@ function setQuorumInput(idx, valor) {
     function renderizarPlacaQuorum(totalPresentes, tDuda, reporteDetalle) {
         const camara = dataCongreso[camaraActiva];
         const hoy = new Date();
-        const fechaTxt = `${String(hoy.getDate()).padStart(2,'0')}/${String(hoy.getMonth()+1).padStart(2,'0')}/${hoy.getFullYear()}`;
+        const fechaTxt = fechaPlacaTexto();
         const hayQuorum = totalPresentes >= camara.quorum;
 
                 // Volanta
-        const pqVolanta = document.getElementById('pq-volanta');
-        if (pqVolanta && pqVolanta.dataset.editado !== 'true') {
-            pqVolanta.innerText = `Cámara de ${camara.label} — Sesión del ${fechaTxt}`;
-        }
+        const inputTQ = document.getElementById('inputTituloQuorum');
+if (inputTQ && inputTQ.dataset.editado !== 'true') {
+    inputTQ.value = `Cámara de ${camara.label} — Sesión${fechaOcultaPlacas ? '' : ' del ' + fechaPlacaTexto()}`;
+}
+const pqVolanta = document.getElementById('pq-volanta');
+if (pqVolanta && inputTQ) pqVolanta.innerText = inputTQ.value;
 
         // Badge
         const pqBadge = document.getElementById('pq-badge');
@@ -3192,7 +3201,7 @@ function setQuorumInput(idx, valor) {
             const camaraNombre = camaraActiva.charAt(0).toUpperCase() + camaraActiva.slice(1);
 
             if(document.getElementById('placaVolantaText')) {
-                document.getElementById('placaVolantaText').innerText = `Resultado votación - ${camaraNombre} (${dia}/${mes}/${anio})`;
+                document.getElementById('placaVolantaText').innerText = `Resultado votación - ${camaraNombre}${fechaOcultaPlacas ? '' : ` (${fechaPlacaTexto()})`}`;
             }
 
                         const placaBlocksDetail = document.getElementById('placaBlocksDetail');
