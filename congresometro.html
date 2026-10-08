@@ -2544,6 +2544,7 @@ const items = modoActivo === 'quorum'
 <button class="btn-action" onclick="todosPresentes(${idx}, ${bloque.max})">Todos</button>
 <button class="btn-duda-bloque" onclick="ciclarDuda(${idx})" title="+1 en duda">❔</button>
 <input type="number" id="d-num-${idx}" class="quorum-num-input" min="0" max="${bloque.max}" value="${getDudaBloque(camaraActiva, idx)}" onchange="setDudaInput(${idx}, this.value)">
+  <input type="range" id="q-slide-${idx}" min="0" max="${bloque.max}" value="0" style="display: none;">
                     </div>`;
                 card.innerHTML = `
                     <div class="block-header">
