@@ -2593,17 +2593,24 @@ const items = modoActivo === 'quorum'
         ejecutarCalculos();
     }
 
-    function setQuorumInput(idx, valor) {
-        let v = parseInt(valor);
-        if (isNaN(v) || v < 0) v = 0;
-        const slider = document.getElementById(`q-slide-${idx}`);
-        const max = slider ? parseInt(slider.max) - getDudaBloque(camaraActiva, idx) : Infinity;
-        if (v > max) v = max;
-        if(slider) slider.value = v;
-        const numInput = document.getElementById(`q-num-${idx}`);
-        if (numInput && parseInt(numInput.value) !== v) numInput.value = v;
-        ejecutarCalculos();
+function setQuorumInput(idx, valor) {
+    let v = parseInt(valor);
+    if (isNaN(v) || v < 0) v = 0;
+    const slider = document.getElementById(`q-slide-${idx}`);
+    const max = slider ? parseInt(slider.max) : Infinity;
+    if (v > max) v = max;
+    if (slider) slider.value = v;
+    const numInput = document.getElementById(`q-num-${idx}`);
+    if (numInput && parseInt(numInput.value) !== v) numInput.value = v;
+
+    // Si presentes + duda supera el máximo, baja la duda
+    const duda = getDudaBloque(camaraActiva, idx);
+    if (v + duda > max) {
+        dudaPorBloque[claveDuda(camaraActiva, idx)] = max - v;
+        pintarBotonDuda(idx);
     }
+    ejecutarCalculos();
+}
 
  // Actualiza la línea de referencia superior según modo y mayoría elegida
     function actualizarLineaReferencia() {
