@@ -1110,8 +1110,14 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                 <button class="btn-shortcut" onclick="atajoLimpiarTodo()">❌ Limpiar Todo</button>
                 <button id="btn-marcar-todos" class="btn-shortcut" onclick="atajoMarcarTodos()">✅ Marcar Todos</button>
                 <button id="btn-presidencia-sv" class="btn-shortcut" onclick="togglePresidenciaSinVotar()" style="display:none;">🔵 Presidencia: Sin Votar</button>
-                <button id="btn-ocultar-fecha" class="btn-shortcut" onclick="toggleOcultarFecha()" style="display:none;">🗓️ Ocultar fecha</button>
             </div>
+<div class="global-shortcuts-bar" id="barraDatosPlaca">
+    <span class="shortcuts-title">Fecha de la placa:</span>
+    <input type="date" id="inputFechaPlaca" class="input-nombre-votacion" style="flex:0 0 auto; min-width:0;" oninput="onCambioFechaPlaca()">
+    <label style="display:flex; align-items:center; gap:6px; color:#e2e8f0; font-size:12px; font-weight:700; cursor:pointer; user-select:none;">
+        <input type="checkbox" id="checkOcultarFecha" onchange="onCambioOcultarFecha()"> Ocultar fecha
+    </label>
+</div>
                         <div id="recintoContainer" style="display:none; margin-bottom:15px;"></div>
             <div id="recintoPopover" style="display:none;position:fixed;z-index:9999;background:#1e293b;border:1px solid #334155;border-radius:8px;padding:10px;box-shadow:0 8px 20px rgba(0,0,0,.4);"></div>
             <div class="global-shortcuts-bar" id="filtroEstadoBar" style="display:none;">
@@ -1418,6 +1424,28 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     let filtroEstadoDetallada = 'todos';
     let fechaOcultaPlacas = false;
     let dudaPorBloque = {};
+
+	function hoyISO() {
+    const h = new Date();
+    return `${h.getFullYear()}-${String(h.getMonth() + 1).padStart(2, '0')}-${String(h.getDate()).padStart(2, '0')}`;
+}
+let fechaPlacaISO = hoyISO();
+
+function fechaPlacaTexto() {
+    const [a, m, d] = fechaPlacaISO.split('-');
+    return `${d}/${m}/${a}`;
+}
+
+function onCambioFechaPlaca() {
+    const v = document.getElementById('inputFechaPlaca').value;
+    fechaPlacaISO = v || hoyISO();
+    ejecutarCalculos();
+}
+
+function onCambioOcultarFecha() {
+    fechaOcultaPlacas = document.getElementById('checkOcultarFecha').checked;
+    ejecutarCalculos();
+}
 
     function claveDuda(camaraKey, idx) {
         return `${camaraKey}::${idx}`;
@@ -3420,6 +3448,7 @@ function ajustarQuorum(idx, cambio) {
     }
     document.getElementById('opcion34presentes').style.display = (camaraActiva === 'diputados') ? 'flex' : 'none';
     cargarLegisladores();
+	document.getElementById('inputFechaPlaca').value = fechaPlacaISO;
 </script>
 
 </body>
