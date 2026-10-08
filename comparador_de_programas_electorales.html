@@ -330,7 +330,7 @@ const TOPIC_ICONS = {
           </div>
           <div class="p-4 flex-1 space-y-3.5 overflow-y-auto max-h-[600px]">
             ${candidateProposals.length === 0 
-              ? '<p class="text-xs text-slate-400 italic py-4 text-center">No hay propuestas registradas para este filtro.</p>' 
+? '<p class="text-xs text-slate-400 italic py-4 text-center">Sin propuestas registradas en esta plataforma para este eje.</p>'
               : candidateProposals.map(p => {
                   const iconClass = getTopicIcon(p.topicId, p.topicName);
                   return `
