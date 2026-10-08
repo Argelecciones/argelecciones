@@ -58,7 +58,7 @@
       
       <!-- CANDIDATOS / FUERZAS POLÍTICAS -->
       <div>
-        <h2 class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3">Candidatos / Fuerzas Políticas</h2>
+        <h2 class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3"> Seleccioná a los candidatos / fuerzas políticas y/o comparalos</h2>
         <div class="flex flex-wrap gap-2.5" id="candidateFilters">
           <!-- Chips de candidatos generados dinámicamente -->
         </div>
@@ -66,7 +66,7 @@
 
       <!-- EJES TEMÁTICOS -->
       <div>
-        <h2 class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3">Ejes Temáticos</h2>
+        <h2 class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3">Seleccioná los ejes temáticos que te interesan</h2>
         <div class="flex flex-wrap gap-2.5" id="topicButtons">
           <!-- Botones de ejes temáticos dinámicos -->
         </div>
@@ -150,13 +150,13 @@ const TOPIC_ICONS = {
   'educacion': 'fa-graduation-cap',
   'salud': 'fa-heart-pulse',
   'estado': 'fa-building-columns',
-  'reforma': 'fa-building-columns',
   'vivienda_servicios': 'fa-house',
   'servicios': 'fa-bolt',
   'ambiente': 'fa-leaf',
   'genero': 'fa-venus-mars',
   'internacional': 'fa-globe',
-  'agro': 'fa-wheat-awn'
+  'agro': 'fa-wheat-awn',
+  'jubilaciones': 'fa-person-cane'
 };
     let candidates = [];
     let proposals = [];
@@ -300,11 +300,26 @@ const TOPIC_ICONS = {
       renderComparison();
     });
 
-    function renderComparison() {
-      const container = document.getElementById('comparisonGrid');
-      container.innerHTML = '';
+function renderComparison() {
+  const container = document.getElementById('comparisonGrid');
+  container.innerHTML = '';
 
-      const visibleCandidates = candidates.filter(c => selectedCandidates.has(c.id));
+  const visibleCandidates = candidates.filter(c => selectedCandidates.has(c.id));
+  const count = visibleCandidates.length;
+
+  // Ajustar las columnas según la cantidad de candidatos seleccionados
+  if (count === 1) {
+    container.className = "hidden grid grid-cols-1 gap-6 max-w-2xl mx-auto";
+  } else if (count === 2) {
+    container.className = "hidden grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto";
+  } else {
+    container.className = "hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full";
+  }
+
+  // Si hay al menos un candidato visible, quitamos la clase 'hidden'
+  if (count > 0) {
+    container.classList.remove('hidden');
+  }
 
       visibleCandidates.forEach(cand => {
         const candidateProposals = proposals.filter(p => {
