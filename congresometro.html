@@ -305,11 +305,8 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         .vote-summary-line .vs-sv { background: rgba(37, 99, 235, 0.15); color: #1e40af; }
         .vote-summary-line .vs-duda { background: rgba(100, 116, 139, 0.15); color: #334155; }
 
-        /* CAJA DE REDES */
-        .social-box { background: #eff6ff; border: 1px solid #bfdbfe; padding: 15px; border-radius: 12px; }
-        .social-box h4 { margin: 0 0 10px 0; font-size: 14px; color: #1e40af; }
-        textarea { width: 100%; height: 120px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px; font-family: inherit; font-size: 13px; resize: none; background: white; }
-        .copy-btn { background: #3b82f6; color: white; border: none; padding: 8px 14px; font-size: 12px; font-weight: 800; border-radius: 6px; margin-top: 8px; cursor: pointer; float: right; }
+        /* CAJA DE REDES - - - NO SE USA*/
+         textarea { width: 100%; height: 120px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px; font-family: inherit; font-size: 13px; resize: none; background: white; }
 
         /* CAJA CONTENEDORA QUE ESCALA LA PLACA EN PANTALLA */
         .placa-preview-container {
@@ -1281,15 +1278,6 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                 </div>
             </div>
 
-            <div class="social-box">
-                <h4 id="socialTitle" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center;" onclick="toggleSocialBox()">📝 Copia Rápida para Redes Sociales <span id="socialToggleIcon">▸</span></h4>
-                <div id="socialBoxContent" style="display:none;">
-                    <textarea id="socialText" readonly></textarea>
-                    <button class="copy-btn" onclick="copiarTextoRedes()">Copiar Copete</button>
-                    <div style="clear:both;"></div>
-                            </div>
-        </div>
-        </div>
     </div>
 </div>
 
@@ -1480,10 +1468,22 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         ejecutarCalculos();
     }
 
+	function ajustarPresentesPorDuda(idx) {
+    const slider = document.getElementById(`q-slide-${idx}`);
+    if (!slider) return;
+    const tope = parseInt(slider.max) - getDudaBloque(camaraActiva, idx);
+    if (parseInt(slider.value) > tope) {
+        slider.value = tope;
+        const n = document.getElementById(`q-num-${idx}`);
+        if (n) n.value = tope;
+    }
+}
+
 function ciclarDuda(idx) {
     const bloque = dataCongreso[camaraActiva].blocks[idx];
     const actual = getDudaBloque(camaraActiva, idx);
     dudaPorBloque[claveDuda(camaraActiva, idx)] = actual >= bloque.max ? 0 : actual + 1;
+	ajustarPresentesPorDuda(idx);
     pintarBotonDuda(idx);
     ejecutarCalculos();
 }
@@ -1498,6 +1498,7 @@ function setDudaInput(idx, valor) {
     let v = parseInt(valor) || 0;
     v = Math.max(0, Math.min(v, max));
     dudaPorBloque[claveDuda(camaraActiva, idx)] = v;
+	ajustarPresentesPorDuda(idx);
     pintarBotonDuda(idx);
     ejecutarCalculos();
 }
@@ -2596,7 +2597,7 @@ const items = modoActivo === 'quorum'
         let v = parseInt(valor);
         if (isNaN(v) || v < 0) v = 0;
         const slider = document.getElementById(`q-slide-${idx}`);
-        const max = slider ? parseInt(slider.max) : Infinity;
+        const max = slider ? parseInt(slider.max) - getDudaBloque(camaraActiva, idx) : Infinity;
         if (v > max) v = max;
         if(slider) slider.value = v;
         const numInput = document.getElementById(`q-num-${idx}`);
@@ -3276,23 +3277,6 @@ const items = modoActivo === 'quorum'
         }, 2000);
     }
 
-	function toggleSocialBox() {
-        const content = document.getElementById('socialBoxContent');
-        const icon = document.getElementById('socialToggleIcon');
-        const abierto = content.style.display !== 'none';
-        content.style.display = abierto ? 'none' : 'block';
-        icon.textContent = abierto ? '▸' : '▾';
-    }
-
-    function copiarTextoRedes() {
-        const area = document.getElementById('socialText');
-        if (area) {
-            area.select();
-            document.execCommand('copy');
-            alert('Texto copiado al portapapeles. ¡Listo para publicar en X!');
-        }
-    }
-
     function generarPrevisualizacionGaleria() {
         const target = document.getElementById('placaHtmlEntity');
         const originalTransform = target.style.transform;
@@ -3406,20 +3390,11 @@ dataCongreso[camaraActiva].blocks.forEach((_, i) => pintarBotonDuda(i));
         ejecutarCalculos();
     }
 
-    function ajustarQuorum(idx, cambio) {
-        const slider = document.getElementById(`q-slide-${idx}`);
-        if (!slider) return;
-        let nuevoValor = parseInt(slider.value) + cambio;
-        
-        if (nuevoValor < 0) nuevoValor = 0;
-        if (nuevoValor > parseInt(slider.max)) nuevoValor = parseInt(slider.max);
-        
-        slider.value = nuevoValor;
-        const numInput = document.getElementById(`q-num-${idx}`);
-        if (numInput) numInput.value = nuevoValor;
-        
-        ejecutarCalculos();
-    }
+function ajustarQuorum(idx, cambio) {
+    const slider = document.getElementById(`q-slide-${idx}`);
+    if (!slider) return;
+    setQuorumInput(idx, parseInt(slider.value) + cambio);
+}
 
    const observadorModo = new MutationObserver(() => {
         const btnMarcar = document.getElementById('btn-marcar-todos');
