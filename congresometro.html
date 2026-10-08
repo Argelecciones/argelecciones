@@ -1489,11 +1489,17 @@ function ciclarDuda(idx) {
 }
 
 function pintarBotonDuda(idx) {
-    const btn = document.getElementById(`btn-duda-${idx}`);
-    if (!btn) return;
-    const v = getDudaBloque(camaraActiva, idx);
-    btn.textContent = v > 0 ? `❔${v}` : '❔';
-    btn.classList.toggle('active', v > 0);
+    const inp = document.getElementById(`d-num-${idx}`);
+    if (inp) inp.value = getDudaBloque(camaraActiva, idx);
+}
+
+function setDudaInput(idx, valor) {
+    const max = dataCongreso[camaraActiva].blocks[idx].max;
+    let v = parseInt(valor) || 0;
+    v = Math.max(0, Math.min(v, max));
+    dudaPorBloque[claveDuda(camaraActiva, idx)] = v;
+    pintarBotonDuda(idx);
+    ejecutarCalculos();
 }
 
 function todosPresentes(idx, max) {
@@ -2536,8 +2542,8 @@ const items = modoActivo === 'quorum'
                         <input type="number" id="q-num-${idx}" class="quorum-num-input" min="0" max="${bloque.max}" value="0" onchange="setQuorumInput(${idx}, this.value)" oninput="if(this.value.length>0) setQuorumInput(${idx}, this.value)">
                         <button class="btn-action" onclick="ajustarQuorum(${idx}, 1)">+</button>
 <button class="btn-action" onclick="todosPresentes(${idx}, ${bloque.max})">Todos</button>
-<button class="btn-duda-bloque ${getDudaBloque(camaraActiva, idx) > 0 ? 'active' : ''}" id="btn-duda-${idx}" onclick="ciclarDuda(${idx})" title="En duda (+1 por click)">${getDudaBloque(camaraActiva, idx) > 0 ? '❔' + getDudaBloque(camaraActiva, idx) : '❔'}</button>
-                        <input type="range" id="q-slide-${idx}" min="0" max="${bloque.max}" value="0" style="display: none;">
+<button class="btn-duda-bloque" onclick="ciclarDuda(${idx})" title="+1 en duda">❔</button>
+<input type="number" id="d-num-${idx}" class="quorum-num-input" min="0" max="${bloque.max}" value="${getDudaBloque(camaraActiva, idx)}" onchange="setDudaInput(${idx}, this.value)">
                     </div>`;
                 card.innerHTML = `
                     <div class="block-header">
