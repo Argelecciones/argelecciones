@@ -209,24 +209,9 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         .block-header span { color: #f8fafc; }
         .quorum-control-compact div { color: #f8fafc; }
         .quorum-control-compact { display: flex; align-items: center; gap: 4px; width: 100%; }
-        .quorum-num-input {
-            flex: 1;
-            min-width: 0;
-            text-align: center;
-            font-weight: 800;
-            font-size: 13px;
-            background: #0f172a;
-            color: #f8fafc;
-            padding: 4px;
-            border-radius: 4px;
-            border: 1px solid #334155;
-            font-family: inherit;
-        }
-        .quorum-num-input::-webkit-inner-spin-button,
-        .quorum-num-input::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
+.quorum-num-input { flex: 0 0 38px; width: 38px; min-width: 0; text-align: center; font-weight: 800; font-size: 13px; background: #0f172a; color: #f8fafc; padding: 4px 2px; border-radius: 4px; border: 1px solid #334155; font-family: inherit; }
+.btn-duda-bloque { background:#334155; color:#f8fafc; border:none; padding:5px 8px; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap; }
+.btn-duda-bloque.active { background:#64748b; }
 
         .btn-action {
             background: #334155;
@@ -1128,7 +1113,6 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                 <button class="btn-shortcut" onclick="atajoLimpiarTodo()">❌ Limpiar Todo</button>
                 <button id="btn-marcar-todos" class="btn-shortcut" onclick="atajoMarcarTodos()">✅ Marcar Todos</button>
                 <button id="btn-presidencia-sv" class="btn-shortcut" onclick="togglePresidenciaSinVotar()" style="display:none;">🔵 Presidencia: Sin Votar</button>
-						                 <button id="btn-duda-bloques" class="btn-shortcut" onclick="abrirModalDuda()" style="display:none;">🔘 En duda</button>
                 <button id="btn-ocultar-fecha" class="btn-shortcut" onclick="toggleOcultarFecha()" style="display:none;">🗓️ Ocultar fecha</button>
             </div>
                         <div id="recintoContainer" style="display:none; margin-bottom:15px;"></div>
@@ -1376,7 +1360,6 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
 </div>
 
 <!-- LIGHTBOX MODAL DE PREVISUALIZACIÓN EMERGENTE -->
-	<div id="modalDudaEntity" class="gallery-modal" onclick="cerrarModalDuda(event)">
     <div class="gallery-content-wrapper" onclick="event.stopPropagation()" style="background:#1e293b; border-radius:12px; padding:24px; max-width:420px; width:100%;">
         <button class="gallery-close-btn" onclick="cerrarModalDuda()" style="top:-10px; right:-10px;">&times;</button>
         <h3 style="color:#f8fafc; font-size:16px; margin-bottom:4px;">Marcar "En duda" por bloque</h3>
@@ -1504,37 +1487,27 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         ejecutarCalculos();
     }
 
-	    function abrirModalDuda() {
-        const camara = dataCongreso[camaraActiva];
-        const lista = document.getElementById('listaDudaBloques');
-        lista.innerHTML = '';
-        camara.blocks.forEach((bloque, idx) => {
-            const val = getDudaBloque(camaraActiva, idx);
-            const fila = document.createElement('div');
-            fila.style.cssText = 'display:flex; align-items:center; justify-content:space-between; gap:10px;';
-            fila.innerHTML = `
-                <span style="color:#f8fafc; font-size:13px; font-weight:700;">${bloque.name}</span>
-                <input type="number" min="0" max="${bloque.max}" value="${val}" style="width:60px; padding:5px; border-radius:4px; border:1px solid #334155; background:#0f172a; color:#f8fafc; text-align:center;" onchange="setDudaBloque(${idx}, this.value, ${bloque.max})">
-            `;
-            lista.appendChild(fila);
-        });
-        document.getElementById('modalDudaEntity').style.display = 'flex';
-        document.body.classList.add('modal-abierto');
-    }
+function ciclarDuda(idx) {
+    const bloque = dataCongreso[camaraActiva].blocks[idx];
+    const actual = getDudaBloque(camaraActiva, idx);
+    dudaPorBloque[claveDuda(camaraActiva, idx)] = actual >= bloque.max ? 0 : actual + 1;
+    pintarBotonDuda(idx);
+    ejecutarCalculos();
+}
 
-    function setDudaBloque(idx, valor, max) {
-        let v = parseInt(valor) || 0;
-        if (v < 0) v = 0;
-        if (v > max) v = max;
-        dudaPorBloque[claveDuda(camaraActiva, idx)] = v;
-        ejecutarCalculos();
-    }
+function pintarBotonDuda(idx) {
+    const btn = document.getElementById(`btn-duda-${idx}`);
+    if (!btn) return;
+    const v = getDudaBloque(camaraActiva, idx);
+    btn.textContent = v > 0 ? `❔${v}` : '❔';
+    btn.classList.toggle('active', v > 0);
+}
 
-    function cerrarModalDuda(evt) {
-        if (evt) evt.stopPropagation();
-        document.getElementById('modalDudaEntity').style.display = 'none';
-        document.body.classList.remove('modal-abierto');
-    }
+function todosPresentes(idx, max) {
+    dudaPorBloque[claveDuda(camaraActiva, idx)] = 0;
+    pintarBotonDuda(idx);
+    setQuorumInput(idx, max);
+}
 
     function mostrarToastSV(texto) {
         const existente = document.getElementById('toastSV');
@@ -2524,9 +2497,7 @@ const items = modoActivo === 'quorum'
                 const idxPresBtn = obtenerIndicePresidente(camaraActiva);
         const btnPresidenciaSV = document.getElementById('btn-presidencia-sv');
         if (btnPresidenciaSV) btnPresidenciaSV.style.display = (vistaActiva === 'bloques' && modoActivo === 'vote' && idxPresBtn >= 0) ? 'inline-block' : 'none';
-		        const btnDudaBloques = document.getElementById('btn-duda-bloques');
-        if (btnDudaBloques) btnDudaBloques.style.display = (vistaActiva === 'bloques' && modoActivo === 'quorum') ? 'inline-block' : 'none';
-
+		
         const dashboardLayout = document.getElementById('dashboardLayout');
         const monitorPanel = document.getElementById('monitorPanel');
         const columnaControles = document.getElementById('columnaControles');
@@ -2571,7 +2542,8 @@ const items = modoActivo === 'quorum'
                         <button class="btn-action" onclick="ajustarQuorum(${idx}, -1)">-</button>
                         <input type="number" id="q-num-${idx}" class="quorum-num-input" min="0" max="${bloque.max}" value="0" onchange="setQuorumInput(${idx}, this.value)" oninput="if(this.value.length>0) setQuorumInput(${idx}, this.value)">
                         <button class="btn-action" onclick="ajustarQuorum(${idx}, 1)">+</button>
-                        <button class="btn-action" onclick="setQuorumInput(${idx}, ${bloque.max})">Todos</button>
+<button class="btn-action" onclick="todosPresentes(${idx}, ${bloque.max})">Todos</button>
+<button class="btn-duda-bloque ${getDudaBloque(camaraActiva, idx) > 0 ? 'active' : ''}" id="btn-duda-${idx}" onclick="ciclarDuda(${idx})" title="En duda (+1 por click)">${getDudaBloque(camaraActiva, idx) > 0 ? '❔' + getDudaBloque(camaraActiva, idx) : '❔'}</button>
                         <input type="range" id="q-slide-${idx}" min="0" max="${bloque.max}" value="0" style="display: none;">
                     </div>`;
                 card.innerHTML = `
@@ -3406,6 +3378,8 @@ const items = modoActivo === 'quorum'
         
         const voteInputs = document.querySelectorAll('input[id^="v-af-"], input[id^="v-neg-"], input[id^="v-abs-"]');
         voteInputs.forEach(input => { input.value = 0; });
+		dudaPorBloque = {};
+dataCongreso[camaraActiva].blocks.forEach((_, i) => pintarBotonDuda(i));
         
         ejecutarCalculos();
     }
