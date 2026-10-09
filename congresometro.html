@@ -1153,6 +1153,11 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
 .ayuda-card ul { margin:0; padding:12px 14px 12px 32px; font-size:13px; line-height:1.55; color:#334155; font-weight:500; }
 .ayuda-card li { margin-bottom:6px; }
 @media (max-width:640px) { .btn-header-ayuda span { display:none; } }
+
+		.tab-btn { display:inline-flex; align-items:center; justify-content:center; gap:7px; }
+.btn-desempate { display:inline-flex; align-items:center; justify-content:center; gap:6px; }
+.btn-shortcut { gap:0; }
+.btn-shortcut .ico { margin-right:6px; vertical-align:-3px; }
     </style>
 </head>
 <body>
@@ -1162,6 +1167,13 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
 		<symbol id="i-circles" viewBox="0 0 24 24"><circle cx="12" cy="6" r="3"/><circle cx="6" cy="17" r="3"/><circle cx="18" cy="17" r="3"/></symbol>
 <symbol id="i-list" viewBox="0 0 24 24"><line x1="9" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="9" y1="18" x2="21" y2="18"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></symbol>
 		<symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+		<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+<symbol id="i-vote" viewBox="0 0 24 24"><path d="m9 12 2 2 4-4"/><path d="M5 7c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2v12H5V7Z"/><path d="M22 19H2"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+<symbol id="i-minus-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></symbol>
+<symbol id="i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol>
+<symbol id="i-x-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></symbol>
 </svg>
 
 <div class="main-container">
@@ -1183,8 +1195,8 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             <button class="tab-btn" id="cam-senadores" onclick="cambiarCamara('senadores')">Senadores</button>
         </div>
         <div class="tab-group">
-            <button class="tab-btn active" id="mod-quorum" onclick="cambiarModo('quorum')">🔍 Busca quórum</button>
-            <button class="tab-btn mode-vote" id="mod-vote" onclick="cambiarModo('vote')">🗳️ Simular Votación</button>
+            <button class="tab-btn active" id="mod-quorum" onclick="cambiarModo('quorum')"><svg class="ico"><use href="#i-search"/></svg>Busca quórum</button>
+<button class="tab-btn mode-vote" id="mod-vote" onclick="cambiarModo('vote')"><svg class="ico"><use href="#i-vote"/></svg>Simular Votación</button>
         </div>
     </div>
 
@@ -1219,8 +1231,8 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                <div class="desempate-selector" id="desempateSelector" style="display:none;">
                     <div class="desempate-selector-title">⚖️ Empate — Resolución por desempate de la Presidencia</div>
                     <div class="desempate-selector-options">
-                        <button class="btn-desempate btn-desempate-favor" id="btnDesempateFavor" onclick="setDesempate('favor')">✅ Desempató a favor</button>
-                        <button class="btn-desempate btn-desempate-contra" id="btnDesempateContra" onclick="setDesempate('contra')">❌ Desempató en contra</button>
+                        <button class="btn-desempate btn-desempate-favor" id="btnDesempateFavor" onclick="setDesempate('favor')"><svg class="ico"><use href="#i-check-circle"/></svg>Desempató a favor</button>
+<button class="btn-desempate btn-desempate-contra" id="btnDesempateContra" onclick="setDesempate('contra')"><svg class="ico"><use href="#i-x-circle"/></svg>Desempató en contra</button>
                     </div>
                 </div>
                 </div>
@@ -1238,9 +1250,9 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             </div>
                      <div class="global-shortcuts-bar">
                 <span class="shortcuts-title">Acciones rápidas:</span>
-                <button class="btn-shortcut" onclick="atajoLimpiarTodo()">❌ Limpiar Todo</button>
-                <button id="btn-marcar-todos" class="btn-shortcut" onclick="atajoMarcarTodos()">✅ Marcar Todos</button>
-                <button id="btn-presidencia-sv" class="btn-shortcut" onclick="togglePresidenciaSinVotar()" style="display:none;" title="Presidencia: normalmente no vota, salvo empate">🔵 Presidencia: Sin Votar</button>
+                <button class="btn-shortcut" onclick="atajoLimpiarTodo()"><svg class="ico"><use href="#i-x"/></svg>Limpiar todo</button>
+<button id="btn-marcar-todos" class="btn-shortcut" onclick="atajoMarcarTodos()"><svg class="ico"><use href="#i-check"/></svg>Marcar todos</button>
+<button id="btn-presidencia-sv" class="btn-shortcut" onclick="togglePresidenciaSinVotar()" style="display:none;" title="Presidencia: normalmente no vota, salvo empate"><svg class="ico"><use href="#i-minus-circle"/></svg>Presidencia: Sin votar</button>
             </div>
 <div class="global-shortcuts-bar" id="barraDatosPlaca">
     <span class="shortcuts-title">Fecha de la placa:</span>
