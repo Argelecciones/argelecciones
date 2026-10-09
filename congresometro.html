@@ -1137,6 +1137,22 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
 .vote-summary-line .vs-abs { background:rgba(234,179,8,.25); border-color:rgba(234,179,8,.55); color:#854d0e; }
 .vote-summary-line .vs-sv { background:rgba(37,99,235,.18); border-color:rgba(37,99,235,.40); color:#1e40af; }
 .vote-summary-line .vs-aus, .vote-summary-line .vs-duda { background:rgba(148,163,184,.22); border-color:rgba(148,163,184,.50); color:#334155; }
+
+		/* ===== AYUDA ===== */
+.btn-header-ayuda { display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,.15); color:#fff; border:none; padding:6px 12px; border-radius:6px; font-family:inherit; font-size:12px; font-weight:800; cursor:pointer; white-space:nowrap; }
+.btn-header-ayuda:hover { background:rgba(255,255,255,.25); }
+.ayuda-modal { position:fixed; inset:0; background:rgba(15,23,42,.75); display:none; justify-content:center; align-items:center; z-index:10000; padding:20px; }
+.ayuda-card { background:#fff; border-radius:14px; width:100%; max-width:560px; max-height:85vh; overflow-y:auto; padding:22px; position:relative; box-shadow:0 20px 50px rgba(0,0,0,.35); }
+.ayuda-card h2 { margin:0 0 4px; font-size:20px; }
+.ayuda-sub { margin:0 0 16px; font-size:13px; color:#64748b; font-weight:600; }
+.ayuda-cerrar { position:absolute; top:12px; right:14px; background:none; border:none; font-size:28px; line-height:1; color:#64748b; cursor:pointer; }
+.ayuda-cerrar:hover { color:#dc2626; }
+.ayuda-card details { border:1px solid #e2e8f0; border-radius:8px; margin-bottom:8px; background:#f8fafc; }
+.ayuda-card summary { padding:11px 14px; font-size:13px; font-weight:800; color:#0f172a; cursor:pointer; text-transform:uppercase; letter-spacing:.03em; }
+.ayuda-card details[open] summary { border-bottom:1px solid #e2e8f0; }
+.ayuda-card ul { margin:0; padding:12px 14px 12px 32px; font-size:13px; line-height:1.55; color:#334155; font-weight:500; }
+.ayuda-card li { margin-bottom:6px; }
+@media (max-width:640px) { .btn-header-ayuda span { display:none; } }
     </style>
 </head>
 <body>
@@ -1145,6 +1161,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
 		<symbol id="i-circles" viewBox="0 0 24 24"><circle cx="12" cy="6" r="3"/><circle cx="6" cy="17" r="3"/><circle cx="18" cy="17" r="3"/></symbol>
 <symbol id="i-list" viewBox="0 0 24 24"><line x1="9" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="9" y1="18" x2="21" y2="18"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></symbol>
+		<symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
 </svg>
 
 <div class="main-container">
@@ -1154,7 +1171,10 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             <h1 style="margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3px;text-transform:uppercase">Congresómetro</h1>
             <p style="margin:2px 0 0;font-size:11px;color:#93c5fd;font-weight:700;text-transform:uppercase;letter-spacing:.1em">@ArgElecciones Toolbox</p>
         </div>
-        <a href="index.html" style="margin-left:auto;color:#fff;font-size:12px;font-weight:800;text-decoration:none;background:rgba(255,255,255,.15);padding:6px 12px;border-radius:6px;white-space:nowrap;">← Toolbox</a>
+        <div style="margin-left:auto; display:flex; gap:8px;">
+    <button class="btn-header-ayuda" onclick="abrirAyuda()"><svg class="ico"><use href="#i-help"/></svg><span>Ayuda</span></button>
+    <a href="index.html" style="color:#fff;font-size:12px;font-weight:800;text-decoration:none;background:rgba(255,255,255,.15);padding:6px 12px;border-radius:6px;white-space:nowrap;">← Toolbox</a>
+</div>
     </header>
 
     <div class="selectors-grid">
@@ -1220,7 +1240,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                 <span class="shortcuts-title">Acciones rápidas:</span>
                 <button class="btn-shortcut" onclick="atajoLimpiarTodo()">❌ Limpiar Todo</button>
                 <button id="btn-marcar-todos" class="btn-shortcut" onclick="atajoMarcarTodos()">✅ Marcar Todos</button>
-                <button id="btn-presidencia-sv" class="btn-shortcut" onclick="togglePresidenciaSinVotar()" style="display:none;">🔵 Presidencia: Sin Votar</button>
+                <button id="btn-presidencia-sv" class="btn-shortcut" onclick="togglePresidenciaSinVotar()" style="display:none;" title="Presidencia: normalmente no vota, salvo empate">🔵 Presidencia: Sin Votar</button>
             </div>
 <div class="global-shortcuts-bar" id="barraDatosPlaca">
     <span class="shortcuts-title">Fecha de la placa:</span>
@@ -1470,6 +1490,50 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
 <div class="marca-agua-difusion"></div>
 </div>
 
+	<div id="ayudaModal" class="ayuda-modal" onclick="cerrarAyuda()">
+    <div class="ayuda-card" onclick="event.stopPropagation()">
+        <button class="ayuda-cerrar" onclick="cerrarAyuda()">&times;</button>
+        <h2>Cómo usar el Congresómetro</h2>
+        <p class="ayuda-sub">Simulá quórum y votaciones, y exportá placas para redes.</p>
+
+        <details open>
+            <summary>Modos</summary>
+            <ul>
+                <li><b>Busca quórum:</b> cargá los presentes de cada bloque. La barra muestra si se llega al quórum (129 en Diputados, 37 en Senado).</li>
+                <li><b>Simular votación:</b> cargá afirmativos, negativos y abstenciones por bloque. El resultado se calcula según la mayoría que elijas (simple, absoluta, 2/3 o 3/4).</li>
+            </ul>
+        </details>
+
+        <details>
+            <summary>Vistas</summary>
+            <ul>
+                <li><b>Por bloques:</b> carga rápida con números, un renglón por bloque.</li>
+                <li><b>Vista detallada:</b> marcás legislador por legislador, o tocando su banca en el hemiciclo. Habilita las placas Nominal y Recinto.</li>
+                <li>Al cambiar de vista se borran los datos cargados.</li>
+            </ul>
+        </details>
+
+        <details>
+            <summary>En duda y Sin votar</summary>
+            <ul>
+                <li><b>❔ En duda</b> (solo Quórum): no cuenta para el quórum. Sumás de a 1 con el botón o escribís el número. Se descuenta primero de los ausentes y después de los presentes.</li>
+                <li><b>Sin votar</b> (solo Votación): la Presidencia de la Cámara normalmente no vota, salvo empate. Se activa con el botón "Presidencia: Sin Votar".</li>
+                <li><b>Empate:</b> aparece un selector para indicar cómo desempató la Presidencia.</li>
+            </ul>
+        </details>
+
+        <details>
+            <summary>Placas</summary>
+            <ul>
+                <li>Elegí la <b>fecha</b> en "Fecha de la placa". Puede ser pasada o futura, y con "Ocultar fecha" desaparece de todas.</li>
+                <li>En Quórum podés editar el <b>título</b>. En Votación se escribe en el campo de título de la votación.</li>
+                <li><b>Quórum:</b> una placa horizontal. <b>Votación:</b> horizontal e Instagram (vertical). <b>Vista detallada:</b> listado Nominal y Recinto.</li>
+                <li>"Vista previa" muestra cómo queda y "Descargar PNG" la guarda como imagen.</li>
+            </ul>
+        </details>
+    </div>
+</div>
+
 <!-- LIGHTBOX MODAL DE PREVISUALIZACIÓN EMERGENTE -->
 </div>
 <div id="galleryModalEntity" class="gallery-modal" onclick="cerrarModalGaleria()">
@@ -1623,6 +1687,10 @@ function onCambioOcultarFecha() {
         if (n) n.value = tope;
     }
 }
+
+	function abrirAyuda() { document.getElementById('ayudaModal').style.display = 'flex'; }
+function cerrarAyuda() { document.getElementById('ayudaModal').style.display = 'none'; }
+window.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrarAyuda(); });
 
 function ciclarDuda(idx) {
     const bloque = dataCongreso[camaraActiva].blocks[idx];
@@ -2690,7 +2758,7 @@ if (filaTituloQ) filaTituloQ.style.display = (vistaActiva === 'bloques' && modoA
                         <input type="number" id="q-num-${idx}" class="quorum-num-input" min="0" max="${bloque.max}" value="0" onchange="setQuorumInput(${idx}, this.value)" oninput="if(this.value.length>0) setQuorumInput(${idx}, this.value)">
                         <button class="btn-action" onclick="ajustarQuorum(${idx}, 1)">+</button>
 <button class="btn-action" onclick="todosPresentes(${idx}, ${bloque.max})">Todos</button>
-<button class="btn-duda-bloque" onclick="ciclarDuda(${idx})" title="+1 en duda">❔</button>
+<button class="btn-duda-bloque" onclick="ciclarDuda(${idx})" title="En duda: no cuenta para el quórum (+1 por click)">❔</button>
 <input type="number" id="d-num-${idx}" class="quorum-num-input" min="0" max="${bloque.max}" value="${getDudaBloque(camaraActiva, idx)}" onchange="setDudaInput(${idx}, this.value)">
   <input type="range" id="q-slide-${idx}" min="0" max="${bloque.max}" value="0" style="display: none;">
                     </div>`;
