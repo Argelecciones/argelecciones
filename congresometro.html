@@ -1061,6 +1061,9 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     #placaHtmlEntity,
     #placaQuorumEntity { transform: none !important; }
 }
+		@media (max-width: 899px) {
+    #panel-title { margin-top: 28px !important; padding-top: 18px; border-top: 1px solid #e2e8f0; }
+}
     </style>
 </head>
 <body>
@@ -1093,14 +1096,14 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
    <div class="dashboard-layout" id="dashboardLayout">
         <!-- COLUMNA IZQUIERDA (CONTROLES) -->
         <div class="columna-controles-sticky" id="columnaControles">
-<h3 id="panel-title" style="margin-top:0; font-size:13px; color:#94a3b8; font-weight:700; text-transform:uppercase; letter-spacing:.04em;">Gestión de bloques</h3>
+<h3 id="panel-title" style="margin-top:0; font-size:13px; color:#94a3b8; font-weight:700; text-transform:uppercase; letter-spacing:.04em;">Elegí la vista</h3>
             <div class="tab-group-sub" style="margin-bottom:15px;">
                 <button class="tab-btn-sub active" id="btnVistaBloques" onclick="intentarCambiarVista('bloques')">Por bloques</button>
                 <button class="tab-btn-sub" id="btnVistaDetallada" onclick="intentarCambiarVista('detallada')">Vista detallada</button>
             </div>
 						<div class="majority-panel" id="majorityPanel" style="display:none;">
                 <div class="majority-panel-title" id="majorityPanelTitle" onclick="toggleMajorityPanel()" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
-                    <span>Mayoría requerida: <span id="majorityPanelResumen">Mayoría simple</span></span>
+                    <span>Elegí la mayoría: <span id="majorityPanelResumen" style="color:#f8fafc;">Mayoría simple</span></span>
                     <span id="majorityPanelIcono">▾</span>
                 </div>
                 <div id="majorityPanelBody">
@@ -2523,7 +2526,7 @@ function sincronizarTituloVotacion() {
 	
     function inicializarEstructura() {
         const camara = dataCongreso[camaraActiva];
-        document.getElementById('panel-title').innerText = 'Gestión de bloques';
+        document.getElementById('panel-title').innerText = 'Elegí la vista';
 		        const majorityBody = document.getElementById('majorityPanelBody');
         if (majorityBody && !majorityBody.dataset.inicializado) {
             majorityBody.style.display = 'none';
