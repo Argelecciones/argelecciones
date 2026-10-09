@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Calculadora D'Hondt — @ArgElecciones</title>
-    <meta name="description" content="Calculá la distribución de bancas legislativas por el sistema D'Hondt con piso electoral configurable.">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://argelecciones.netlify.app/DHondt_v2.html">
     <meta property="og:title" content="Calculadora D'Hondt — @argelecciones">
@@ -58,15 +58,18 @@
 
         /* Barra Lateral (Derecha) */
         .dhondt-sidebar {
-            width: 320px;
-            background: var(--bg-dark);
-            border-left: 1px solid #334155;
-            padding: 25px 20px;
-            box-sizing: border-box;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+    display: none; /* Oculto por defecto */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    z-index: 9999;
+    border-left: none;
+    padding: 20px 20px calc(20px + env(safe-area-inset-bottom, 0px));
+    background: #090d16;
+}
 
         .dhondt-sidebar h3 {
             margin-top: 0;
