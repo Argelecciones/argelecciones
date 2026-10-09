@@ -1032,9 +1032,42 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
         z-index: 200;
     }
 }
+		.ico { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0; }
+.btn-shortcut { display:inline-flex; align-items:center; justify-content:center; gap:6px; }
+.export-label { font-size:11px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:.05em; margin:14px 0 6px; }
+.export-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.btn-export { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:12px; border-radius:8px; border:1.5px solid #cbd5e1; background:#fff; color:#334155; font-family:inherit; font-size:13px; font-weight:800; cursor:pointer; transition:all .15s; }
+.btn-export:hover { background:#f8fafc; border-color:#94a3b8; }
+.btn-export-primary { background:#2563eb; border-color:#2563eb; color:#fff; }
+.btn-export-primary:hover { background:#1d4ed8; border-color:#1d4ed8; }
+@media (max-width:480px) { .export-row { grid-template-columns:1fr; } }
+
+		@media (max-width: 899px) {
+    #placaWrapperBlock > h3,
+    #placaQuorumWrapperBlock > h3 { display: none; }
+
+    .placa-preview-container,
+    .placa-quorum-preview-container {
+        position: fixed !important;
+        left: -9999px !important;
+        top: 0 !important;
+        width: 1920px !important;
+        height: 1080px !important;
+        aspect-ratio: auto;
+        overflow: visible !important;
+        border: none;
+    }
+
+    #placaHtmlEntity,
+    #placaQuorumEntity { transform: none !important; }
+}
     </style>
 </head>
 <body>
+	<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
+</svg>
 
 <div class="main-container">
 <header>
@@ -1097,13 +1130,13 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
            <div class="global-shortcuts-bar" id="accionesVistaDetallada" style="display:none;">
                 <span class="shortcuts-title">Listado nominal:</span>
                 <input type="text" id="inputNombreVotacionNominal" class="input-nombre-votacion" placeholder="Nombre de la votación...">
-                <button class="btn-shortcut" onclick="previsualizarPlacaNominal()">📸 Vista previa</button>
-                <button class="btn-shortcut" onclick="exportarPlacaNominal()">📥 Descargar PNG</button>
+                <button class="btn-shortcut" onclick="previsualizarPlacaNominal()"><svg class="ico"><use href="#i-eye"/></svg>Vista previa</button>
+<button class="btn-shortcut" onclick="exportarPlacaNominal()"><svg class="ico"><use href="#i-download"/></svg>Descargar PNG</button>
             </div>
            <div class="global-shortcuts-bar" id="accionesRecinto" style="display:none;">
                 <span class="shortcuts-title">Placa de recinto:</span>
-                <button class="btn-shortcut" onclick="previsualizarPlacaRecinto()">📸 Vista previa</button>
-                <button class="btn-shortcut" onclick="exportarPlacaRecinto()">📥 Descargar PNG</button>
+                <button class="btn-shortcut" onclick="previsualizarPlacaRecinto()"><svg class="ico"><use href="#i-eye"/></svg>Vista previa</button>
+<button class="btn-shortcut" onclick="exportarPlacaRecinto()"><svg class="ico"><use href="#i-download"/></svg>Descargar PNG</button>
             </div>
                      <div class="global-shortcuts-bar">
                 <span class="shortcuts-title">Acciones rápidas:</span>
@@ -1214,10 +1247,10 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
 <div class="marca-agua-difusion"></div>
                     </div>
                 </div>
-                <div class="actions-grid-buttons" style="margin-top:12px;">
-                    <button class="btn-download btn-secondary" onclick="previsualizarPlacaQuorum()">📸 Procesar Captura Quórum</button>
-                    <button class="btn-download btn-primary" onclick="exportarPlacaQuorum()">📥 Descargar Placa Quórum (PNG)</button>
-                </div>
+<div class="export-row" style="margin-top:12px;">
+    <button class="btn-export" onclick="previsualizarPlacaQuorum()"><svg class="ico"><use href="#i-eye"/></svg>Vista previa</button>
+    <button class="btn-export btn-export-primary" onclick="exportarPlacaQuorum()"><svg class="ico"><use href="#i-download"/></svg>Descargar PNG</button>
+</div>
             </div>
 
             <div class="placa-wrapper" id="placaWrapperBlock" style="display: none;">
@@ -1278,14 +1311,16 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
                     </div>
                 </div>
                 
-                <div class="actions-grid-buttons">
-                    <button class="btn-download btn-secondary" onclick="generarPrevisualizacionGaleria()">📸 Procesar Captura de Imagen</button>
-                    <button class="btn-download btn-primary" onclick="exportarPlacaAImagen()">📥 Descargar Imagen (PNG)</button>
-                </div>
-                <div class="actions-grid-buttons" id="filaPlacaInstagram" style="margin-top:8px;">
-                    <button class="btn-download btn-secondary" onclick="previsualizarPlacaInstagram()">📱 Vista previa Instagram</button>
-                    <button class="btn-download btn-primary" onclick="exportarPlacaInstagram()">📥 Descargar Instagram (PNG)</button>
-                </div>
+<div class="export-label">Placa horizontal · 1920×1080</div>
+<div class="export-row">
+    <button class="btn-export" onclick="generarPrevisualizacionGaleria()"><svg class="ico"><use href="#i-eye"/></svg>Vista previa</button>
+    <button class="btn-export btn-export-primary" onclick="exportarPlacaAImagen()"><svg class="ico"><use href="#i-download"/></svg>Descargar PNG</button>
+</div>
+<div class="export-label" id="filaPlacaInstagram">Placa Instagram · 1080×1350</div>
+<div class="export-row">
+    <button class="btn-export" onclick="previsualizarPlacaInstagram()"><svg class="ico"><use href="#i-eye"/></svg>Vista previa</button>
+    <button class="btn-export btn-export-primary" onclick="exportarPlacaInstagram()"><svg class="ico"><use href="#i-download"/></svg>Descargar PNG</button>
+</div>
             </div>
 
     </div>
