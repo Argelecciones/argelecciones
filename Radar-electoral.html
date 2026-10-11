@@ -320,7 +320,7 @@
                 .filter(f => !isNaN(f));
             const ultimaCarga = fechasCarga.length > 0 ? new Date(Math.max(...fechasCarga)) : null;
             document.getElementById('loadingStatus').innerText = ultimaCarga
-                ? `Última actualización: ${ultimaCarga.toLocaleString('es-AR')}`
+                ? `Última actualización: ${ultimaCarga.toLocaleString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' })}`
                 : "Sin datos de actualización.";
         } else {
             document.getElementById('loadingStatus').innerText = "Sin noticias cargadas todavía.";
