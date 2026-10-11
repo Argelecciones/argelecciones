@@ -1158,6 +1158,13 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
 .btn-desempate { display:inline-flex; align-items:center; justify-content:center; gap:6px; }
 .btn-shortcut { gap:0; }
 .btn-shortcut .ico { margin-right:6px; vertical-align:-3px; }
+
+		@media (max-width: 899px) {
+    #placaWrapperBlock { margin-top: 22px; padding-top: 18px; border-top: 1px solid #e2e8f0; }
+}
+
+		#accionesVistaDetallada { flex-wrap: wrap; }
+#accionesVistaDetallada .input-nombre-votacion { flex: 1 1 100%; order: 1; }
     </style>
 </head>
 <body>
@@ -1239,7 +1246,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
             </div>
            <div class="global-shortcuts-bar" id="accionesVistaDetallada" style="display:none;">
                 <span class="shortcuts-title">Listado nominal:</span>
-                <input type="text" id="inputNombreVotacionNominal" class="input-nombre-votacion" placeholder="Nombre de la votación...">
+                <input type="text" id="inputNombreVotacionNominal" class="input-nombre-votacion" placeholder="Título de la votación (opcional)">
                 <button class="btn-shortcut" onclick="previsualizarPlacaNominal()"><svg class="ico"><use href="#i-eye"/></svg>Vista previa</button>
 <button class="btn-shortcut" onclick="exportarPlacaNominal()"><svg class="ico"><use href="#i-download"/></svg>Descargar PNG</button>
             </div>
@@ -1365,7 +1372,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
 
             <div class="placa-wrapper" id="placaWrapperBlock" style="display: none;">
                                 <h3 style="font-size:14px; color:#475569; margin-bottom:10px;">Previsualización de Placa (Interactiva)</h3>
-                <input type="text" id="inputTituloVotacion" class="input-nombre-votacion" placeholder="Título de la votación (opcional, se usa en ambas placas)..." style="width:100%; margin-bottom:10px; box-sizing:border-box;" oninput="sincronizarTituloVotacion()">
+                <input type="text" id="inputTituloVotacion" class="input-nombre-votacion" placeholder="Título de la votación (opcional)" style="width:100%; margin-bottom:10px; box-sizing:border-box;" oninput="sincronizarTituloVotacion()">
 
                 <div class="placa-preview-container">
                     <div id="placaHtmlEntity">
@@ -2698,7 +2705,7 @@ function sincronizarTituloVotacion() {
         // En modo votación, se actualiza dinámicamente según la mayoría elegida
         actualizarLineaReferencia();
 
-        document.getElementById('qMax').innerText = modoActivo === 'quorum' ? `/${camara.total}` : `/ ${camara.total} presentes`;
+        document.getElementById('qMax').innerText = `/${camara.total}`;
         
         const container = document.getElementById('blocksContainer');
         container.innerHTML = '';
