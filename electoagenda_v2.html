@@ -1025,10 +1025,6 @@ function descargarPlacaEvento(idx, formato='cuadrada') {
     const placa = document.getElementById('placaProximoExport');
   const orig = placa.style.cssText;
 
-  placa.style.position = 'fixed';
-  placa.style.left = '0';
-  placa.style.top = '0';
-  placa.style.zIndex = '-1';
   placa.style.display = 'flex';
   placa.style.width = dims.w + 'px';
   placa.style.height = dims.h + 'px';
@@ -1041,8 +1037,13 @@ function descargarPlacaEvento(idx, formato='cuadrada') {
         backgroundColor: '#ffffff',
         width: dims.w,
         height: dims.h,
-        useCORS: true,
-        allowTaint: true
+                useCORS: true,
+        allowTaint: true,
+        onclone: (doc) => {
+          const clon = doc.getElementById('placaProximoExport');
+          clon.style.left = '0';
+          clon.style.top = '0';
+        }
       }).then(canvas => {
         placa.style.cssText = orig;
         placa.style.display = 'none';
@@ -1076,11 +1077,7 @@ function descargarPlacaEvento(idx, formato='cuadrada') {
     const placa = document.getElementById('placaEfemerideExport');
   const orig = placa.style.cssText;
 
-  placa.style.position = 'fixed';
-  placa.style.left = '0';
-  placa.style.top = '0';
-  placa.style.zIndex = '-1';
-  placa.style.display = 'flex';
+    placa.style.display = 'flex';
   placa.style.width = dims.w + 'px';
   placa.style.height = dims.h + 'px';
   placa.querySelector('img').style.display = 'block';
@@ -1092,8 +1089,13 @@ function descargarPlacaEvento(idx, formato='cuadrada') {
         backgroundColor: '#ffffff',
         width: dims.w,
         height: dims.h,
-        useCORS: true,
-        allowTaint: true
+                useCORS: true,
+        allowTaint: true,
+        onclone: (doc) => {
+          const clon = doc.getElementById('placaEfemerideExport');
+          clon.style.left = '0';
+          clon.style.top = '0';
+        }
       }).then(canvas => {
         placa.style.cssText = orig;
         placa.style.display = 'none';
