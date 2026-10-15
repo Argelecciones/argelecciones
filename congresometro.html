@@ -2213,30 +2213,27 @@ function renderizarVistaDetallada(camara) {
     }
 
         function capturarPlacaNominal(onListo) {
-        const camara = dataCongreso[camaraActiva];
-        armarContenidoPlacaNominal(camara);
+    const camara = dataCongreso[camaraActiva];
+    armarContenidoPlacaNominal(camara);
+    const placa = document.getElementById('placaNominalEntity');
 
-        const placa = document.getElementById('placaNominalEntity');
-        placa.style.left = '0';
-        placa.style.zIndex = '-1';
-        document.body.classList.add('modal-abierto');
-
-        setTimeout(async () => {
-            const alturaReal = placa.scrollHeight;
-            try {
-                const canvas = await html2canvas(placa, {
-                    scale: 1, backgroundColor: '#f8fafc', width: 1920, height: alturaReal, useCORS: true, allowTaint: true, windowWidth: 1920, windowHeight: alturaReal, scrollX: 0, scrollY: 0
-                });
-                onListo(canvas);
-            } catch (err) {
-                alert('Error al generar el listado nominal: ' + err.message);
-            } finally {
-                placa.style.left = '-9999px';
-                placa.style.zIndex = '';
-                document.body.classList.remove('modal-abierto');
-            }
-        }, 150);
-    }
+    setTimeout(async () => {
+        const alturaReal = placa.scrollHeight;
+        try {
+            const canvas = await html2canvas(placa, {
+                scale: 1, backgroundColor: '#f8fafc', width: 1920, height: alturaReal, useCORS: true, allowTaint: true,
+                windowWidth: 1920, windowHeight: alturaReal, scrollX: 0, scrollY: 0,
+                onclone: (doc) => {
+                    const c = doc.getElementById('placaNominalEntity');
+                    c.style.left = '0'; c.style.top = '0';
+                }
+            });
+            onListo(canvas);
+        } catch (err) {
+            alert('Error al generar el listado nominal: ' + err.message);
+        }
+    }, 150);
+}
 
     function previsualizarPlacaNominal() {
         capturarPlacaNominal(canvas => {
@@ -2397,31 +2394,28 @@ function sincronizarTituloVotacion() {
 }
 
     function capturarPlacaInstagram(onListo) {
-        const camara = dataCongreso[camaraActiva];
-        const votos = recolectarVotos(camara);
-        const mayoria = calcularMayoria(camara, votos);
-        armarContenidoPlacaInstagram(camara, votos, mayoria);
+    const camara = dataCongreso[camaraActiva];
+    const votos = recolectarVotos(camara);
+    const mayoria = calcularMayoria(camara, votos);
+    armarContenidoPlacaInstagram(camara, votos, mayoria);
+    const placa = document.getElementById('placaInstagramEntity');
 
-        const placa = document.getElementById('placaInstagramEntity');
-        placa.style.left = '0';
-        placa.style.zIndex = '-1';
-        document.body.classList.add('modal-abierto');
-
-        setTimeout(async () => {
-            try {
-                const canvas = await html2canvas(placa, {
-                    scale: 1, backgroundColor: '#f8fafc', width: 1080, height: 1350, useCORS: true, allowTaint: true, windowWidth: 1080, windowHeight: 1350, scrollX: 0, scrollY: 0
-                });
-                onListo(canvas);
-            } catch (err) {
-                alert('Error al generar la placa Instagram: ' + err.message);
-            } finally {
-                placa.style.left = '-9999px';
-                placa.style.zIndex = '';
-                document.body.classList.remove('modal-abierto');
-            }
-        }, 150);
-    }
+    setTimeout(async () => {
+        try {
+            const canvas = await html2canvas(placa, {
+                scale: 1, backgroundColor: '#f8fafc', width: 1080, height: 1350, useCORS: true, allowTaint: true,
+                windowWidth: 1080, windowHeight: 1350, scrollX: 0, scrollY: 0,
+                onclone: (doc) => {
+                    const c = doc.getElementById('placaInstagramEntity');
+                    c.style.left = '0'; c.style.top = '0';
+                }
+            });
+            onListo(canvas);
+        } catch (err) {
+            alert('Error al generar la placa Instagram: ' + err.message);
+        }
+    }, 150);
+}
 
     function previsualizarPlacaInstagram() {
         capturarPlacaInstagram(canvas => {
@@ -2442,29 +2436,26 @@ function sincronizarTituloVotacion() {
     }
 
         function capturarPlacaRecinto(onListo) {
-        const camara = dataCongreso[camaraActiva];
-        armarContenidoPlacaRecinto(camara);
+    const camara = dataCongreso[camaraActiva];
+    armarContenidoPlacaRecinto(camara);
+    const placa = document.getElementById('placaRecintoEntity');
 
-        const placa = document.getElementById('placaRecintoEntity');
-        placa.style.left = '-9999px';
-		placa.style.zIndex = '0';
-        document.body.classList.add('modal-abierto');
-
-        setTimeout(async () => {
-            try {
-                const canvas = await html2canvas(placa, {
-                    scale: 1, backgroundColor: '#f8fafc', width: 1920, height: 1080, useCORS: true, allowTaint: true, windowWidth: 1920, windowHeight: 1080, scrollX: 0, scrollY: 0
-                });
-                onListo(canvas);
-            } catch (err) {
-                alert('Error al generar la placa de recinto: ' + err.message);
-            } finally {
-                placa.style.left = '-9999px';
-                placa.style.zIndex = '';
-                document.body.classList.remove('modal-abierto');
-            }
-        }, 150);
-    }
+    setTimeout(async () => {
+        try {
+            const canvas = await html2canvas(placa, {
+                scale: 1, backgroundColor: '#f8fafc', width: 1920, height: 1080, useCORS: true, allowTaint: true,
+                windowWidth: 1920, windowHeight: 1080, scrollX: 0, scrollY: 0,
+                onclone: (doc) => {
+                    const c = doc.getElementById('placaRecintoEntity');
+                    c.style.left = '0'; c.style.top = '0';
+                }
+            });
+            onListo(canvas);
+        } catch (err) {
+            alert('Error al generar la placa de recinto: ' + err.message);
+        }
+    }, 150);
+}
 
         function previsualizarPlacaRecinto() {
         capturarPlacaRecinto(canvas => {
@@ -3011,42 +3002,31 @@ if (pqVolanta && inputTQ) pqVolanta.innerText = inputTQ.value;
     }
 
     function previsualizarPlacaQuorum() {
-        const target = document.getElementById('placaQuorumEntity');
-        const originalTransform = target.style.transform;
-        target.style.transform = 'none';
-        html2canvas(target, {
-            scale: 2, backgroundColor: '#f8fafc', width: 1920, height: 1080, scrollX: -window.scrollX, scrollY: -window.scrollY
-        }).then(canvas => {
-            target.style.transform = originalTransform;
-            const imgModalElement = document.getElementById('galleryStaticImage');
-            imgModalElement.src = canvas.toDataURL('image/png');
-			document.body.classList.add('modal-abierto');
-            document.getElementById('galleryModalEntity').style.display = 'flex';
-        }).catch(err => {
-            target.style.transform = originalTransform;
-            console.error('Error al capturar placa quórum:', err);
-        });
-    }
+    const target = document.getElementById('placaQuorumEntity');
+    html2canvas(target, {
+        scale: 2, backgroundColor: '#f8fafc', width: 1920, height: 1080,
+        onclone: (doc) => { doc.getElementById('placaQuorumEntity').style.transform = 'none'; }
+    }).then(canvas => {
+        document.getElementById('galleryStaticImage').src = canvas.toDataURL('image/png');
+        document.body.classList.add('modal-abierto');
+        document.getElementById('galleryModalEntity').style.display = 'flex';
+    }).catch(err => console.error('Error al capturar placa quórum:', err));
+}
 
     function exportarPlacaQuorum() {
-        const target = document.getElementById('placaQuorumEntity');
-        const originalTransform = target.style.transform;
-        target.style.transform = 'none';
-        html2canvas(target, {
-            scale: 2, backgroundColor: '#f8fafc', width: 1920, height: 1080, windowWidth: 1920, windowHeight: 1080, scrollX: 0, scrollY: 0
-        }).then(canvas => {
-            target.style.transform = originalTransform;
-            const hoy = new Date();
-            const fecha = `${hoy.getFullYear()}${String(hoy.getMonth()+1).padStart(2,'0')}${String(hoy.getDate()).padStart(2,'0')}`;
-            const link = document.createElement('a');
-            link.download = `quorum-${camaraActiva}-${fecha}-argelecciones.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-        }).catch(err => {
-            target.style.transform = originalTransform;
-            console.error(err);
-        });
-    }
+    const target = document.getElementById('placaQuorumEntity');
+    html2canvas(target, {
+        scale: 2, backgroundColor: '#f8fafc', width: 1920, height: 1080,
+        onclone: (doc) => { doc.getElementById('placaQuorumEntity').style.transform = 'none'; }
+    }).then(canvas => {
+        const hoy = new Date();
+        const fecha = `${hoy.getFullYear()}${String(hoy.getMonth()+1).padStart(2,'0')}${String(hoy.getDate()).padStart(2,'0')}`;
+        const a = document.createElement('a');
+        a.download = `quorum-${camaraActiva}-${fecha}-argelecciones.png`;
+        a.href = canvas.toDataURL('image/png');
+        a.click();
+    }).catch(err => console.error(err));
+}
 
     function recolectarVotos(camara) {
         let totalPresentes = 0;
@@ -3522,33 +3502,16 @@ if (pqVolanta && inputTQ) pqVolanta.innerText = inputTQ.value;
     }
 
     function generarPrevisualizacionGaleria() {
-        const target = document.getElementById('placaHtmlEntity');
-        const originalTransform = target.style.transform;
-        
-        target.style.transform = 'none';
-
-        html2canvas(target, {
-            scale: 2,
-            backgroundColor: '#f8fafc',
-            width: 1920,
-            height: 1080,
-            windowWidth: 1920,
-            windowHeight: 1080,
-            scrollX: 0,
-            scrollY: 0
-        }).then(canvas => {
-            target.style.transform = originalTransform;
-            
-            const imgModalElement = document.getElementById('galleryStaticImage');
-            imgModalElement.src = canvas.toDataURL('image/png');
-
-			document.body.classList.add('modal-abierto');            
-            document.getElementById('galleryModalEntity').style.display = 'flex';
-        }).catch(err => {
-            target.style.transform = originalTransform;
-            console.error("Error al procesar la captura de la galería:", err);
-        });
-    }
+    const target = document.getElementById('placaHtmlEntity');
+    html2canvas(target, {
+        scale: 2, backgroundColor: '#f8fafc', width: 1920, height: 1080,
+        onclone: (doc) => { doc.getElementById('placaHtmlEntity').style.transform = 'none'; }
+    }).then(canvas => {
+        document.getElementById('galleryStaticImage').src = canvas.toDataURL('image/png');
+        document.body.classList.add('modal-abierto');
+        document.getElementById('galleryModalEntity').style.display = 'flex';
+    }).catch(err => console.error('Error al procesar la captura:', err));
+}
 
             function cerrarModalGaleria() {
         document.getElementById('galleryModalEntity').style.display = 'none';
@@ -3559,31 +3522,18 @@ if (pqVolanta && inputTQ) pqVolanta.innerText = inputTQ.value;
     });
 
     function exportarPlacaAImagen() {
-        const target = document.getElementById('placaHtmlEntity');
-        const originalTransform = target.style.transform;
-        target.style.transform = 'none';
+    const target = document.getElementById('placaHtmlEntity');
+    html2canvas(target, {
+        scale: 2, backgroundColor: '#f8fafc', width: 1920, height: 1080,
+        onclone: (doc) => { doc.getElementById('placaHtmlEntity').style.transform = 'none'; }
+    }).then(canvas => {
+        const a = document.createElement('a');
+        a.download = `votacion-${camaraActiva}-argelecciones.png`;
+        a.href = canvas.toDataURL('image/png');
+        a.click();
+    }).catch(err => console.error(err));
+}
 
-        html2canvas(target, {
-            scale: 2,
-            backgroundColor: '#f8fafc',
-            width: 1920,
-            height: 1080,
-            windowWidth: 1920,
-            windowHeight: 1080,
-            scrollX: 0,
-            scrollY: 0
-        }).then(canvas => {
-            target.style.transform = originalTransform;
-
-            const downloadLink = document.createElement('a');
-            downloadLink.download = `votacion-${camaraActiva}-argelecciones.png`;
-            downloadLink.href = canvas.toDataURL('image/png');
-            downloadLink.click();
-        }).catch(err => {
-            target.style.transform = originalTransform;
-            console.error(err);
-        });
-    }
 
     function atajoLimpiarTodo() {
         desempateManual = null;
