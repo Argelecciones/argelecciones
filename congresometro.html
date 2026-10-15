@@ -970,7 +970,7 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
     .igv-legend-item.aus { background:rgba(148,163,184,.15); }
         .igv-blocks { flex:1; display:grid; grid-template-columns:1fr 1fr; gap:14px 20px; align-content:center; overflow:hidden; }
     .igv-block-row { display:flex; justify-content:space-between; align-items:center; background:#f1f5f9; border-radius:10px; padding:16px 18px; border-left:6px solid #64748b; }
-    .igv-block-nombre { font-size:15px; font-weight:700; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px; }
+    .igv-block-nombre { font-size:15px; font-weight:700; color:#0f172a; flex:1; min-width:0; white-space:normal; line-height:1.2; margin-right:10px; }
     .igv-block-votos { display:flex; gap:4px; flex-shrink:0; }
     .igv-block-votos span { font-size:13px; font-weight:800; padding:3px 6px; border-radius:5px; min-width:24px; text-align:center; }
     .igv-footer { display:flex; justify-content:space-between; align-items:center; border-top:1px solid #e2e8f0; margin-top:18px; padding-top:16px; }
@@ -1166,7 +1166,20 @@ header h1{margin:0;font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3p
 		#accionesVistaDetallada { flex-wrap: wrap; }
 #accionesVistaDetallada .input-nombre-votacion { flex: 1 1 100%; order: 1; }
 
-		.igv-block-nombre { flex: 1; min-width: 0; max-width: none; white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.2; margin-right: 10px; }
+		/* Placa nominal: colores vivos */
+.placa-nominal-tag { border:1px solid transparent; }
+.tag-af { background:#10b981; border-color:#059669; color:#fff; }
+.tag-neg { background:#ef4444; border-color:#dc2626; color:#fff; }
+.tag-abs { background:#eab308; border-color:#ca8a04; color:#422006; }
+.tag-sv { background:#dbeafe; border-color:#3b82f6; color:#1e40af; }
+.tag-aus, .tag-duda { background:#e2e8f0; border-color:#94a3b8; color:#334155; }
+
+/* Chips del encabezado (modo votación) */
+.chip-af { background:#10b981; color:#fff; }
+.chip-neg { background:#ef4444; color:#fff; }
+.chip-abs { background:#eab308; color:#422006; }
+.chip-sv { background:#dbeafe; color:#1e40af; }
+.chip-aus { background:#e2e8f0; color:#334155; }
     </style>
 </head>
 <body>
