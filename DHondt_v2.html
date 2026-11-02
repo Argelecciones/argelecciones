@@ -440,7 +440,6 @@
                         <tr>
                             <th>Partido / Frente</th>
                             <th>Votos</th>
-                            <th>%</th>
                             <th>Bancas Asignadas</th>
                         </tr>
                     </thead>
@@ -652,14 +651,12 @@
 
             todosLosPartidos.forEach(p => {
                 const pasoPiso = partidosFiltrados.some(f => f.name === p.name);
-                const pct = ((p.votes / totalEmitidos) * 100).toFixed(2);
                 const bancasAsignadas = pasoPiso ? partidosFiltrados.find(f => f.name === p.name).bancas : 0;
 
                 tbody.innerHTML += `
                     <tr class="${!pasoPiso ? 'row-excluded' : ''}">
                         <td>${p.name} ${!pasoPiso ? '<span class="badge-excluido">Excluido por piso</span>' : ''}</td>
                         <td>${p.votes.toLocaleString()}</td>
-                        <td>${pct}%</td>
                         <td><strong class="banca-count">${bancasAsignadas}</strong></td>
                     </tr>
                 `;
