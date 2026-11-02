@@ -400,9 +400,10 @@
                     <div class="input-group">
                         <label for="baseExclusion">Base del piso electoral</label>
                         <select id="baseExclusion">
-                            <option value="validos">Votos Válidos (positivos + blancos)</option>
-                            <option value="padron">Votos sobre el Padrón Total</option>
-                        </select>
+    <option value="validos">Votos Afirmativos (sin blancos)</option>
+    <option value="validosBlanco">Votos Válidos (afirmativos + blancos)</option>
+    <option value="padron">Votos sobre el Padrón Total</option>
+</select>
                     </div>
                 </div>
 
@@ -592,7 +593,8 @@
             const totalVotosValidos = totalVotosPositivos + votosBlanco;
             const totalVotosEmitidos = totalVotosValidos + votosNulos;
 
-            let baseCalculoPiso = totalVotosValidos;
+            let baseCalculoPiso = totalVotosPositivos;
+			if (baseExclusion === 'validosBlanco') baseCalculoPiso = totalVotosValidos;
             if (baseExclusion === 'padron') baseCalculoPiso = totalPadron;
 
 			if (baseCalculoPiso <= 0) {
@@ -643,7 +645,7 @@
 
         function renderResults(todosLosPartidos, totalEmitidos, partidosFiltrados, analisisText) {
             document.getElementById('resultsSection').style.display = 'block';
-            document.getElementById('summaryStats').innerHTML = `<strong>Total Emitidos:</strong> ${totalEmitidos.toLocaleString()} | <strong>Votos Positivos:</strong> ${todosLosPartidos.reduce((a,b)=>a+b.votes,0).toLocaleString()}`;
+            document.getElementById('summaryStats').innerHTML = `<strong>Total Emitidos:</strong> ${totalEmitidos.toLocaleString()} | <strong>Votos Afirmativos:</strong> ${todosLosPartidos.reduce((a,b)=>a+b.votes,0).toLocaleString()}`;
             
             const tbody = document.getElementById('resultsTableBody');
             tbody.innerHTML = '';
