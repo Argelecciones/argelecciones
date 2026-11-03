@@ -41,6 +41,7 @@ button,input{font-family:inherit}
 .cd{display:none;align-items:center;gap:16px;padding:12px 24px;background:var(--s);border-bottom:1px solid var(--b)}.cd.v{display:flex}
 .cdn{font-size:32px;font-weight:900;color:var(--nacional);line-height:1;min-width:64px;text-align:center}
 .cdt{font-size:14px;font-weight:800}.cds{font-size:11px;color:var(--m);font-weight:600;margin-top:2px}
+.cdb{display:flex;gap:14px}.cdb div{text-align:center;min-width:48px}.cdb b{display:block;font-size:28px;font-weight:900;color:var(--nacional);line-height:1;font-variant-numeric:tabular-nums}.cdb i{font-style:normal;font-size:9px;font-weight:700;color:var(--m);text-transform:uppercase}
 /* filtros */
 .tb{padding:12px 24px;border-bottom:1px solid var(--b);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .bq{position:relative}.bq input{background:var(--s);border:1px solid var(--b);border-radius:6px;padding:8px 12px 8px 32px;font-size:13px;width:220px;outline:0;color:var(--t)}.bq .ico{position:absolute;left:10px;top:10px;color:var(--m)}
@@ -93,7 +94,7 @@ button,input{font-family:inherit}
 #pl{position:fixed;left:-9999px;top:0}
 @media(max-width:600px){
 .hd{flex-direction:column;align-items:stretch;text-align:center}.hl{justify-content:center}.hr{justify-content:center}.hr .bh{flex:1;justify-content:center;padding:8px 4px}
-.px{flex-direction:column;text-align:center}.pa{margin:0}.cd{padding:12px 16px}
+.px{flex-direction:column;text-align:center}.pa{margin:0}.cd{padding:12px 16px;flex-wrap:wrap;gap:10px}
 .tb{padding:12px 16px;flex-direction:column;align-items:stretch}.bq input{width:100%}.fl{display:grid;grid-template-columns:repeat(3,1fr)}.bp{margin:0;justify-content:center}
 .ev{grid-template-columns:46px 3px 1fr}.ea{grid-column:1/-1;flex-direction:row;border-left:0;border-top:1px solid var(--b);padding:10px 0 0;margin-top:10px}.ea .ab{flex:1;padding:8px 4px}
 .cc{min-height:62px;padding:4px}.cb{font-size:12px}.cu{font-size:8px;padding:1px 3px;-webkit-line-clamp:1}
@@ -185,7 +186,9 @@ const MES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Se
 const DS=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
 const DL=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 const hoy=new Date();hoy.setHours(0,0,0,0);
-const CUENTA={fecha:new Date(2027,9,24),titulo:'Elecciones presidenciales'};
+const CUENTA={fecha:new Date('2027-10-24T08:00:00-03:00'),titulo:'Elecciones presidenciales'};
+let LOGO='logo.png';
+fetch('logo.png').then(r=>r.blob()).then(b=>{const f=new FileReader();f.onload=()=>LOGO=f.result;f.readAsDataURL(b)}).catch(()=>{});
 let EV=[],EF=[],fil='todos',vis='lista',pas=false,cA=hoy.getFullYear(),cM=hoy.getMonth(),T='',I=0,IC=0;
 const esc=s=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const ico=(n,c='')=>`<svg class="ico ${c}"><use href="#i-${n}"/></svg>`;
@@ -203,7 +206,7 @@ const key=e=>e.destacado?'des':ck(e.categoria);
 const FMT={cuadrada:{w:1200,h:1200,p:'65px 75px'},instagram:{w:1080,h:1350,p:'65px 70px'},grande:{w:1080,h:1440,p:'70px 70px'},stories:{w:1080,h:1920,p:'270px 70px 384px'}};
 const PIN='<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-4px"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> ';
 function placaHTML(d,f){const F=FMT[f];return `<div style="width:${F.w}px;height:${F.h}px;padding:${F.p};background:#fff;border-top:10px solid ${d.acc};display:flex;flex-direction:column;justify-content:space-between;font-family:Inter,system-ui,sans-serif;color:#000;box-sizing:border-box">
-<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #000;padding-bottom:14px"><div style="display:flex;align-items:center;gap:16px"><img src="logo.png" style="height:90px;width:auto"><span style="font-size:24px;font-weight:900;color:#19aae5;letter-spacing:.04em;text-transform:uppercase">ElectoAgenda</span></div><div style="background:${d.tc};color:#fff;font-size:16px;font-weight:900;letter-spacing:.07em;padding:10px 14px;text-transform:uppercase">${d.tag}</div></div>
+<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #000;padding-bottom:14px"><div style="display:flex;align-items:center;gap:16px"><img src="${LOGO}" style="height:90px;width:auto"><span style="font-size:24px;font-weight:900;color:#19aae5;letter-spacing:.04em;text-transform:uppercase">ElectoAgenda</span></div><div style="background:${d.tc};color:#fff;font-size:16px;font-weight:900;letter-spacing:.07em;padding:10px 14px;text-transform:uppercase">${d.tag}</div></div>
 <div style="display:flex;flex-direction:column;gap:44px"><div style="display:flex;align-items:baseline;gap:14px"><span style="font-size:170px;font-weight:900;color:#19aae5;line-height:.82;letter-spacing:-.06em">${d.big}</span><span style="font-size:38px;font-weight:900;text-transform:uppercase">${d.lbl}</span></div>
 <div style="font-size:64px;font-weight:900;line-height:1.04;letter-spacing:-.04em">${d.title}</div>
 <div style="border-left:8px solid ${d.tc};padding:6px 0 6px 18px;font-size:25px;font-weight:800;line-height:1.35">${d.date}</div>
@@ -212,10 +215,10 @@ ${d.det?`<div style="background:#f1f5f9;padding:26px 30px;font-size:28px;font-we
 function datos(){
   if(T==='evento'){const e=EV[I],C={nacional:'#000',provincial:'#19aae5',municipal:'#ff6b00',partidos:'#19aae5'};return{f:e.fecha,d:{tag:e.destacado?'Elección destacada':esc(e.categoria),tc:e.destacado?'#ff6b00':C[ck(e.categoria)],acc:e.destacado?'#ff6b00':'#19aae5',big:e.fecha.getDate(),lbl:MES[e.fecha.getMonth()],title:esc(e.descripcion),date:largo(e.fecha)+(e.provincia?' · '+PIN+esc(e.provincia):'')}}}
   if(T==='efemeride'){const e=EF[I];return{f:e.fecha,d:{tag:'Efeméride',tc:'#ff6b00',acc:'#19aae5',big:e.fecha.getDate(),lbl:MES[e.fecha.getMonth()],title:esc(e.descripcion),date:`${e.fecha.getDate()} de ${MES[e.fecha.getMonth()]} de ${e.fecha.getFullYear()}`,det:esc(e.detalle)}}}
-  const f=CUENTA.fecha;return{f,d:{tag:'Cuenta regresiva',tc:'#ff6b00',acc:'#ff6b00',big:dias(f),lbl:'días restantes',title:esc(CUENTA.titulo),date:largo(f)}}
+  const f=CUENTA.fecha,r=resta();return{f,d:{tag:'Cuenta regresiva',tc:'#ff6b00',acc:'#ff6b00',big:r.d,lbl:`días · ${r.h} h ${r.m} min`,title:esc(CUENTA.titulo),date:largo(f)+' · 8:00 hs'}}
 }
 function bajar(f){const{f:fe,d}=datos(),F=FMT[f],p=$('pl');p.innerHTML=placaHTML(d,f);p.style.width=F.w+'px';p.style.height=F.h+'px';
-  document.fonts.ready.then(()=>setTimeout(()=>html2canvas(p,{scale:1,width:F.w,height:F.h,backgroundColor:'#fff',useCORS:true,allowTaint:true,onclone:c=>{const e=c.getElementById('pl');e.style.left='0';e.style.top='0'}}).then(cv=>{const a=document.createElement('a');a.download=`${T}-${fe.getFullYear()}-${fe.getMonth()+1}-${fe.getDate()}-${f}.png`;a.href=cv.toDataURL('image/png');a.click()}).catch(e=>alert('Error generando imagen: '+e.message)),150))}
+  document.fonts.ready.then(()=>setTimeout(()=>html2canvas(p,{scale:1,width:F.w,height:F.h,backgroundColor:'#fff',useCORS:true,onclone:c=>{const e=c.getElementById('pl');e.style.left='0';e.style.top='0'}}).then(cv=>{const a=document.createElement('a');a.download=`${T}-${fe.getFullYear()}-${fe.getMonth()+1}-${fe.getDate()}-${f}.png`;a.href=cv.toDataURL('image/png');a.click()}).catch(e=>alert('Error generando imagen: '+e.message)),150))}
 
 /* ---------- menús ---------- */
 function abrirPop(el,evt,w,h){evt.stopPropagation();$('popF').style.display='none';$('popC').style.display='none';el.style.display='flex';const r=evt.currentTarget.getBoundingClientRect();let l=r.left;if(l+w>innerWidth)l=innerWidth-w-10;let t=r.bottom+6;if(r.bottom+h>innerHeight)t=r.top-h-6;el.style.left=Math.max(l,8)+'px';el.style.top=t+'px'}
@@ -233,14 +236,16 @@ addEventListener('keydown',e=>{if(e.key==='Escape')cerrar()});
 function copiar(t,b){navigator.clipboard.writeText(t).then(()=>{const s=b.querySelector('span'),o=b.innerHTML;b.innerHTML=ico('check')+(s?'<span>Copiado</span>':'');setTimeout(()=>b.innerHTML=o,1800)})}
 function copEv(i,b){const e=EV[i];copiar(`📅 ElectoAgenda @ArgElecciones\n\n🗳 ${e.descripcion}${e.provincia?` (${e.provincia})`:''}: ${largo(e.fecha)}`,b)}
 function copEf(i,b){const e=EF[i],a=hoy.getFullYear()-e.fecha.getFullYear();copiar(`📅 ElectoAgenda @ArgElecciones\n\n🏛 Se cumplen ${a} años: ${e.descripcion} (${e.fecha.getDate()} de ${MES[e.fecha.getMonth()]} de ${e.fecha.getFullYear()})${e.detalle?`\n\n${e.detalle}`:''}`,b)}
-function copCd(b){copiar(`📅 ElectoAgenda @ArgElecciones\n\n🗳 Faltan ${dias(CUENTA.fecha)} días para las ${CUENTA.titulo.toLowerCase()}: ${largo(CUENTA.fecha)}`,b)}
+function copCd(b){const r=resta();copiar(`📅 ElectoAgenda @ArgElecciones\n\n🗳 Faltan ${r.d} días, ${r.h} h y ${r.m} min para las ${CUENTA.titulo.toLowerCase()}: ${largo(CUENTA.fecha)}, 8:00 hs`,b)}
 
 /* ---------- vistas ---------- */
 function banner(){const f=EV.filter(e=>e.fecha>=hoy),b=$('bnr');if(!f.length){b.classList.remove('v');return}const e=f[0],d=dias(e.fecha),i=EV.indexOf(e);
   $('bnN').innerHTML=d?`${d}<small>días</small>`:'¡HOY!';$('bnD').textContent=e.descripcion;$('bnF').textContent=largo(e.fecha)+(e.provincia?' · '+e.provincia:'');
   $('bnC').onclick=()=>copEv(i,$('bnC'));$('bnL').onclick=ev=>fmt(ev,'evento',i);b.classList.add('v')}
-function cuenta(){const d=dias(CUENTA.fecha),c=$('cd');if(d<0){c.classList.remove('v');return}
-  c.innerHTML=`<div class="cdn">${d}</div><div style="flex:1"><div class="cdt">${esc(CUENTA.titulo)}</div><div class="cds">Días restantes · ${largo(CUENTA.fecha)}</div></div><button class="ab" onclick="copCd(this)">${ico('copy')}<span>Copiar</span></button><button class="ab pu" onclick="fmt(event,'cuenta',0)">${ico('download')}<span>Placa</span></button>`;c.classList.add('v')}
+function resta(){const s=Math.max(0,Math.floor((CUENTA.fecha-new Date())/1000));return{d:Math.floor(s/86400),h:Math.floor(s%86400/3600),m:Math.floor(s%3600/60),s:s%60,fin:CUENTA.fecha<=new Date()}}
+function tick(){const c=$('cd');if(!$('cdD'))return;const r=resta();if(r.fin){c.classList.remove('v');return}const p=n=>String(n).padStart(2,'0');$('cdD').textContent=r.d;$('cdH').textContent=p(r.h);$('cdM').textContent=p(r.m);$('cdS').textContent=p(r.s)}
+function cuenta(){const c=$('cd');if(CUENTA.fecha<=new Date()){c.classList.remove('v');return}
+  c.innerHTML=`<div style="flex:1;min-width:200px"><div class="cdt">${esc(CUENTA.titulo)}</div><div class="cds">${largo(CUENTA.fecha)} · 8:00 hs (Buenos Aires)</div></div><div class="cdb"><div><b id="cdD">0</b><i>días</i></div><div><b id="cdH">00</b><i>horas</i></div><div><b id="cdM">00</b><i>min</i></div><div><b id="cdS">00</b><i>seg</i></div></div><button class="ab" onclick="copCd(this)">${ico('copy')}<span>Copiar</span></button><button class="ab pu" onclick="fmt(event,'cuenta',0)">${ico('download')}<span>Placa</span></button>`;c.classList.add('v');tick()}
 function vista(v){vis=v;$('vL').style.display=v==='lista'?'block':'none';$('vC').style.display=v==='cal'?'block':'none';$('vE').style.display=v==='efem'?'block':'none';$('tb').style.display=v==='efem'?'none':'flex';
   $('bL').classList.toggle('on',v==='lista');$('bC').classList.toggle('on',v==='cal');$('bE').classList.toggle('on',v==='efem');if(v==='cal')calendario();if(v==='efem')efem()}
 function filtrar(f){fil=f;document.querySelectorAll('.f').forEach(b=>b.classList.toggle('on',b.dataset.f===f));vis==='cal'?calendario():lista()}
@@ -280,7 +285,7 @@ async function cargar(){const t=$('stT');$('rf').classList.add('sp');t.textConte
     t.textContent=`${EV.length} eventos cargados · ${new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}`;banner();cuenta();lista();if(vis==='cal')calendario();if(vis==='efem')efem()}
   catch(e){t.textContent='Error: '+e.message;$('mn').innerHTML='<div class="vc">No se pudieron cargar los datos.</div>'}
   finally{$('rf').classList.remove('sp')}}
-cuenta();cargar();
+cuenta();cargar();setInterval(tick,1000);
 </script>
 </body>
 </html>
