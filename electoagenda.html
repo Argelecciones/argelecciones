@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ElectoAgenda — @ArgElecciones</title>
+<meta name="description" content="Cronograma y calendario electoral nacional y provincial de Argentina.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ElectoAgenda — @ArgElecciones">
+<meta property="og:image" content="https://argelecciones.netlify.app/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--b:#e2e8f0;--s:#f8fafc;--t:#0f172a;--m:#64748b;--nacional:#2563eb;--provincial:#7c3aed;--municipal:#ea580c;--partidos:#059669;--des:#e11d48;--efe:#b45309}
+body{background:#fff;color:var(--t);font-family:'Inter',system-ui,sans-serif;min-height:100vh}
+button,input{font-family:inherit}
+.ico{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;vertical-align:-2px}
+.ico-fill{fill:currentColor}
+.sp{animation:sp .8s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+/* encabezado oscuro */
+.hd{background:#0b1220;color:#f0f4ff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:100}
+.hl{display:flex;align-items:center;gap:12px}.hl img{height:44px;width:auto}
+.ht{font-size:20px;font-weight:900}.ht span{color:#f43f5e}
+.hg{font-size:10px;color:#93a3c0;font-weight:700;letter-spacing:.1em}
+.hr{display:flex;gap:8px;flex-wrap:wrap}
+.bh{background:#1e293b;border:1px solid #334155;color:#cbd5e1;padding:7px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+.bh.on{background:#f43f5e;border-color:#f43f5e;color:#fff}
+#bE{border-color:#ca8a04;color:#facc15}#bE.on{background:#ca8a04;color:#0f172a}
+/* próximo evento (rojo) */
+.px{display:none;background:linear-gradient(135deg,#be123c,#e11d48);padding:14px 24px;align-items:center;gap:16px;color:#fff}.px.v{display:flex}
+.pe{background:#fff;color:#be123c;font-size:9px;font-weight:900;letter-spacing:.1em;padding:3px 8px;border-radius:3px;white-space:nowrap}
+.pn{font-size:28px;font-weight:900;color:#fff;line-height:1;text-align:center;min-width:50px}.pn small{display:block;font-size:10px;color:#ffe4e6;font-weight:700}
+.pd{font-size:14px;font-weight:700}.pf{font-size:11px;color:#ffe4e6;font-weight:600;margin-top:3px}
+.pa{margin-left:auto;display:flex;gap:6px}
+.ib{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.45);color:#fff;width:34px;height:34px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+/* cuenta regresiva */
+.cd{display:none;align-items:center;gap:16px;padding:12px 24px;background:var(--s);border-bottom:1px solid var(--b)}.cd.v{display:flex}
+.cdn{font-size:32px;font-weight:900;color:var(--nacional);line-height:1;min-width:64px;text-align:center}
+.cdt{font-size:14px;font-weight:800}.cds{font-size:11px;color:var(--m);font-weight:600;margin-top:2px}
+.cdb{display:flex;gap:14px}.cdb div{text-align:center;min-width:48px}.cdb b{display:block;font-size:28px;font-weight:900;color:var(--nacional);line-height:1;font-variant-numeric:tabular-nums}.cdb i{font-style:normal;font-size:9px;font-weight:700;color:var(--m);text-transform:uppercase}
+/* filtros */
+.tb{padding:12px 24px;border-bottom:1px solid var(--b);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.bq{position:relative}.bq input{background:var(--s);border:1px solid var(--b);border-radius:6px;padding:8px 12px 8px 32px;font-size:13px;width:220px;outline:0;color:var(--t)}.bq .ico{position:absolute;left:10px;top:10px;color:var(--m)}
+.fl{display:flex;gap:6px;flex-wrap:wrap}
+.f{--c:var(--m);padding:5px 12px;border-radius:20px;border:1.5px solid var(--c);color:var(--c);background:#fff;font-size:11px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:5px}.f.on{background:var(--c);color:#fff}
+.bp{margin-left:auto;background:#fff;border:1px solid var(--b);color:var(--m);padding:6px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px}.bp.on{background:var(--t);color:#fff}
+.st{padding:8px 24px;font-size:11px;color:var(--m);display:flex;gap:7px;align-items:center;border-bottom:1px solid var(--b)}.dt{width:6px;height:6px;border-radius:50%;background:var(--partidos)}
+/* listas */
+.mn{max-width:840px;margin:0 auto;padding:20px 20px 60px}
+.mb{margin-bottom:30px}
+.mh{display:flex;align-items:center;gap:12px;padding-bottom:10px;border-bottom:1px solid var(--b);margin-bottom:14px;font-size:12px;font-weight:900;color:var(--m);letter-spacing:.1em;text-transform:uppercase}.mh i{font-style:normal;font-size:10px;background:var(--s);padding:2px 8px;border-radius:10px}
+.ev{display:grid;grid-template-columns:52px 3px 1fr auto;gap:0 14px;padding:14px;border:1px solid var(--b);border-radius:10px;margin-bottom:10px;background:#fff}.ev.ps{opacity:.45}
+.en{text-align:center}.en b{display:block;font-size:26px;font-weight:900;line-height:1}.en i{font-style:normal;font-size:9px;color:var(--m);font-weight:700;text-transform:uppercase}
+.br{border-radius:3px}.eb{min-width:0}
+.et{display:flex;align-items:center;gap:7px;margin-bottom:5px;flex-wrap:wrap}
+.cp{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;border-radius:4px;background:color-mix(in srgb,var(--c) 12%,#fff);color:var(--c)}
+.bd{background:var(--des);color:#fff;font-size:8px;font-weight:900;padding:2px 6px;border-radius:3px;display:inline-flex;gap:3px;align-items:center;text-transform:uppercase}.bd .ico{width:9px;height:9px}
+.bz{background:var(--s);color:var(--m);font-size:8px;font-weight:700;padding:2px 6px;border-radius:3px}
+.fd{font-size:9px;font-weight:800;color:var(--des)}.fd.c{color:#ea580c}
+.ed{font-size:15px;font-weight:700;line-height:1.35}.ep{font-size:12px;color:var(--m);font-weight:600;margin-top:3px}
+.ee{font-size:12px;color:var(--m);line-height:1.5;margin-top:6px}
+.ea{display:flex;flex-direction:column;gap:6px;justify-content:center;padding-left:14px;border-left:1px solid var(--b);min-width:150px}
+.ab{background:#fff;border:1px solid var(--b);color:var(--t);padding:7px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}.ab:hover{background:var(--s)}.ab.pu{color:#7c3aed;border-color:#c4b5fd}
+.ef .br{background:var(--efe)}.ef .et span{font-size:10px;font-weight:800;color:var(--efe)}
+.ac{border:1px solid var(--b);border-radius:8px;margin-bottom:10px;overflow:hidden}
+.ah{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--s);cursor:pointer;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:900}.ah b{flex:1}.ah i{font-style:normal;font-size:10px;color:var(--m)}
+.ac.mes .ah{border-left:3px solid var(--efe)}.ct{display:none;padding:12px 16px 2px}.ac.on .ct{display:block}.ac.on .ch{transform:rotate(90deg)}
+.vc{text-align:center;padding:60px 20px;color:var(--m);font-size:14px}
+/* calendario */
+.cn2{display:flex;align-items:center;justify-content:space-between;padding:16px 0 12px;max-width:840px;margin:0 auto}
+.cm{font-size:16px;font-weight:900;text-transform:uppercase;letter-spacing:.08em}
+.bn{background:#fff;border:1px solid var(--b);width:34px;height:34px;border-radius:6px;cursor:pointer;font-size:16px}
+.cg{max-width:840px;margin:0 auto 24px}
+.cs,.cx{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}.cs div{text-align:center;font-size:10px;font-weight:800;color:var(--m);text-transform:uppercase;padding:4px 0}
+.cc{border:1px solid var(--b);border-radius:8px;min-height:100px;padding:8px;background:#fff;min-width:0;overflow:hidden}.cc.o{opacity:.3}.cc.h{border-color:var(--t)}.cc.y{cursor:pointer}.cc.y:hover{background:var(--s)}
+.cb{font-size:15px;font-weight:900;color:var(--m);margin-bottom:5px}.cc.h .cb{color:var(--t)}
+.cu{border-radius:4px;margin-bottom:3px;font-size:11px;font-weight:700;color:#fff;padding:2px 6px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow-wrap:anywhere}
+.cy{font-size:10px;font-weight:800;color:var(--m)}.ci{display:none}
+/* modal y menús */
+.mo{position:fixed;inset:0;background:rgba(15,23,42,.6);display:none;align-items:center;justify-content:center;z-index:10000;padding:20px}.mo.v{display:flex}
+.mc{background:#fff;border-radius:12px;padding:24px;width:100%;max-width:440px;position:relative;max-height:90vh;overflow:auto}
+.mx{position:absolute;top:14px;right:14px;background:0;border:0;color:var(--m);cursor:pointer}
+.mf{font-size:11px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px;padding-right:24px}
+.mi{margin-bottom:18px}.mi:last-child{margin-bottom:0}
+.md{font-size:20px;font-weight:800;line-height:1.3;margin:8px 0}.mp{font-size:13px;color:var(--m);margin-bottom:14px}
+.mac{display:flex;gap:8px}.mac .ab{flex:1}
+.po{display:none;position:fixed;z-index:10001;background:#fff;border:1px solid var(--b);border-radius:8px;padding:6px;box-shadow:0 8px 24px rgba(15,23,42,.18);flex-direction:column;gap:4px}
+.po button{background:var(--s);border:1px solid var(--b);color:var(--t);padding:8px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;text-align:left;white-space:nowrap}
+.ft{text-align:center;padding:16px;font-size:10px;color:var(--m);border-top:1px solid var(--b);letter-spacing:.05em;text-transform:uppercase}
+#pl{position:fixed;left:-9999px;top:0}
+@media(max-width:600px){
+.hd{flex-direction:column;align-items:stretch;text-align:center}.hl{justify-content:center}.hr{justify-content:center}.hr .bh{flex:1;justify-content:center;padding:8px 4px}
+.px{flex-direction:column;text-align:center}.pa{margin:0}.cd{padding:12px 16px;flex-wrap:wrap;gap:10px}
+.tb{padding:12px 16px;flex-direction:column;align-items:stretch}.bq input{width:100%}.fl{display:grid;grid-template-columns:repeat(3,1fr)}.bp{margin:0;justify-content:center}
+.ev{grid-template-columns:46px 3px 1fr}.ea{grid-column:1/-1;flex-direction:row;border-left:0;border-top:1px solid var(--b);padding:10px 0 0;margin-top:10px}.ea .ab{flex:1;padding:8px 4px}
+.cc{min-height:62px;padding:4px}.cb{font-size:12px}.cu{display:none}.ci{display:flex;justify-content:center;margin-top:2px}.ci .ico{width:18px;height:18px}.cy{text-align:center}
+}
+</style>
+</head>
+<body>
+<!-- Iconos: Lucide (ISC License) https://lucide.dev -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></symbol>
+<symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="i-list" viewBox="0 0 24 24"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol>
+<symbol id="i-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></symbol>
+<symbol id="i-calendar-plus" viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><path d="M21 13V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8"/><path d="M3 10h18"/><path d="M16 19h6"/><path d="M19 16v6"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
+<symbol id="i-landmark" viewBox="0 0 24 24"><line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/></symbol>
+<symbol id="i-calendar" viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></symbol>
+<symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></symbol>
+<symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-vote" viewBox="0 0 24 24"><path d="m9 12 2 2 4-4"/><path d="M5 7c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2v12H5V7Z"/><path d="M22 19H2"/></symbol>
+</svg>
+
+<div class="hd">
+  <div class="hl"><img src="logo.png" alt="ARG elecciones"><div><div class="ht">Electo<span>Agenda</span></div><div class="hg">AGENDA ELECTORAL · @ARGELECCIONES</div></div></div>
+  <div class="hr">
+    <a href="index.html" class="bh"><svg class="ico"><use href="#i-arrow-left"/></svg>Toolbox</a>
+    <button class="bh on" id="bL" onclick="vista('lista')"><svg class="ico"><use href="#i-list"/></svg>Lista</button>
+    <button class="bh" id="bC" onclick="vista('cal')"><svg class="ico"><use href="#i-calendar"/></svg>Calendario</button>
+    <button class="bh" id="bE" onclick="vista('efem')"><svg class="ico"><use href="#i-landmark"/></svg>Efemérides</button>
+    <button class="bh" onclick="cargar()"><svg class="ico" id="rf"><use href="#i-refresh"/></svg>Actualizar</button>
+  </div>
+</div>
+
+<div class="px" id="bnr">
+  <div class="pe">PRÓXIMO EVENTO</div>
+  <div class="pn" id="bnN">—</div>
+  <div style="flex:1"><div class="pd" id="bnD">—</div><div class="pf" id="bnF">—</div></div>
+  <div class="pa"><button class="ib" id="bnC" aria-label="Copiar"><svg class="ico"><use href="#i-copy"/></svg></button><button class="ib" id="bnA" aria-label="Agregar al calendario"><svg class="ico"><use href="#i-calendar-plus"/></svg></button><button class="ib" id="bnL" aria-label="Descargar placa"><svg class="ico"><use href="#i-download"/></svg></button></div>
+</div>
+<div class="cd" id="cd"></div>
+
+<div class="tb" id="tb">
+  <div class="bq"><svg class="ico"><use href="#i-search"/></svg><input type="text" id="q" placeholder="Buscar evento..." oninput="lista()"></div>
+  <div class="fl">
+    <button class="f on" data-f="todos" onclick="filtrar('todos')">Todos</button>
+    <button class="f" data-f="nacional" style="--c:var(--nacional)" onclick="filtrar('nacional')">Nac.</button>
+    <button class="f" data-f="provincial" style="--c:var(--provincial)" onclick="filtrar('provincial')">Prov.</button>
+    <button class="f" data-f="municipal" style="--c:var(--municipal)" onclick="filtrar('municipal')">Mun.</button>
+    <button class="f" data-f="partidos" style="--c:var(--partidos)" onclick="filtrar('partidos')">Part.</button>
+    <button class="f" data-f="destacado" style="--c:var(--des)" onclick="filtrar('destacado')"><svg class="ico ico-fill" style="width:11px;height:11px"><use href="#i-star"/></svg>Dest.</button>
+  </div>
+  <button class="bp" id="bP" onclick="pasados()"><svg class="ico"><use href="#i-history"/></svg>Mostrar pasados</button>
+</div>
+<div class="st"><span class="dt" id="dt"></span><span id="stT">Cargando desde Google Sheets...</span></div>
+
+<div id="vL"><div class="mn" id="mn"></div></div>
+<div id="vC" style="display:none;padding:0 20px">
+  <div class="cn2"><button class="bn" onclick="mes(-1)">‹</button><div class="cm" id="cmT">—</div><button class="bn" onclick="mes(1)">›</button></div>
+  <div class="cg"><div class="cs"><div>Dom</div><div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div><div>Vie</div><div>Sáb</div></div><div class="cx" id="cx"></div></div>
+</div>
+<div id="vE" style="display:none">
+  <div style="max-width:840px;margin:0 auto;padding:20px 20px 0"><div class="bq"><svg class="ico"><use href="#i-search"/></svg><input type="text" id="qE" placeholder="Buscar efeméride..." oninput="efem()" style="width:100%"></div></div>
+  <div class="mn" id="mnE"></div>
+</div>
+
+<div class="mo" id="mo" onclick="cerrar()"><div class="mc" onclick="event.stopPropagation()"><button class="mx" onclick="cerrar()" aria-label="Cerrar"><svg class="ico"><use href="#i-x"/></svg></button><div id="moB"></div></div></div>
+<div class="po" id="popF">
+  <button onclick="elegir('cuadrada')">Cuadrada · 1200×1200</button>
+  <button onclick="elegir('instagram')">Instagram · 1080×1350</button>
+  <button onclick="elegir('grande')">Instagram grande · 1080×1440</button>
+  <button onclick="elegir('stories')">Stories · 1080×1920</button>
+</div>
+<div class="po" id="popC">
+  <button onclick="agregar('google')">Google Calendar</button>
+  <button onclick="agregar('ics')">Descargar .ics (Apple, Outlook)</button>
+</div>
+<div id="pl"></div>
+<div class="ft">#ElectoAgenda · Solo para difusión · @ArgElecciones</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const U='https://script.google.com/macros/s/AKfycbzNeoVgpRk3Luck2mPhe86zJqkRssY7zQGAeQ-AmawGn3HJGlKeprxC3dNcp52dSCbZ/exec';
+const MES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const DS=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+const DL=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+const hoy=new Date();hoy.setHours(0,0,0,0);
+const CUENTA={fecha:new Date('2027-10-24T08:00:00-03:00'),titulo:'Elecciones presidenciales'};
+let LOGO='logo.png';
+fetch('logo.png').then(r=>r.blob()).then(b=>{const f=new FileReader();f.onload=()=>LOGO=f.result;f.readAsDataURL(b)}).catch(()=>{});
+let EV=[],EF=[],fil='todos',vis='lista',pas=false,cA=hoy.getFullYear(),cM=hoy.getMonth(),T='',I=0,IC=0;
+const esc=s=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ico=(n,c='')=>`<svg class="ico ${c}"><use href="#i-${n}"/></svg>`;
+const largo=f=>`${DL[f.getDay()]} ${f.getDate()} de ${MES[f.getMonth()]} de ${f.getFullYear()}`;
+const dias=f=>Math.round((f-hoy)/864e5);
+function pf(s){const p=s.trim().split('/');if(p.length!==3)return null;const d=+p[0],m=+p[1]-1,a=+p[2];if(isNaN(d)||isNaN(m)||isNaN(a))return null;const f=new Date(a,m,d);f.setHours(0,0,0,0);return f}
+function pl(line){const c=[];let x='',q=false;for(let i=0;i<line.length;i++){const k=line[i];if(k==='"'){if(q&&line[i+1]==='"'){x+='"';i++}else q=!q}else if(k===','&&!q){c.push(x);x=''}else x+=k}c.push(x);return c}
+const lm=s=>(s||'').trim().replace(/^"|"$/g,'');
+function parseEv(t){const r=[];t.trim().split('\n').slice(1).forEach(l=>{const c=pl(l);if(c.length<3)return;const f=pf(c[0]),d=lm(c[1]),k=lm(c[2]);if(!f||!d||!k)return;r.push({fecha:f,descripcion:d,categoria:k,provincia:lm(c[3]),destacado:lm(c[4]).toLowerCase()==='si'})});return r.sort((a,b)=>a.fecha-b.fecha)}
+function parseEf(t){const r=[];t.trim().split('\n').slice(1).forEach(l=>{const c=pl(l);if(c.length<3)return;const f=pf(c[0]),d=lm(c[1]);if(!f||!d)return;r.push({fecha:f,descripcion:d,detalle:lm(c[2]),categoria:lm(c[3])})});return r.sort((a,b)=>a.fecha.getMonth()-b.fecha.getMonth()||a.fecha.getDate()-b.fecha.getDate())}
+function ck(c){c=c.toLowerCase();return c.includes('provin')?'provincial':c.includes('munici')?'municipal':c.includes('partido')?'partidos':'nacional'}
+const key=e=>e.destacado?'des':ck(e.categoria);
+
+/* ---------- placas: un solo motor, 4 formatos ---------- */
+const FMT={cuadrada:{w:1200,h:1200,p:'65px 75px'},instagram:{w:1080,h:1350,p:'65px 70px'},grande:{w:1080,h:1440,p:'70px 70px'},stories:{w:1080,h:1920,p:'270px 70px 384px'}};
+const PIN='<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-4px"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> ';
+function placaHTML(d,f){const F=FMT[f];return `<div style="width:${F.w}px;height:${F.h}px;padding:${F.p};background:#fff;border-top:10px solid ${d.acc};display:flex;flex-direction:column;justify-content:space-between;font-family:Inter,system-ui,sans-serif;color:#000;box-sizing:border-box">
+<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #000;padding-bottom:14px"><div style="display:flex;align-items:center;gap:16px"><img src="${LOGO}" style="height:90px;width:auto"><span style="font-size:24px;font-weight:900;color:#19aae5;letter-spacing:.04em;text-transform:uppercase">ElectoAgenda</span></div><div style="background:${d.tc};color:#fff;font-size:16px;font-weight:900;letter-spacing:.07em;padding:10px 14px;text-transform:uppercase">${d.tag}</div></div>
+<div style="display:flex;flex-direction:column;gap:44px"><div style="display:flex;align-items:baseline;gap:14px"><span style="font-size:170px;font-weight:900;color:#19aae5;line-height:.82;letter-spacing:-.06em">${d.big}</span><span style="font-size:38px;font-weight:900;text-transform:uppercase">${d.lbl}</span></div>
+<div style="font-size:64px;font-weight:900;line-height:1.04;letter-spacing:-.04em">${d.title}</div>
+<div style="border-left:8px solid ${d.tc};padding:6px 0 6px 18px;font-size:25px;font-weight:800;line-height:1.35">${d.date}</div>
+${d.det?`<div style="background:#f1f5f9;padding:26px 30px;font-size:28px;font-weight:500;line-height:1.5">${d.det}</div>`:''}</div>
+<div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid #000;padding-top:16px;font-size:18px;font-weight:800"><span>@ArgElecciones</span><span style="font-size:14px;color:#777;letter-spacing:.08em;text-transform:uppercase">Solo para difusión</span></div></div>`}
+function datos(){
+  if(T==='evento'){const e=EV[I],C={nacional:'#000',provincial:'#19aae5',municipal:'#ff6b00',partidos:'#19aae5'};return{f:e.fecha,d:{tag:e.destacado?'Elección destacada':esc(e.categoria),tc:e.destacado?'#ff6b00':C[ck(e.categoria)],acc:e.destacado?'#ff6b00':'#19aae5',big:e.fecha.getDate(),lbl:MES[e.fecha.getMonth()],title:esc(e.descripcion),date:largo(e.fecha)+(e.provincia?' · '+PIN+esc(e.provincia):'')}}}
+  if(T==='efemeride'){const e=EF[I];return{f:e.fecha,d:{tag:'Efeméride',tc:'#ff6b00',acc:'#19aae5',big:e.fecha.getDate(),lbl:MES[e.fecha.getMonth()],title:esc(e.descripcion),date:`${e.fecha.getDate()} de ${MES[e.fecha.getMonth()]} de ${e.fecha.getFullYear()}`,det:esc(e.detalle)}}}
+  const f=CUENTA.fecha,r=resta();return{f,d:{tag:'Cuenta regresiva',tc:'#ff6b00',acc:'#ff6b00',big:r.d,lbl:`días · ${r.h} h ${r.m} min`,title:esc(CUENTA.titulo),date:largo(f)+' · 8:00 hs'}}
+}
+function bajar(f){const{f:fe,d}=datos(),F=FMT[f],p=$('pl');p.innerHTML=placaHTML(d,f);p.style.width=F.w+'px';p.style.height=F.h+'px';
+  document.fonts.ready.then(()=>setTimeout(()=>html2canvas(p,{scale:1,width:F.w,height:F.h,backgroundColor:'#fff',useCORS:true,onclone:c=>{const e=c.getElementById('pl');e.style.left='0';e.style.top='0'}}).then(cv=>{const a=document.createElement('a');a.download=`${T}-${fe.getFullYear()}-${fe.getMonth()+1}-${fe.getDate()}-${f}.png`;a.href=cv.toDataURL('image/png');a.click()}).catch(e=>alert('Error generando imagen: '+e.message)),150))}
+
+/* ---------- menús ---------- */
+function abrirPop(el,evt,w,h){evt.stopPropagation();$('popF').style.display='none';$('popC').style.display='none';el.style.display='flex';const r=evt.currentTarget.getBoundingClientRect();let l=r.left;if(l+w>innerWidth)l=innerWidth-w-10;let t=r.bottom+6;if(r.bottom+h>innerHeight)t=r.top-h-6;el.style.left=Math.max(l,8)+'px';el.style.top=t+'px'}
+function fmt(e,t,i){T=t;I=i;abrirPop($('popF'),e,230,170)}
+function elegir(f){$('popF').style.display='none';bajar(f)}
+function calMenu(e,i){IC=i;abrirPop($('popC'),e,240,90)}
+function agregar(a){$('popC').style.display='none';const e=EV[IC];if(!e)return;a==='google'?window.open(gcal(e),'_blank'):ics(e)}
+function ymd(f){const p=n=>String(n).padStart(2,'0');return `${f.getFullYear()}${p(f.getMonth()+1)}${p(f.getDate())}`}
+function gcal(e){const f=new Date(e.fecha);f.setDate(f.getDate()+1);const p=new URLSearchParams({action:'TEMPLATE',text:e.descripcion,dates:`${ymd(e.fecha)}/${ymd(f)}`,details:`${e.categoria} - ElectoAgenda @ArgElecciones`});if(e.provincia)p.set('location',e.provincia);return 'https://calendar.google.com/calendar/render?'+p}
+function ics(e){const z=s=>(s||'').replace(/([,;])/g,'\\$1'),d=ymd(e.fecha);const t=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//ElectoAgenda//ArgElecciones//ES','BEGIN:VEVENT',`UID:${d}-${Math.random().toString(36).slice(2,9)}@argelecciones`,`DTSTAMP:${d}T000000Z`,`DTSTART;VALUE=DATE:${d}`,`SUMMARY:${z(e.descripcion)}`,e.provincia?`LOCATION:${z(e.provincia)}`:'',`DESCRIPTION:${z(e.categoria)} - ElectoAgenda @ArgElecciones`,'END:VEVENT','END:VCALENDAR'].filter(Boolean).join('\r\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/calendar;charset=utf-8'}));a.download=`${d}-${e.descripcion.slice(0,30).replace(/[^a-z0-9]+/gi,'-')}.ics`;a.click();URL.revokeObjectURL(a.href)}
+document.addEventListener('click',e=>{['popF','popC'].forEach(i=>{if(!$(i).contains(e.target))$(i).style.display='none'})});
+addEventListener('keydown',e=>{if(e.key==='Escape')cerrar()});
+
+/* ---------- copiar ---------- */
+function copiar(t,b){navigator.clipboard.writeText(t).then(()=>{const s=b.querySelector('span'),o=b.innerHTML;b.innerHTML=ico('check')+(s?'<span>Copiado</span>':'');setTimeout(()=>b.innerHTML=o,1800)})}
+function copEv(i,b){const e=EV[i];copiar(`📅 ElectoAgenda @ArgElecciones\n\n🗳 ${e.descripcion}${e.provincia?` (${e.provincia})`:''}: ${largo(e.fecha)}`,b)}
+function copEf(i,b){const e=EF[i],a=hoy.getFullYear()-e.fecha.getFullYear();copiar(`📅 ElectoAgenda @ArgElecciones\n\n🏛 Se cumplen ${a} años: ${e.descripcion} (${e.fecha.getDate()} de ${MES[e.fecha.getMonth()]} de ${e.fecha.getFullYear()})${e.detalle?`\n\n${e.detalle}`:''}`,b)}
+function copCd(b){const r=resta();copiar(`📅 ElectoAgenda @ArgElecciones\n\n🗳 Faltan ${r.d} días, ${r.h} h y ${r.m} min para las ${CUENTA.titulo.toLowerCase()}: ${largo(CUENTA.fecha)}, 8:00 hs`,b)}
+
+/* ---------- vistas ---------- */
+function banner(){const f=EV.filter(e=>e.fecha>=hoy),b=$('bnr');if(!f.length){b.classList.remove('v');return}const e=f[0],d=dias(e.fecha),i=EV.indexOf(e);
+  $('bnN').innerHTML=d?`${d}<small>días</small>`:'¡HOY!';$('bnD').textContent=e.descripcion;$('bnF').textContent=largo(e.fecha)+(e.provincia?' · '+e.provincia:'');
+  $('bnC').onclick=()=>copEv(i,$('bnC'));$('bnA').onclick=ev=>calMenu(ev,i);$('bnL').onclick=ev=>fmt(ev,'evento',i);b.classList.add('v')}
+function resta(){const s=Math.max(0,Math.floor((CUENTA.fecha-new Date())/1000));return{d:Math.floor(s/86400),h:Math.floor(s%86400/3600),m:Math.floor(s%3600/60),s:s%60,fin:CUENTA.fecha<=new Date()}}
+function tick(){const c=$('cd');if(!$('cdD'))return;const r=resta();if(r.fin){c.classList.remove('v');return}const p=n=>String(n).padStart(2,'0');$('cdD').textContent=r.d;$('cdH').textContent=p(r.h);$('cdM').textContent=p(r.m);$('cdS').textContent=p(r.s)}
+function cuenta(){const c=$('cd');if(CUENTA.fecha<=new Date()){c.classList.remove('v');return}
+  c.innerHTML=`<div style="flex:1;min-width:200px"><div class="cdt">${esc(CUENTA.titulo)}</div><div class="cds">${largo(CUENTA.fecha)} · 8:00 hs (Buenos Aires)</div></div><div class="cdb"><div><b id="cdD">0</b><i>días</i></div><div><b id="cdH">00</b><i>horas</i></div><div><b id="cdM">00</b><i>min</i></div><div><b id="cdS">00</b><i>seg</i></div></div><button class="ab" onclick="copCd(this)">${ico('copy')}<span>Copiar</span></button><button class="ab pu" onclick="fmt(event,'cuenta',0)">${ico('download')}<span>Placa</span></button>`;c.classList.add('v');tick()}
+function vista(v){vis=v;$('vL').style.display=v==='lista'?'block':'none';$('vC').style.display=v==='cal'?'block':'none';$('vE').style.display=v==='efem'?'block':'none';$('tb').style.display=v==='efem'?'none':'flex';
+  $('bL').classList.toggle('on',v==='lista');$('bC').classList.toggle('on',v==='cal');$('bE').classList.toggle('on',v==='efem');if(v==='cal')calendario();if(v==='efem')efem()}
+function filtrar(f){fil=f;document.querySelectorAll('.f').forEach(b=>b.classList.toggle('on',b.dataset.f===f));vis==='cal'?calendario():lista()}
+function pasados(){pas=!pas;$('bP').classList.toggle('on',pas);$('bP').innerHTML=ico('history')+(pas?'Ocultar pasados':'Mostrar pasados');lista()}
+const pasa=e=>fil==='destacado'?e.destacado:fil==='todos'||ck(e.categoria)===fil;
+function tarjeta(e,i){const p=e.fecha<hoy,d=dias(e.fecha),k=key(e);let b='';
+  if(e.destacado&&!p)b+=`<span class="bd">${ico('star','ico-fill')}Clave</span>`;if(p)b+='<span class="bz">Realizado</span>';if(!p&&d<=30)b+=`<span class="fd${d<=7?' c':''}">${d?`Faltan ${d}d`:'¡Hoy!'}</span>`;
+  return `<div class="ev${p?' ps':''}"><div class="en"><b>${e.fecha.getDate()}</b><i>${DS[e.fecha.getDay()]}</i></div><div class="br" style="background:var(--${k})"></div><div class="eb"><div class="et"><span class="cp" style="--c:var(--${ck(e.categoria)})">${esc(e.categoria)}</span>${b}</div><div class="ed">${esc(e.descripcion)}</div>${e.provincia?`<div class="ep">${ico('pin')} ${esc(e.provincia)}</div>`:''}<div class="ee">${esc(e.descripcion)}${e.provincia?` (${esc(e.provincia)})`:''}: ${largo(e.fecha)}</div></div><div class="ea"><button class="ab" onclick="detalle(${i})">${ico('eye')}<span>Ver detalle</span></button><button class="ab" onclick="copEv(${i},this)">${ico('copy')}<span>Copiar</span></button><button class="ab pu" onclick="fmt(event,'evento',${i})">${ico('download')}<span>Descargar placa</span></button></div></div>`}
+function lista(){const q=$('q').value.toLowerCase().trim();let l=EV.map((e,i)=>({e,i})).filter(x=>(pas||x.e.fecha>=hoy)&&pasa(x.e)&&(!q||x.e.descripcion.toLowerCase().includes(q)||x.e.provincia.toLowerCase().includes(q)));
+  if(!l.length){$('mn').innerHTML=`<div class="vc">No hay eventos para este filtro.</div>`;return}
+  const g={};l.forEach(x=>{const k=x.e.fecha.getFullYear()*100+x.e.fecha.getMonth();(g[k]=g[k]||[]).push(x)});
+  $('mn').innerHTML=Object.keys(g).sort().map(k=>{const a=g[k],f=a[0].e.fecha;return `<div class="mb"><div class="mh">${MES[f.getMonth()]} ${f.getFullYear()}<i>${a.length} evento${a.length>1?'s':''}</i></div>${a.map(x=>tarjeta(x.e,x.i)).join('')}</div>`}).join('')}
+function tarjEf(e,i){const a=hoy.getFullYear()-e.fecha.getFullYear();return `<div class="ev ef"><div class="en"><b>${e.fecha.getDate()}</b><i>${MES[e.fecha.getMonth()].slice(0,3)}</i></div><div class="br"></div><div class="eb"><div class="et"><span>${e.fecha.getDate()} de ${MES[e.fecha.getMonth()]} de ${e.fecha.getFullYear()} · Hace ${a} años</span></div><div class="ed">${esc(e.descripcion)}</div>${e.detalle?`<div class="ee">${esc(e.detalle)}</div>`:''}</div><div class="ea"><button class="ab" onclick="copEf(${i},this)">${ico('copy')}<span>Copiar</span></button><button class="ab pu" onclick="fmt(event,'efemeride',${i})">${ico('download')}<span>Descargar placa</span></button></div></div>`}
+function efem(){if(!EF.length){$('mnE').innerHTML=`<div class="vc">No hay efemérides cargadas.</div>`;return}
+  const q=$('qE').value.toLowerCase().trim(),l=EF.map((e,i)=>({e,i})).filter(x=>!q||x.e.descripcion.toLowerCase().includes(q)||x.e.detalle.toLowerCase().includes(q));
+  if(!l.length){$('mnE').innerHTML=`<div class="vc">No hay efemérides para esta búsqueda.</div>`;return}
+  const g={};l.forEach(x=>(g[x.e.fecha.getMonth()]=g[x.e.fecha.getMonth()]||[]).push(x));let h='';
+  for(let m=0;m<12;m++){if(!g[m])continue;const a=m===hoy.getMonth();h+=`<div class="ac${a||q?' on':''}${a?' mes':''}"><div class="ah" onclick="this.parentNode.classList.toggle('on')">${ico('chevron-right','ch')}<b>${MES[m]}${a?' · Este mes':''}</b><i>${g[m].length}</i></div><div class="ct">${g[m].map(x=>tarjEf(x.e,x.i)).join('')}</div></div>`}
+  $('mnE').innerHTML=h}
+function mes(d){cM+=d;if(cM>11){cM=0;cA++}else if(cM<0){cM=11;cA--}calendario()}
+function calendario(){$('cmT').textContent=`${MES[cM]} ${cA}`;const ini=new Date(cA,cM,1).getDay(),n=new Date(cA,cM+1,0).getDate();let h='';
+  for(let i=0;i<ini;i++)h+='<div class="cc o"></div>';
+  for(let d=1;d<=n;d++){const f=new Date(cA,cM,d);f.setHours(0,0,0,0);const ev=EV.filter(e=>e.fecha.getTime()===f.getTime()&&pasa(e));
+    h+=`<div class="cc${f.getTime()===hoy.getTime()?' h':''}${ev.length?' y':''}"${ev.length?` onclick="dia(${d})"`:''}><div class="cb">${d}</div>${ev.length?`<div class="cu" style="background:var(--${key(ev[0])})">${esc(ev[0].descripcion)}</div><div class="ci" style="color:var(--${key(ev[0])})">${ico('vote')}</div>`:''}${ev.length>1?`<div class="cy">+${ev.length-1}</div>`:''}</div>`}
+  $('cx').innerHTML=h}
+
+/* ---------- modal ---------- */
+function item(e,i){const k=key(e);return `<div class="mi"><div class="et"><span class="cp" style="--c:var(--${ck(e.categoria)})">${esc(e.categoria)}</span>${e.destacado?`<span class="bd">${ico('star','ico-fill')}Clave</span>`:''}</div><div class="md">${esc(e.descripcion)}</div>${e.provincia?`<div class="mp">${ico('pin')} ${esc(e.provincia)}</div>`:''}<div class="mac"><button class="ab" onclick="copEv(${i},this)">${ico('copy')}<span>Copiar</span></button><button class="ab pu" onclick="fmt(event,'evento',${i})">${ico('download')}<span>Placa</span></button><button class="ab" onclick="calMenu(event,${i})">${ico('calendar-plus')}<span>Calendario</span></button></div></div>`}
+function abrir(f,h){$('moB').innerHTML=`<div class="mf">${f}</div>${h}`;$('mo').classList.add('v')}
+function detalle(i){abrir(largo(EV[i].fecha),item(EV[i],i))}
+function dia(d){const f=new Date(cA,cM,d);f.setHours(0,0,0,0);const l=EV.map((e,i)=>({e,i})).filter(x=>x.e.fecha.getTime()===f.getTime()&&pasa(x.e));if(l.length)abrir(largo(f),l.map(x=>item(x.e,x.i)).join(''))}
+function cerrar(){$('mo').classList.remove('v');$('popF').style.display='none';$('popC').style.display='none'}
+
+async function cargar(){const t=$('stT');$('rf').classList.add('sp');t.textContent='Actualizando desde Google Sheets...';
+  try{const r=await fetch(U);if(!r.ok)throw new Error('No se pudo conectar con Google Sheets');EV=parseEv(await r.text());
+    try{const x=await fetch(U+'?hoja=efemerides');if(x.ok)EF=parseEf(await x.text())}catch(e){console.error('Efemérides:',e)}
+    t.textContent=`${EV.length} eventos cargados · ${new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}`;banner();cuenta();lista();if(vis==='cal')calendario();if(vis==='efem')efem()}
+  catch(e){t.textContent='Error: '+e.message;$('mn').innerHTML='<div class="vc">No se pudieron cargar los datos.</div>'}
+  finally{$('rf').classList.remove('sp')}}
+cuenta();cargar();setInterval(tick,1000);
+</script>
+</body>
+</html>
