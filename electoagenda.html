@@ -138,7 +138,7 @@ button,input{font-family:inherit}
   <div class="pe">PRÓXIMO EVENTO</div>
   <div class="pn" id="bnN">—</div>
   <div style="flex:1"><div class="pd" id="bnD">—</div><div class="pf" id="bnF">—</div></div>
-  <div class="pa"><button class="ib" id="bnC" aria-label="Copiar"><svg class="ico"><use href="#i-copy"/></svg></button><button class="ib" id="bnL" aria-label="Descargar placa"><svg class="ico"><use href="#i-download"/></svg></button></div>
+  <div class="pa"><button class="ib" id="bnC" aria-label="Copiar"><svg class="ico"><use href="#i-copy"/><button class="ib" id="bnA" aria-label="Agregar al calendario"><svg class="ico"><use href="#i-calendar-plus"/></svg></button></svg></button><button class="ib" id="bnL" aria-label="Descargar placa"><svg class="ico"><use href="#i-download"/></svg></button></div>
 </div>
 <div class="cd" id="cd"></div>
 
@@ -242,7 +242,7 @@ function copCd(b){const r=resta();copiar(`📅 ElectoAgenda @ArgElecciones\n\n�
 /* ---------- vistas ---------- */
 function banner(){const f=EV.filter(e=>e.fecha>=hoy),b=$('bnr');if(!f.length){b.classList.remove('v');return}const e=f[0],d=dias(e.fecha),i=EV.indexOf(e);
   $('bnN').innerHTML=d?`${d}<small>días</small>`:'¡HOY!';$('bnD').textContent=e.descripcion;$('bnF').textContent=largo(e.fecha)+(e.provincia?' · '+e.provincia:'');
-  $('bnC').onclick=()=>copEv(i,$('bnC'));$('bnL').onclick=ev=>fmt(ev,'evento',i);b.classList.add('v')}
+  $('bnC').onclick=()=>copEv(i,$('bnC'));$('bnA').onclick=ev=>calMenu(ev,i);$('bnL').onclick=ev=>fmt(ev,'evento',i);b.classList.add('v')}
 function resta(){const s=Math.max(0,Math.floor((CUENTA.fecha-new Date())/1000));return{d:Math.floor(s/86400),h:Math.floor(s%86400/3600),m:Math.floor(s%3600/60),s:s%60,fin:CUENTA.fecha<=new Date()}}
 function tick(){const c=$('cd');if(!$('cdD'))return;const r=resta();if(r.fin){c.classList.remove('v');return}const p=n=>String(n).padStart(2,'0');$('cdD').textContent=r.d;$('cdH').textContent=p(r.h);$('cdM').textContent=p(r.m);$('cdS').textContent=p(r.s)}
 function cuenta(){const c=$('cd');if(CUENTA.fecha<=new Date()){c.classList.remove('v');return}
